@@ -1,6 +1,6 @@
 package com.devPontes.LeialaoME.model.entities;
 
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
@@ -19,6 +18,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
@@ -28,7 +29,8 @@ import jakarta.persistence.Table;
 @Table(name = "tb_usuario")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "tipo_usuario")
-public abstract class Usuario implements UserDetails {
+public abstract class Usuario implements UserDetails, Serializable {
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,27 +46,20 @@ public abstract class Usuario implements UserDetails {
 	private byte[] fotoPerfil;
 
 	@ManyToMany
+	@JoinTable(name = "tb_permissoes_usuarios", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "permissao_id"))
 	private Set<Permissao> permissoes = new HashSet<>();
-
-	@OneToMany(fetch = FetchType.EAGER)
-	private Set<Leilao> leiloesVendidos = new HashSet<>();;
-
-	@OneToMany(fetch = FetchType.EAGER)
-	private Set<Leilao> leiloesComprados = new HashSet<>();
 
 	public Usuario() {
 	}
 
 	public Usuario(Long id, String username, String password, String biografia, byte[] fotoPerfil,
-			Set<Permissao> permissoes, Set<Leilao> leiloesVendidos, Set<Leilao> leiloesComprados) {
+			Set<Permissao> permissoes) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.biografia = biografia;
 		this.fotoPerfil = fotoPerfil;
 		this.permissoes = permissoes;
-		this.leiloesVendidos = leiloesVendidos;
-		this.leiloesComprados = leiloesComprados;
 	}
 
 	public Long getId() {
@@ -144,22 +139,6 @@ public abstract class Usuario implements UserDetails {
 		this.permissoes = permissoes;
 	}
 
-	public Set<Leilao> getLeiloesVendidos() {
-		return leiloesVendidos;
-	}
-
-	public void setLeiloesVendidos(Set<Leilao> leiloesVendidos) {
-		this.leiloesVendidos = leiloesVendidos;
-	}
-
-	public Set<Leilao> getLeiloesComprados() {
-		return leiloesComprados;
-	}
-
-	public void setLeiloesComprados(Set<Leilao> leiloesComprados) {
-		this.leiloesComprados = leiloesComprados;
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
@@ -180,8 +159,9 @@ public abstract class Usuario implements UserDetails {
 	@Override
 	public String toString() {
 		return "Usuario [id=" + id + ", username=" + username + ", password=" + password + ", biografia=" + biografia
-				+ ", fotoPerfil=" + Arrays.toString(fotoPerfil) + ", permissoes=" + permissoes + ", leiloesVendidos="
-				+ leiloesVendidos + ", leiloesComprados=" + leiloesComprados + "]";
+				+ ", fotoPerfil=" + Arrays.toString(fotoPerfil) + ", permissoes=" + permissoes + "]";
 	}
+
+	
 
 }
