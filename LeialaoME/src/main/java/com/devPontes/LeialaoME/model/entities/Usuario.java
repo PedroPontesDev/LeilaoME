@@ -74,14 +74,10 @@ public abstract class Usuario implements UserDetails {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-	
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return permissoes.stream()
-                .map(p -> (GrantedAuthority) () -> p.getUsuarioRole().name())
-                .toList();
+		return permissoes.stream().map(p -> (GrantedAuthority) () -> p.getUsuarioRole().name()).toList();
 	}
 
 	@Override
@@ -132,8 +128,8 @@ public abstract class Usuario implements UserDetails {
 		this.biografia = biografia;
 	}
 
-	public byte[] getFotoPerfil(MultipartFile file) throws IOException {
-		return file.getBytes();
+	public byte[] getFotoPerfil() {
+		return fotoPerfil;
 	}
 
 	public void setFotoPerfil(byte[] fotoPerfil) {
@@ -188,6 +184,4 @@ public abstract class Usuario implements UserDetails {
 				+ leiloesVendidos + ", leiloesComprados=" + leiloesComprados + "]";
 	}
 
-	
-	
 }
