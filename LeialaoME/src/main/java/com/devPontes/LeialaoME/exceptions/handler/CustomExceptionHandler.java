@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import com.devPontes.LeialaoME.exceptions.ExceptionResponse;
+import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
+import com.devPontes.LeialaoME.exceptions.OfertaNegadaException;
 
 @ControllerAdvice
 @RestController
@@ -21,4 +23,17 @@ public class CustomExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	  @ExceptionHandler(LeilaoEncerradoException.class)
+	    public ResponseEntity<ExceptionResponse> handleLeilaoEncerrado(LeilaoEncerradoException ex, WebRequest request) {
+		  	ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+	        return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
+	    }
+
+	    // Tratar oferta inválida / NEGADA
+	    @ExceptionHandler(OfertaNegadaException.class)
+	    public ResponseEntity<ExceptionResponse> handleLeilaoEncerrado(OfertaNegadaException ex, WebRequest request) {
+		  	ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+	        return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
+	    }
+	
 }
