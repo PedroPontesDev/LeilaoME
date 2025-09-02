@@ -2,12 +2,15 @@ package com.devPontes.LeialaoME.model.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -22,6 +25,9 @@ public class UsuarioComprador extends Usuario implements Serializable {
 
 	@OneToMany(mappedBy = "comprador")
 	List<Oferta> ofertas = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "comprador")
+	private Set<Leilao> leiloesPaticipados = new HashSet<>();
 
 	public UsuarioComprador(Long id, String username, String password, String biografia, byte[] fotoPerfil,
 			Set<Permissao> permissoes, String cpf, List<Oferta> ofertas) {

@@ -15,12 +15,10 @@ import jakarta.persistence.Table;
 public class UsuarioVendedor extends Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	
 	private String cnpj;
 
 	@OneToMany(mappedBy = "vendedor")
 	Set<Leilao> leilaoCadastrado = new HashSet<>();
-	
 
 	public UsuarioVendedor(String cnpj, Set<Leilao> leilaoCadastrado) {
 		this.cnpj = cnpj;
@@ -28,9 +26,9 @@ public class UsuarioVendedor extends Usuario implements Serializable {
 	}
 
 	public UsuarioVendedor() {
-		
+
 	}
-	
+
 	public String getCnpj() {
 		return cnpj;
 	}
@@ -39,13 +37,9 @@ public class UsuarioVendedor extends Usuario implements Serializable {
 		this.cnpj = cnpj;
 	}
 
-
 	@Override
 	public String toString() {
 		return "UsuarioVendedor [cnpj=" + cnpj + ", leilaoCadastrado=" + leilaoCadastrado + "]";
 	}
-
-
-	
 
 }

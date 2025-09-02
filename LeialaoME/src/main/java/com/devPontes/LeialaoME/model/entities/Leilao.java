@@ -45,8 +45,15 @@ public class Leilao {
 	@JoinColumn(name = "vendedor_id")
 	private UsuarioVendedor vendedor;
 
+	@ManyToOne
+	@JoinColumn(name = "comprador_id", nullable = false)
+	private UsuarioComprador comprador;
+
 	@OneToMany(mappedBy = "leilao")
 	private List<Oferta> ofertas = new ArrayList<>();
+	
+	@Column
+	private boolean indaAtivo = false;
 
 	public Leilao(Long id, String descricao, byte[] fotoProduto, LocalDateTime inicio, LocalDateTime termino,
 			BigDecimal valorIncrementadoAposLance, BigDecimal lanceInicial, UsuarioVendedor vendedor,
