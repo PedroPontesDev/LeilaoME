@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,8 +20,8 @@ public class Permissao {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Enumerated
-	UsuarioRole usuarioRole;
+	@Enumerated(EnumType.STRING)
+	private UsuarioRole usuarioRole;
 
 	public Permissao() {
 	}

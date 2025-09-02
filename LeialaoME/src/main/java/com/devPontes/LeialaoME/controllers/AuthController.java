@@ -1,6 +1,8 @@
 package com.devPontes.LeialaoME.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
 import com.devPontes.LeialaoME.security.dtos.UsuarioLoginRequestDTO;
 import com.devPontes.LeialaoME.security.dtos.UsuarioLoginResponseDTO;
 import com.devPontes.LeialaoME.security.services.CustomUserDetailsServices;
 import com.devPontes.LeialaoME.security.services.JwtService;
+import com.devPontes.LeialaoME.services.impl.UsuarioCompradorServicesImpl;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,6 +25,9 @@ public class AuthController {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private UsuarioCompradorServicesImpl userServices;
 
 	@Autowired
 	private JwtService jwtService;
@@ -40,7 +47,13 @@ public class AuthController {
 		return new UsuarioLoginResponseDTO(request.getUsername(), token);
 	}
 	
-	//Registrar outros usuarios para utilizar a API
+
+	@PostMapping(path = "/cadastrar-comprador")
+	public ResponseEntity<UsuarioDTO> registrarUsuarioComprador(@RequestBody UsuarioDTO usuario) throws Exception {
+		UsuarioDTO saved =  userServices.cadastrarUsuarioComprador(usuario);
+	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
+	}
+	
 	
 
 }
