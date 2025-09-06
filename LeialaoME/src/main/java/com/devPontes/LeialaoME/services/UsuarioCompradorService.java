@@ -10,7 +10,6 @@ import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
 public interface UsuarioCompradorService {
 
 	 UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception;
-	 UsuarioDTO cadastrarUsuarioVendedor(UsuarioDTO novoUsuario) throws Exception;
 	 UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId);
 	 byte[] fazerUploadDeImamgemDePerfil(MultipartFile file);
 	 String escreverBiografia(Long usuarioId, String beografia);

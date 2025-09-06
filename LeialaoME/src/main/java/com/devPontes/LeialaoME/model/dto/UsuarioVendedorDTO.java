@@ -1,30 +1,29 @@
 package com.devPontes.LeialaoME.model.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class UsuarioCompradorDTO implements Serializable {
+public class UsuarioVendedorDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
     private String username;
     private String biografia;
     private byte[] fotoPerfil;
+    private String cnpj;
 
-    private List<OfertaDTO> ofertas = new ArrayList<>();
-    private Set<LeilaoDTO> leiloesParticipados = new HashSet<>();
+    private Set<LeilaoDTO> leiloesCadastrados = new HashSet<>();
 
-    public UsuarioCompradorDTO() {}
+    public UsuarioVendedorDTO() {}
 
-    public UsuarioCompradorDTO(Long id, String username, String biografia, byte[] fotoPerfil) {
+    public UsuarioVendedorDTO(Long id, String username, String biografia, byte[] fotoPerfil, String cnpj) {
         this.id = id;
         this.username = username;
         this.biografia = biografia;
         this.fotoPerfil = fotoPerfil;
+        this.cnpj = cnpj;
     }
 
     // Getters e Setters
@@ -56,18 +55,18 @@ public class UsuarioCompradorDTO implements Serializable {
         this.fotoPerfil = fotoPerfil;
     }
 
-    public List<OfertaDTO> getOfertas() {
-        return ofertas;
+    public String getCnpj() {
+        return cnpj;
     }
-    public void setOfertas(List<OfertaDTO> ofertas) {
-        this.ofertas = ofertas;
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
     }
 
-    public Set<LeilaoDTO> getLeiloesParticipados() {
-        return leiloesParticipados;
+    public Set<LeilaoDTO> getLeiloesCadastrados() {
+        return leiloesCadastrados;
     }
-    public void setLeiloesParticipados(Set<LeilaoDTO> leiloesParticipados) {
-        this.leiloesParticipados = leiloesParticipados;
+    public void setLeiloesCadastrados(Set<LeilaoDTO> leiloesCadastrados) {
+        this.leiloesCadastrados = leiloesCadastrados;
     }
 
     // Equals e HashCode (baseados no id)
@@ -79,15 +78,14 @@ public class UsuarioCompradorDTO implements Serializable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        UsuarioCompradorDTO other = (UsuarioCompradorDTO) obj;
+        UsuarioVendedorDTO other = (UsuarioVendedorDTO) obj;
         return Objects.equals(id, other.id);
     }
 
     @Override
     public String toString() {
-        return "UsuarioCompradorDTO [id=" + id + ", username=" + username 
-                + ", biografia=" + biografia 
-                + ", ofertas=" + (ofertas != null ? ofertas.size() : 0) 
-                + ", leiloesParticipados=" + (leiloesParticipados != null ? leiloesParticipados.size() : 0) + "]";
+        return "UsuarioVendedorDTO [id=" + id + ", username=" + username 
+                + ", cnpj=" + cnpj 
+                + ", leiloesCadastrados=" + (leiloesCadastrados != null ? leiloesCadastrados.size() : 0) + "]";
     }
 }

@@ -45,13 +45,9 @@ public class Leilao {
 	@JoinColumn(name = "vendedor_id")
 	private UsuarioVendedor vendedor;
 
-	@ManyToOne
-	@JoinColumn(name = "comprador_id", nullable = false)
-	private UsuarioComprador comprador;
-
 	@OneToMany(mappedBy = "leilao")
 	private List<Oferta> ofertas = new ArrayList<>();
-	
+
 	@Column
 	private boolean indaAtivo = false;
 
@@ -142,6 +138,14 @@ public class Leilao {
 
 	public void setOfertas(List<Oferta> ofertas) {
 		this.ofertas = ofertas;
+	}
+
+	public boolean isIndaAtivo() {
+		return indaAtivo;
+	}
+
+	public void setIndaAtivo(boolean indaAtivo) {
+		this.indaAtivo = indaAtivo;
 	}
 
 	@Override

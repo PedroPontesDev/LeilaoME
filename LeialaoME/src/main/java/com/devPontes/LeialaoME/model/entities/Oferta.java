@@ -39,7 +39,7 @@ public class Oferta {
     private Leilao leilao;
 
     @Column(nullable = false)
-    private LocalDateTime tempoDuravel = LocalDateTime.now();
+    private LocalDateTime momentoOferta = LocalDateTime.now();
 
     @Column(nullable = false)
     private boolean aceita = false;
@@ -53,7 +53,7 @@ public class Oferta {
         this.statusOferta = statusOferta;
         this.comprador = comprador;
         this.leilao = leilao;
-        this.tempoDuravel = LocalDateTime.now();
+        this.momentoOferta = LocalDateTime.now();
         this.aceita = false;
     }
 
@@ -73,16 +73,17 @@ public class Oferta {
     public Leilao getLeilao() { return leilao; }
     public void setLeilao(Leilao leilao) { this.leilao = leilao; }
 
-    public LocalDateTime getTempoDuravel() { return tempoDuravel; }
-    public void setTempoDuravel(LocalDateTime tempoDuravel) { this.tempoDuravel = tempoDuravel; }
+    public LocalDateTime getMomentoOferta() { return momentoOferta; }
+    public void setMomentoOferta(LocalDateTime momentoOferta) { this.momentoOferta = momentoOferta; }
 
     public boolean isAceita() { return aceita; }
     public void setAceita(boolean aceita) { this.aceita = aceita; }
 
-    @Override
-    public String toString() {
-        return "Oferta [id=" + id + ", valorOferta=" + valorOferta + ", statusOferta=" + statusOferta 
-                + ", comprador=" + comprador.getUsername() + ", leilao=" + leilao.getId() 
-                + ", tempoDuravel=" + tempoDuravel + ", aceita=" + aceita + "]";
-    }
+	@Override
+	public String toString() {
+		return "Oferta [id=" + id + ", valorOferta=" + valorOferta + ", statusOferta=" + statusOferta + ", comprador="
+				+ comprador + ", leilao=" + leilao + ", momentoOferta=" + momentoOferta + ", aceita=" + aceita + "]";
+	}
+
+
 }

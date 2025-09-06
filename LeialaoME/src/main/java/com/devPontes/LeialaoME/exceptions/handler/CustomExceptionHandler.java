@@ -12,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.devPontes.LeialaoME.exceptions.ExceptionResponse;
 import com.devPontes.LeialaoME.exceptions.JWTCreationException;
 import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
+import com.devPontes.LeialaoME.exceptions.LeilaoException;
 import com.devPontes.LeialaoME.exceptions.OfertaNegadaException;
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
 
@@ -25,29 +26,39 @@ public class CustomExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	  @ExceptionHandler(LeilaoEncerradoException.class)
-	    public ResponseEntity<ExceptionResponse> handleLeilaoEncerrado(LeilaoEncerradoException ex, WebRequest request) {
-		  	ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
-	        return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
-	    }
+	@ExceptionHandler(LeilaoEncerradoException.class)
+	public ResponseEntity<ExceptionResponse> handleLeilaoEncerrado(LeilaoEncerradoException ex, WebRequest request) {
+		ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
+	}
 
-	    // Tratar oferta inválida / NEGADA
-	    @ExceptionHandler(OfertaNegadaException.class)
-	    public ResponseEntity<ExceptionResponse> handleLeilaoEncerrado(OfertaNegadaException ex, WebRequest request) {
-		  	ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
-	        return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
-	    }
-	    
-	    @ExceptionHandler(UsuarioNaoEncontradoException.class)
-	    public ResponseEntity<ExceptionResponse> handleUsuarioNaoEncontrado(UsuarioNaoEncontradoException ex, WebRequest request) {
-		  	ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
-	        return new ResponseEntity<>(erro, HttpStatus.NOT_FOUND);
-	    }
+	// Tratar oferta inválida / NEGADA
+	@ExceptionHandler(OfertaNegadaException.class)
+	public ResponseEntity<ExceptionResponse> handleLeilaoEncerrado(OfertaNegadaException ex, WebRequest request) {
+		ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
+	}
+
+	@ExceptionHandler(UsuarioNaoEncontradoException.class)
+	public ResponseEntity<ExceptionResponse> handleUsuarioNaoEncontrado(UsuarioNaoEncontradoException ex,
+			WebRequest request) {
+		ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(erro, HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(JWTCreationException.class)
+	public ResponseEntity<ExceptionResponse> handJwtCreatErrro(JWTCreationException ex, WebRequest request) {
+		ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
+	}
 	
-	    @ExceptionHandler(JWTCreationException.class)
-	    public ResponseEntity<ExceptionResponse> handJwtCreatErrro(JWTCreationException ex, WebRequest request) {
-		  	ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
-	        return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
-	    }
 	
+	@ExceptionHandler(LeilaoException.class)
+	public ResponseEntity<ExceptionResponse> handLeilaoExcpetions(LeilaoException ex, WebRequest request) {
+		ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
+	}
+	
+	
+
 }

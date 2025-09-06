@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
 import com.devPontes.LeialaoME.model.dto.PermissaoDTO;
 import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
 import com.devPontes.LeialaoME.model.entities.Permissao;
@@ -65,5 +67,49 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		return dto;
 
 	}
+
+
+	@Override
+	public UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public byte[] fazerUploadDeImamgemDePerfil(MultipartFile file) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String escreverBiografia(Long usuarioId, String beografia) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String atualizarUsername(Long usuarioId, String usernameNovo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String atualizarPassword(Long usuarioId, String passwordNova) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UsuarioDTO findOfertasMaisCaras(Long ofertaId, Long userId, String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public LeilaoDTO mostrarLeiloesAdquiridos(Long leiloesId, Long usuaroCompradorId, String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

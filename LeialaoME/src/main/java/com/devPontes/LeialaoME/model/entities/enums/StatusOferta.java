@@ -5,6 +5,9 @@ public enum StatusOferta {
 	ATIVA,
 	PENDENTE,
 	DESISTIDA,
+	GANHADORA,
+	PERDEDORA,
+	PERDENDO,
 	INTATIVA;
 	
 

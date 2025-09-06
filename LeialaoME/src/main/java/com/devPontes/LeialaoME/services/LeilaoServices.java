@@ -1,14 +1,22 @@
 package com.devPontes.LeialaoME.services;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
-import com.devPontes.LeialaoME.model.entities.Leilao;
-import com.devPontes.LeialaoME.model.entities.Oferta;
+import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
+import com.devPontes.LeialaoME.model.dto.UsuarioCompradorDTO;
 
 @Service
 public interface LeilaoServices {
 
-	Leilao criarLeialaoSobVendedor(Long vendedorId, Leilao leilao);
-	Leilao abrirLeilaoComPoucaMargemDeTempo(Leilao leilao, Oferta oferta, Long compradorId, Long vendedorId);
-	Leilao receberPorpostaDeOferta(Long compradorId, Oferta oferta);
+	LeilaoDTO criarLeilaoSobVendedor(Long vendedorId, LeilaoDTO novoLeilao);
+
+	LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, LocalDateTime tempoNecessario);
+
+	void fecharLeilao(Long leilaoId, String status);
+
+	LeilaoDTO verificarEstadoDeLeilao(Long leilaoId);
+
+	UsuarioCompradorDTO definirGanhador(Long leilaoId);
 }
