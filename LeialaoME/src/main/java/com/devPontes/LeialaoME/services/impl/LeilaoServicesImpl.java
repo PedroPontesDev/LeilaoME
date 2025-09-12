@@ -4,17 +4,14 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
 import com.devPontes.LeialaoME.exceptions.LeilaoException;
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
 import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
-import com.devPontes.LeialaoME.model.dto.OfertaDTO;
 import com.devPontes.LeialaoME.model.dto.UsuarioCompradorDTO;
 import com.devPontes.LeialaoME.model.entities.Leilao;
-import com.devPontes.LeialaoME.model.entities.Oferta;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.LeilaoRepositories;
@@ -35,7 +32,6 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	private UsuarioVendedorRepositories vendedorRepository;
 
 	@Override
-	@PreAuthorize("hasAnyRole('ADMIN','VENDEDOR')")
 	public LeilaoDTO criarLeilaoSobVendedor(Long vendedorId, LeilaoDTO novoLeilao) {
 		UsuarioVendedor vendedor = vendedorRepository.findById(vendedorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado com o ID" + vendedorId));
@@ -86,6 +82,8 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	}
 
 	@Override
+	//Precisa verificar a maior oferta dentro do leilao, verificar se esta inativo e setar o ganhador verificando qual é a oferta mais cara baseado
+	//Nas ofertas dadas pelos compradores
 	public UsuarioCompradorDTO definirGanhador(Long leilaoId) {
 		// TODO Auto-generated method stub
 		return null;

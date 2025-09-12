@@ -12,7 +12,6 @@ public interface OfertaService {
 	OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId);
 
 	double calcularNovoLanceMinimo(Long leilaoId);
-	
-	
+
 
 }

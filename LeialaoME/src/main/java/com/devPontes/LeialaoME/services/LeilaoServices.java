@@ -11,6 +11,8 @@ import com.devPontes.LeialaoME.model.dto.UsuarioCompradorDTO;
 public interface LeilaoServices {
 
 	LeilaoDTO criarLeilaoSobVendedor(Long vendedorId, LeilaoDTO novoLeilao);
+	
+	LeilaoDTO abrirLeilaoComValorInicial(LeilaoDTO novoLeilao, Double lanceIniciaç);
 
 	LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, LocalDateTime tempoNecessario);
 
