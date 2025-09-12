@@ -1,6 +1,5 @@
 package com.devPontes.LeialaoME.security.services;
 
-
 import java.time.Instant;
 import java.util.Date;
 
@@ -27,10 +26,8 @@ public class JwtService {
 
 			Algorithm alg = Algorithm.HMAC256(secret);
 
-			String token = JWT.create().withIssuer("Leilao-WebService")
-					.withSubject(userDetails.getUsername())
-					.withExpiresAt(calculateExpiration())
-					.sign(alg);
+			String token = JWT.create().withIssuer("Leilao-WebService").withSubject(userDetails.getUsername())
+					.withExpiresAt(calculateExpiration()).sign(alg);
 
 			return token;
 
@@ -39,19 +36,15 @@ public class JwtService {
 		}
 
 	}
-	
+
 	public String validateToken(String token) {
 		Algorithm alg = Algorithm.HMAC512(secret);
-		
-		return JWT.require(alg)
-				  .withIssuer("Leilao-WebService")
-				  .build()
-				  .verify(token).getSubject();
+
+		return JWT.require(alg).withIssuer("Leilao-WebService").build().verify(token).getSubject();
 	}
 
-
 	private Date calculateExpiration() {
-    return Date.from(Instant.now().plusSeconds(expiration));
-}
-	
+		return Date.from(Instant.now().plusSeconds(expiration));
+	}
+
 }

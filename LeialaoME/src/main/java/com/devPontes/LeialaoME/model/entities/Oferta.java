@@ -1,5 +1,6 @@
 package com.devPontes.LeialaoME.model.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
@@ -19,71 +20,105 @@ import jakarta.persistence.Table;
 @Table(name = "tb_oferta")
 public class Oferta {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private Double valorOferta;
+	@Column(nullable = false)
+	private BigDecimal valorOferta;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StatusOferta statusOferta;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private StatusOferta statusOferta;
 
-    @ManyToOne
-    @JoinColumn(name = "comprador_id", nullable = false)
-    private UsuarioComprador comprador;
+	@ManyToOne
+	@JoinColumn(name = "comprador_id", nullable = false)
+	private UsuarioComprador comprador;
 
-    @ManyToOne
-    @JoinColumn(name = "leilao_id", nullable = false)
-    private Leilao leilao;
+	@ManyToOne
+	@JoinColumn(name = "leilao_id", nullable = false)
+	private Leilao leilao;
 
-    @Column(nullable = false)
-    private LocalDateTime momentoOferta = LocalDateTime.now();
+	@Column(nullable = false)
+	private LocalDateTime momentoOferta = LocalDateTime.now();
 
-    @Column(nullable = false)
-    private boolean aceita = false;
+	@Column(nullable = false)
+	private boolean aceita = false;
 
-    // Construtor padrão
-    public Oferta() {}
+	public Oferta() {
+	}
 
-    // Construtor com campos essenciais
-    public Oferta(Double valorOferta, StatusOferta statusOferta, UsuarioComprador comprador, Leilao leilao) {
-        this.valorOferta = valorOferta;
-        this.statusOferta = statusOferta;
-        this.comprador = comprador;
-        this.leilao = leilao;
-        this.momentoOferta = LocalDateTime.now();
-        this.aceita = false;
-    }
+	public Oferta(Long id, BigDecimal valorOferta, StatusOferta statusOferta, UsuarioComprador comprador, Leilao leilao,
+			LocalDateTime momentoOferta, boolean aceita) {
+		this.id = id;
+		this.valorOferta = valorOferta;
+		this.statusOferta = statusOferta;
+		this.comprador = comprador;
+		this.leilao = leilao;
+		this.momentoOferta = momentoOferta;
+		this.aceita = aceita;
+	}
 
-    // Getters e Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+	public Long getId() {
+		return id;
+	}
 
-    public Double getValorOferta() { return valorOferta; }
-    public void setValorOferta(Double valorOferta) { this.valorOferta = valorOferta; }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public StatusOferta getStatusOferta() { return statusOferta; }
-    public void setStatusOferta(StatusOferta statusOferta) { this.statusOferta = statusOferta; }
+	public BigDecimal getValorOferta() {
+		return valorOferta;
+	}
 
-    public UsuarioComprador getComprador() { return comprador; }
-    public void setComprador(UsuarioComprador comprador) { this.comprador = comprador; }
+	public void setValorOferta(BigDecimal valorOferta) {
+		this.valorOferta = valorOferta;
+	}
 
-    public Leilao getLeilao() { return leilao; }
-    public void setLeilao(Leilao leilao) { this.leilao = leilao; }
+	public StatusOferta getStatusOferta() {
+		return statusOferta;
+	}
 
-    public LocalDateTime getMomentoOferta() { return momentoOferta; }
-    public void setMomentoOferta(LocalDateTime momentoOferta) { this.momentoOferta = momentoOferta; }
+	public void setStatusOferta(StatusOferta statusOferta) {
+		this.statusOferta = statusOferta;
+	}
 
-    public boolean isAceita() { return aceita; }
-    public void setAceita(boolean aceita) { this.aceita = aceita; }
+	public UsuarioComprador getComprador() {
+		return comprador;
+	}
+
+	public void setComprador(UsuarioComprador comprador) {
+		this.comprador = comprador;
+	}
+
+	public Leilao getLeilao() {
+		return leilao;
+	}
+
+	public void setLeilao(Leilao leilao) {
+		this.leilao = leilao;
+	}
+
+	public LocalDateTime getMomentoOferta() {
+		return momentoOferta;
+	}
+
+	public void setMomentoOferta(LocalDateTime momentoOferta) {
+		this.momentoOferta = momentoOferta;
+	}
+
+	public boolean isAceita() {
+		return aceita;
+	}
+
+	public void setAceita(boolean aceita) {
+		this.aceita = aceita;
+	}
 
 	@Override
 	public String toString() {
 		return "Oferta [id=" + id + ", valorOferta=" + valorOferta + ", statusOferta=" + statusOferta + ", comprador="
 				+ comprador + ", leilao=" + leilao + ", momentoOferta=" + momentoOferta + ", aceita=" + aceita + "]";
 	}
-
 
 }

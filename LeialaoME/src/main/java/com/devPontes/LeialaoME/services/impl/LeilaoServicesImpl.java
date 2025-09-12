@@ -32,6 +32,12 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	private UsuarioVendedorRepositories vendedorRepository;
 
 	@Override
+	public LeilaoDTO abrirLeilaoComValorInicial(LeilaoDTO novoLeilao, Double lanceIniciaç) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
 	public LeilaoDTO criarLeilaoSobVendedor(Long vendedorId, LeilaoDTO novoLeilao) {
 		UsuarioVendedor vendedor = vendedorRepository.findById(vendedorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado com o ID" + vendedorId));

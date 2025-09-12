@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -45,7 +46,7 @@ public class Leilao {
 	@JoinColumn(name = "vendedor_id")
 	private UsuarioVendedor vendedor;
 
-	@OneToMany(mappedBy = "leilao")
+	@OneToMany(mappedBy = "leilao", fetch = FetchType.EAGER)
 	private List<Oferta> ofertas = new ArrayList<>();
 
 	@Column
