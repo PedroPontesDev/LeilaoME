@@ -25,7 +25,7 @@ public class Oferta {
 	private Long id;
 
 	@Column(nullable = false)
-	private BigDecimal valorOferta;
+	private Double valorOferta;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -42,21 +42,18 @@ public class Oferta {
 	@Column(nullable = false)
 	private LocalDateTime momentoOferta = LocalDateTime.now();
 
-	@Column(nullable = false)
-	private boolean aceita = false;
-
 	public Oferta() {
 	}
 
-	public Oferta(Long id, BigDecimal valorOferta, StatusOferta statusOferta, UsuarioComprador comprador, Leilao leilao,
-			LocalDateTime momentoOferta, boolean aceita) {
+	public Oferta(Long id, Double valorOferta, StatusOferta statusOferta, UsuarioComprador comprador, Leilao leilao,
+			LocalDateTime momentoOferta) {
+		super();
 		this.id = id;
 		this.valorOferta = valorOferta;
 		this.statusOferta = statusOferta;
 		this.comprador = comprador;
 		this.leilao = leilao;
 		this.momentoOferta = momentoOferta;
-		this.aceita = aceita;
 	}
 
 	public Long getId() {
@@ -65,14 +62,6 @@ public class Oferta {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public BigDecimal getValorOferta() {
-		return valorOferta;
-	}
-
-	public void setValorOferta(BigDecimal valorOferta) {
-		this.valorOferta = valorOferta;
 	}
 
 	public StatusOferta getStatusOferta() {
@@ -99,6 +88,14 @@ public class Oferta {
 		this.leilao = leilao;
 	}
 
+	public Double getValorOferta() {
+		return valorOferta;
+	}
+
+	public void setValorOferta(Double valorOferta) {
+		this.valorOferta = valorOferta;
+	}
+
 	public LocalDateTime getMomentoOferta() {
 		return momentoOferta;
 	}
@@ -107,18 +104,10 @@ public class Oferta {
 		this.momentoOferta = momentoOferta;
 	}
 
-	public boolean isAceita() {
-		return aceita;
-	}
-
-	public void setAceita(boolean aceita) {
-		this.aceita = aceita;
-	}
-
 	@Override
 	public String toString() {
 		return "Oferta [id=" + id + ", valorOferta=" + valorOferta + ", statusOferta=" + statusOferta + ", comprador="
-				+ comprador + ", leilao=" + leilao + ", momentoOferta=" + momentoOferta + ", aceita=" + aceita + "]";
+				+ comprador + ", leilao=" + leilao + ", momentoOferta=" + momentoOferta + "]";
 	}
 
 }

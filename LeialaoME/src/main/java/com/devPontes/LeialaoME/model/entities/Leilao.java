@@ -37,10 +37,10 @@ public class Leilao {
 	private LocalDateTime termino;
 
 	@Column
-	private BigDecimal valorIncrementadoAposLance;
+	private Double valorDeIncremento;
 
 	@Column(name = "lance_inicial")
-	private BigDecimal lanceInicial;
+	private Double lanceInicial;
 
 	@ManyToOne
 	@JoinColumn(name = "vendedor_id")
@@ -50,20 +50,21 @@ public class Leilao {
 	private List<Oferta> ofertas = new ArrayList<>();
 
 	@Column
-	private boolean indaAtivo = false;
+	private boolean aindaAtivo = false;
 
 	public Leilao(Long id, String descricao, byte[] fotoProduto, LocalDateTime inicio, LocalDateTime termino,
-			BigDecimal valorIncrementadoAposLance, BigDecimal lanceInicial, UsuarioVendedor vendedor,
-			List<Oferta> ofertas) {
+			Double valorDeIncremento, Double lanceInicial, UsuarioVendedor vendedor, List<Oferta> ofertas,
+			boolean aindaAtivo) {
 		this.id = id;
 		this.descricao = descricao;
 		this.fotoProduto = fotoProduto;
 		this.inicio = inicio;
 		this.termino = termino;
-		this.valorIncrementadoAposLance = valorIncrementadoAposLance;
+		this.valorDeIncremento = valorDeIncremento;
 		this.lanceInicial = lanceInicial;
 		this.vendedor = vendedor;
 		this.ofertas = ofertas;
+		this.aindaAtivo = aindaAtivo;
 	}
 
 	public Leilao() {
@@ -108,21 +109,28 @@ public class Leilao {
 	public void setTermino(LocalDateTime termino) {
 		this.termino = termino;
 	}
-
-	public BigDecimal getValorIncrementadoAposLance() {
-		return valorIncrementadoAposLance;
+	public Double getValorDeIncremento() {
+		return valorDeIncremento;
 	}
 
-	public void setValorIncrementadoAposLance(BigDecimal valorIncrementadoAposLance) {
-		this.valorIncrementadoAposLance = valorIncrementadoAposLance;
+	public void setValorDeIncremento(Double valorDeIncremento) {
+		this.valorDeIncremento = valorDeIncremento;
 	}
 
-	public BigDecimal getLanceInicial() {
+	public Double getLanceInicial() {
 		return lanceInicial;
 	}
 
-	public void setLanceInicial(BigDecimal lanceInicial) {
+	public void setLanceInicial(Double lanceInicial) {
 		this.lanceInicial = lanceInicial;
+	}
+
+	public boolean isAindaAtivo() {
+		return aindaAtivo;
+	}
+
+	public void setAindaAtivo(boolean aindaAtivo) {
+		this.aindaAtivo = aindaAtivo;
 	}
 
 	public UsuarioVendedor getVendedor() {
@@ -142,11 +150,11 @@ public class Leilao {
 	}
 
 	public boolean isIndaAtivo() {
-		return indaAtivo;
+		return aindaAtivo;
 	}
 
-	public void setIndaAtivo(boolean indaAtivo) {
-		this.indaAtivo = indaAtivo;
+	public void setIndaAtivo(boolean aindaAtivo) {
+		this.aindaAtivo = aindaAtivo;
 	}
 
 	@Override
@@ -169,9 +177,10 @@ public class Leilao {
 	@Override
 	public String toString() {
 		return "Leilao [id=" + id + ", descricao=" + descricao + ", fotoProduto=" + Arrays.toString(fotoProduto)
-				+ ", inicio=" + inicio + ", termino=" + termino + ", valorIncrementadoAposLance="
-				+ valorIncrementadoAposLance + ", lanceInicial=" + lanceInicial + ", vendedor=" + vendedor
-				+ ", ofertas=" + ofertas + "]";
+				+ ", inicio=" + inicio + ", termino=" + termino + ", valorDeIncremento=" + valorDeIncremento
+				+ ", lanceInicial=" + lanceInicial + ", vendedor=" + vendedor + ", ofertas=" + ofertas + ", aindaAtivo="
+				+ aindaAtivo + "]";
 	}
 
+	
 }

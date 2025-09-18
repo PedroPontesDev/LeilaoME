@@ -1,5 +1,7 @@
 package com.devPontes.LeialaoME.services;
 
+import java.math.BigDecimal;
+
 import org.springframework.stereotype.Service;
 
 import com.devPontes.LeialaoME.model.dto.OfertaDTO;
@@ -11,7 +13,7 @@ public interface OfertaService {
 
 	OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId);
 
-	double calcularNovoLanceMinimo(Long leilaoId);
+	Double calcularNovoLanceMinimo(Long leilaoId);
 
 
 }
