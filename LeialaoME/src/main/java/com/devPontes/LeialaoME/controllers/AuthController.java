@@ -50,7 +50,6 @@ public class AuthController {
 	
 
 	@PostMapping(path = "/cadastrar-comprador")
-	@PreAuthorize("ADMIN")
 	public ResponseEntity<UsuarioDTO> registrarUsuarioComprador(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved =  userServices.cadastrarUsuarioComprador(usuario);
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);

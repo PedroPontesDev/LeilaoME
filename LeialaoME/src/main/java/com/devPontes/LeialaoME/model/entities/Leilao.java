@@ -1,5 +1,6 @@
 package com.devPontes.LeialaoME.model.entities;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_leilao")
-public class Leilao {
+public class Leilao implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
@@ -37,7 +39,7 @@ public class Leilao {
 	private LocalDateTime termino;
 
 	@Column
-	private Double valorDeIncremento;
+	private Double valorDeIncremento; //Valor de Incremento == ValorDaforera?
 
 	@Column(name = "lance_inicial")
 	private Double lanceInicial;

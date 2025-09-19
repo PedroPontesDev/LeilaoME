@@ -1,5 +1,6 @@
 package com.devPontes.LeialaoME.model.entities;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -18,7 +19,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_oferta")
-public class Oferta {
+public class Oferta implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

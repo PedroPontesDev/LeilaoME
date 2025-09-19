@@ -31,8 +31,8 @@ public class WebSecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll()
 						.requestMatchers("/leilao/**").hasAnyRole("COMPRADOR", "VENDEDOR")
-						.requestMatchers("/lances/**").hasAnyRole("COMPRADOR")
-						.requestMatchers("/cadastro-admin").hasAnyRole("ADMIN")
+						.requestMatchers("/lances/**").hasAnyRole("COMPRADOR", "VENDEDOR")
+						.requestMatchers("/auth/cadastro-admin").hasAnyRole("ADMIN")
 						.anyRequest().fullyAuthenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

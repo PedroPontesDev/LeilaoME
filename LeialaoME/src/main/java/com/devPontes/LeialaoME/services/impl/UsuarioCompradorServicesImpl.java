@@ -20,6 +20,7 @@ import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.UsuarioRepositories;
 import com.devPontes.LeialaoME.services.UsuarioCompradorService;
+import com.devPontes.LeialaoME.utils.CnpjCpfValidadorClient;
 
 @Service
 public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {

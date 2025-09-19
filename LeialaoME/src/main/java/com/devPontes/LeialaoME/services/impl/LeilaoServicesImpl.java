@@ -1,18 +1,21 @@
 package com.devPontes.LeialaoME.services.impl;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
 import com.devPontes.LeialaoME.exceptions.LeilaoException;
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
 import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
 import com.devPontes.LeialaoME.model.dto.UsuarioCompradorDTO;
 import com.devPontes.LeialaoME.model.entities.Leilao;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
+import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.LeilaoRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioCompradorRepositories;
@@ -38,7 +41,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	}
 	
 	@Override
-	public LeilaoDTO criarLeilaoSobVendedor(Long vendedorId, LeilaoDTO novoLeilao) {
+	public LeilaoDTO criarLeilao(Long vendedorId, LeilaoDTO novoLeilao) {
 		UsuarioVendedor vendedor = vendedorRepository.findById(vendedorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado com o ID" + vendedorId));
 		Leilao leilao = MyMaper.parseObject(novoLeilao, Leilao.class);
@@ -47,38 +50,36 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		leilaoRepository.save(leilao);
 		return MyMaper.parseObject(leilao, LeilaoDTO.class);
 	}
-
+	
 	@Override
-	public LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, LocalDateTime tempoNecessario) {
-		Leilao entity = MyMaper.parseObject(leilao, Leilao.class);
+	public LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, Long tempoMinimoHoras) {
 
-		var tempoInicial = entity.getInicio();
-		var termino = entity.getTermino();
+	    Leilao entity = MyMaper.parseObject(leilao, Leilao.class);
+	    
+	    if (!entity.isAindaAtivo())
+	        throw new LeilaoException("Leilão está inativo!");
 
-		if (!entity.isIndaAtivo())
-			throw new LeilaoEncerradoException("Leilão encerrado ou inativo");
+	    // Calcula duração atual
+	    Duration duracaoAtual = Duration.between(entity.getInicio(), entity.getTermino());
 
-		Duration duracao = Duration.between(tempoInicial, termino);
+	    // Se o leilão já é menor que o mínimo, lança exceção
+	    if (duracaoAtual.toHours() < tempoMinimoHoras)
+	        throw new LeilaoException("O leilão não possui margem/tempo suficiente para abrir.");
 
-		if (duracao.isNegative() || duracao.isZero())
-			throw new LeilaoException("Duracao de leilão deve ser iniciada!");
-
-		long horasNecessarias = tempoNecessario.getHour();
-
-		if (duracao.toHours() < horasNecessarias) 
-			throw new LeilaoException("Leilão não tem tempo suficiente para abrir com a margem desejada!");
-		
-		entity.setTermino(termino.minusHours(horasNecessarias));
-		
-		leilaoRepository.save(entity);
-		
-		return MyMaper.parseObject(entity, LeilaoDTO.class);
+	    //Se duracaoAtual do leilao for maior que tempo minimo horas eu seto o tempo calculado
+	    LocalDateTime tempoCalculado = entity.getInicio().plusHours(tempoMinimoHoras);
+	    if(duracaoAtual.toHours() > tempoMinimoHoras) {
+	    	entity.setTermino(tempoCalculado);
+	    }
+	    
+	    leilaoRepository.save(entity);
+	    
+	    return MyMaper.parseObject(entity, LeilaoDTO.class);
 	}
 
 	@Override
 	public void fecharLeilao(Long leilaoId, String statusOferta) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
@@ -91,6 +92,12 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	//Precisa verificar a maior oferta dentro do leilao, verificar se esta inativo e setar o ganhador verificando qual é a oferta mais cara baseado
 	//Nas ofertas dadas pelos compradores
 	public UsuarioCompradorDTO definirGanhador(Long leilaoId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes, String descricaoLeilao) {
 		// TODO Auto-generated method stub
 		return null;
 	}

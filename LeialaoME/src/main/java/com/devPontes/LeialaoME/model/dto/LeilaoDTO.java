@@ -8,23 +8,25 @@ import java.util.Objects;
 
 public class LeilaoDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private Long id;
 	private String descricao;
 	private LocalDateTime inicio;
 	private LocalDateTime termino;
-	private BigDecimal lanceInicial;
-	private BigDecimal valorIncrementadoAposLance;
+	private Double lanceInicial;
+	private Double valorIncrementadoAposLance;
 	private boolean ativo;
 	private UsuarioVendedorDTO vendedor;
 	private List<OfertaDTO> ofertas;
 	private UsuarioCompradorDTO possivelVencedor;
-	
-	public LeilaoDTO() {}
 
-	public LeilaoDTO(Long id, String descricao, LocalDateTime inicio, LocalDateTime termino, BigDecimal lanceInicial,
-			BigDecimal valorIncrementadoAposLance, boolean ativo, UsuarioVendedorDTO vendedor, List<OfertaDTO> ofertas,
+	public LeilaoDTO() {
+	}
+
+	public LeilaoDTO(Long id, String descricao, LocalDateTime inicio, LocalDateTime termino, Double lanceInicial,
+			Double valorIncrementadoAposLance, boolean ativo, UsuarioVendedorDTO vendedor, List<OfertaDTO> ofertas,
 			UsuarioCompradorDTO possivelVencedor) {
+		super();
 		this.id = id;
 		this.descricao = descricao;
 		this.inicio = inicio;
@@ -69,20 +71,28 @@ public class LeilaoDTO implements Serializable {
 		this.termino = termino;
 	}
 
-	public BigDecimal getLanceInicial() {
+	public Double getLanceInicial() {
 		return lanceInicial;
 	}
 
-	public void setLanceInicial(BigDecimal lanceInicial) {
+	public void setLanceInicial(Double lanceInicial) {
 		this.lanceInicial = lanceInicial;
 	}
 
-	public BigDecimal getValorIncrementadoAposLance() {
+	public Double getValorIncrementadoAposLance() {
 		return valorIncrementadoAposLance;
 	}
 
-	public void setValorIncrementadoAposLance(BigDecimal valorIncrementadoAposLance) {
+	public void setValorIncrementadoAposLance(Double valorIncrementadoAposLance) {
 		this.valorIncrementadoAposLance = valorIncrementadoAposLance;
+	}
+
+	public List<OfertaDTO> getOfertas() {
+		return ofertas;
+	}
+
+	public void setOfertas(List<OfertaDTO> ofertas) {
+		this.ofertas = ofertas;
 	}
 
 	public boolean isAtivo() {
@@ -133,9 +143,6 @@ public class LeilaoDTO implements Serializable {
 				+ ", ativo=" + ativo + ", vendedor=" + vendedor + ", ofertas=" + ofertas + ", possivelVencedor="
 				+ possivelVencedor + "]";
 	}
-	
-	
-	
 
 	// Getters e Setters
 }

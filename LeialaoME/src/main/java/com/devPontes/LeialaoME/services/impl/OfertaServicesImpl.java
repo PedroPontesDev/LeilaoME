@@ -1,6 +1,7 @@
 package com.devPontes.LeialaoME.services.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,50 +38,49 @@ public class OfertaServicesImpl implements OfertaService {
 
 	@Override
 	public OfertaDTO fazerPropostaParaLeilao(OfertaDTO ofertaDTO, Long leilaoId, Long compradorId) {
-	    // Busca leilão
-	    Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
-	            .orElseThrow(() -> new LeilaoException("Leilão não encontrado com ID " + leilaoId));
+		// Busca leilão
+		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
+				.orElseThrow(() -> new LeilaoException("Leilão não encontrado com ID " + leilaoId));
 
-	    // Verifica se leilão está ativo
-	    if (!leilaoExistente.isAindaAtivo()) {
-	        throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
-	    }
-	  
-	    // Busca comprador
-	    UsuarioComprador comprador = (UsuarioComprador) compradorRepository.findById(compradorId)
-	            .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado com ID " + compradorId));
+		// Verifica se leilão está ativo
+		if (!leilaoExistente.isAindaAtivo()) {
+			throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
+		}
 
-	    // Converte DTO para entidade
-	    Oferta ofertaNova = MyMaper.parseObject(ofertaDTO, Oferta.class);
-	    ofertaNova.setComprador(comprador);
-	    ofertaNova.setStatusOferta(StatusOferta.ATIVA);
-	    
-	    if(ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino())) {
-	    	throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
-	    }
+		// Busca comprador
+		UsuarioComprador comprador = (UsuarioComprador) compradorRepository.findById(compradorId)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado com ID " + compradorId));
 
-	    // Calcula valor mínimo permitido
-	    Double valorMinimo = calcularNovoLanceMinimo(leilaoId);
+		// Converte DTO para entidade
+		Oferta ofertaNova = MyMaper.parseObject(ofertaDTO, Oferta.class);
+		ofertaNova.setComprador(comprador);
+		ofertaNova.setStatusOferta(StatusOferta.ATIVA);
 
-	    // Valida valor da oferta
-	    if (ofertaNova.getValorOferta() < valorMinimo) {
-	        throw new LeilaoException("O valor da oferta deve ser igual ou maior que: " + valorMinimo);
-	    }
+		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino())) {
+			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
+		}
 
-	    // Atualiza valor incrementado no leilão
-	    leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta());
+		// Calcula valor mínimo permitido
+		Double valorMinimo = calcularNovoLanceMinimo(leilaoId);
 
-	    // Adiciona oferta ao leilão
-	    leilaoExistente.getOfertas().add(ofertaNova);
+		// Valida valor da oferta
+		if (ofertaNova.getValorOferta() < valorMinimo) {
+			throw new LeilaoException("O valor da oferta deve ser igual ou maior que: " + valorMinimo);
+		}
 
-	    // Salva oferta e leilão
-	    ofertaRepository.save(ofertaNova);
-	    leilaoRepository.save(leilaoExistente);
+		// Atualiza valor incrementado no leilão
+		leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta());
 
-	    // Retorna DTO atualizado
-	    return MyMaper.parseObject(ofertaNova, OfertaDTO.class);
+		// Adiciona oferta ao leilão
+		leilaoExistente.getOfertas().add(ofertaNova);
+
+		// Salva oferta e leilão
+		ofertaRepository.save(ofertaNova);
+		leilaoRepository.save(leilaoExistente);
+
+		// Retorna DTO atualizado
+		return MyMaper.parseObject(ofertaNova, OfertaDTO.class);
 	}
-
 
 	@Override
 	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) {
@@ -90,15 +90,40 @@ public class OfertaServicesImpl implements OfertaService {
 
 	@Override
 	public Double calcularNovoLanceMinimo(Long leilaoId) {
-		// Para cada novo valor em leiloes>ofertas calcular novo valor
-		//Vendo se o lance inicial e maior qo ultimo lanceMinimo e filtrando coisas a descartar
+		Leilao leilao = leilaoRepository.findById(leilaoId)
+				.orElseThrow(() -> new LeilaoException("Leilao não encontrado com ID" + leilaoId));
+		 // Lance inicial do leilão
+	    double lanceMinimo = leilao.getLanceInicial() != null
+	            ? leilao.getLanceInicial()
+	            : 0.0;
+
+	    // Valor de incremento definido pelo leilão
+	    double incremento = leilao.getValorDeIncremento();
+	           
+		for (Oferta oferta : leilao.getOfertas()) {
+			if(!ofertaValida(oferta)) {
+				continue;
+			}
+			
+			double proximoLance = oferta.getValorOferta() + incremento;
+			
+			if(proximoLance > lanceMinimo) {
+				lanceMinimo = proximoLance;
+			}
+		}
 		
-		
-		
-		
-		
-		
-		return 0D;
+		return lanceMinimo;
+
+	}
+
+	private boolean ofertaValida(Oferta oferta) {
+		if (oferta.getComprador() == null)
+			return false;
+		if (oferta.getMomentoOferta() == null && oferta.getMomentoOferta().isBefore(LocalDateTime.now()))
+			return false;
+		if (oferta.getStatusOferta() != StatusOferta.ATIVA)
+			return false;
+		return true;
 	}
 
 }
