@@ -83,6 +83,7 @@ public class OfertaServicesImpl implements OfertaService {
 	}
 
 	@Override
+	//Trabalhar com datas verificar se ofertas subiR
 	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) {
 		// TODO Auto-generated method stub
 		return null;
