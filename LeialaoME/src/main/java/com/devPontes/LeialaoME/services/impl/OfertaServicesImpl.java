@@ -106,7 +106,7 @@ public class OfertaServicesImpl implements OfertaService {
 				continue;
 			}
 			
-			double proximoLance = oferta.getValorOferta() + incremento;
+			double proximoLance = lanceMinimo + incremento;
 			
 			if(proximoLance > lanceMinimo) {
 				lanceMinimo = proximoLance;

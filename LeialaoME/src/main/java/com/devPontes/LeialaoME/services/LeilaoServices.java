@@ -19,7 +19,7 @@ public interface LeilaoServices {
 
 	LeilaoDTO verificarEstadoDeLeilao(Long leilaoId);
 
-	UsuarioCompradorDTO definirGanhador(Long leilaoId);
+	UsuarioCompradorDTO definirGanhador(Long leilaoId) throws Exception;
 	
 	Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes, String descricaoLeilao);
 	

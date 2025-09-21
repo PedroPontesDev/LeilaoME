@@ -47,6 +47,10 @@ public class Leilao implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "vendedor_id")
 	private UsuarioVendedor vendedor;
+	
+	@ManyToOne
+	@JoinColumn(name = "comprador_id")
+	private UsuarioComprador comprador;
 
 	@OneToMany(mappedBy = "leilao", fetch = FetchType.EAGER)
 	private List<Oferta> ofertas = new ArrayList<>();
@@ -55,8 +59,8 @@ public class Leilao implements Serializable {
 	private boolean aindaAtivo = false;
 
 	public Leilao(Long id, String descricao, byte[] fotoProduto, LocalDateTime inicio, LocalDateTime termino,
-			Double valorDeIncremento, Double lanceInicial, UsuarioVendedor vendedor, List<Oferta> ofertas,
-			boolean aindaAtivo) {
+			Double valorDeIncremento, Double lanceInicial, UsuarioVendedor vendedor, UsuarioComprador comprador,
+			List<Oferta> ofertas, boolean aindaAtivo) {
 		this.id = id;
 		this.descricao = descricao;
 		this.fotoProduto = fotoProduto;
@@ -65,6 +69,7 @@ public class Leilao implements Serializable {
 		this.valorDeIncremento = valorDeIncremento;
 		this.lanceInicial = lanceInicial;
 		this.vendedor = vendedor;
+		this.comprador = comprador;
 		this.ofertas = ofertas;
 		this.aindaAtivo = aindaAtivo;
 	}
@@ -157,6 +162,16 @@ public class Leilao implements Serializable {
 
 	public void setIndaAtivo(boolean aindaAtivo) {
 		this.aindaAtivo = aindaAtivo;
+	}
+
+	
+	
+	public UsuarioComprador getComprador() {
+		return comprador;
+	}
+
+	public void setComprador(UsuarioComprador comprador) {
+		this.comprador = comprador;
 	}
 
 	@Override

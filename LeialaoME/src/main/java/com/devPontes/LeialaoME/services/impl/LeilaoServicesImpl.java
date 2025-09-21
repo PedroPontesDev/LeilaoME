@@ -5,9 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,11 +18,15 @@ import com.devPontes.LeialaoME.model.entities.Leilao;
 import com.devPontes.LeialaoME.model.entities.Oferta;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
+import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.LeilaoRepositories;
+import com.devPontes.LeialaoME.repositories.OfertaRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioCompradorRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioVendedorRepositories;
 import com.devPontes.LeialaoME.services.LeilaoServices;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class LeilaoServicesImpl implements LeilaoServices {
@@ -37,6 +39,9 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 	@Autowired
 	private UsuarioVendedorRepositories vendedorRepository;
+	
+	@Autowired
+   private OfertaRepositories ofertaRepository;
 
 	@Override
 	public LeilaoDTO abrirLeilaoComValorInicial(LeilaoDTO novoLeilao, Double lanceIniciaç) {
@@ -73,7 +78,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		// Se duracaoAtual do leilao for maior que tempo minimo esperado em horas eu
 		// seto o tempo
 		// calculado
-		LocalDateTime tempoCalculado = entity.getInicio().plusHours(tempoMinimoHoras);
+		LocalDateTime tempoCalculado = entity.getTermino().minusHours(tempoMinimoHoras);
 		if (duracaoAtual.toHours() > tempoMinimoHoras) {
 			entity.setTermino(tempoCalculado);
 		}
@@ -95,22 +100,40 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	}
 
 	@Override
-	// Precisa verificar a maior oferta dentro do leilao, verificar se esta inativo
-	// e setar o ganhador verificando qual é a oferta mais cara baseado
-	// Nas ofertas dadas pelos compradores
+	@Transactional
 	public UsuarioCompradorDTO definirGanhador(Long leilaoId) throws Exception {
 		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Vendedor não encontrado com o ID" + leilaoId));
 		//Fazer nova validações
 		
 		// Garantir que existem ofertas
-	    List<Oferta> ofertas = leilaoExistente.getOfertas();
-	    if (ofertas == null || ofertas.isEmpty()) {
+	    if (leilaoExistente.getOfertas() == null || leilaoExistente.getOfertas().isEmpty()) {
 	        throw new LeilaoException("Nenhuma oferta encontrada neste leilão.");
 	    }
 	    
-		Oferta maiorOferta = leilaoExistente.getOfertas().stream().max(null).get();
+		Oferta maiorOferta = leilaoExistente.getOfertas()
+							.stream()
+							.max(Comparator.comparing(Oferta::getValorOferta))
+							.get();
+		if(maiorOferta.getStatusOferta().equals(StatusOferta.PENDENTE)) {
+			maiorOferta.setStatusOferta(StatusOferta.GANHADORA);
+		}
+		
+		UsuarioComprador vencedor = maiorOferta.getComprador();
+		maiorOferta.setComprador(vencedor);
+		leilaoExistente.setComprador(vencedor);
+		
+		leilaoRepository.save(leilaoExistente);
+		ofertaRepository.save(maiorOferta);
+		compradorRepository.save(vencedor);
+		
 
+		// Precisa verificar a maior oferta dentro do leilao, verificar se esta ativo
+		// e setar o ganhador verificando qual é a oferta mais cara baseado
+		// Nas ofertas dadas pelos compradores
+		
+		return MyMaper.parseObject(vencedor, UsuarioCompradorDTO.class);
+		
 
 	}
 
