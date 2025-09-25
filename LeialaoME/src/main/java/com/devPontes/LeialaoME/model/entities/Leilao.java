@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -51,7 +52,7 @@ public class Leilao implements Serializable {
 	@JoinColumn(name = "comprador_id")
 	private UsuarioComprador comprador;
 
-	@OneToMany(mappedBy = "leilao", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "leilao", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Oferta> ofertas = new ArrayList<>();
 
 	@Column

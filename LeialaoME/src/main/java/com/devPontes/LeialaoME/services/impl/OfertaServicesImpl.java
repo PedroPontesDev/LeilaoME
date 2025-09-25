@@ -69,7 +69,7 @@ public class OfertaServicesImpl implements OfertaService {
 		}
 
 		// Atualiza valor incrementado no leilão
-		leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta());
+		leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta() + valorMinimo);
 
 		// Adiciona oferta ao leilão
 		leilaoExistente.getOfertas().add(ofertaNova);
@@ -82,39 +82,49 @@ public class OfertaServicesImpl implements OfertaService {
 		return MyMaper.parseObject(ofertaNova, OfertaDTO.class);
 	}
 
-	// Trabalhar com datas verificar se ofertas subiR
+
 	@Override
 	@Transactional
 	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) {
 
-		 // 1. Buscar leilão e comprador pra ver se ecoincidem na mesma transação
+		// 1. Buscar leilão e comprador pra ver se ecoincidem na mesma transação
+
 		Leilao leilao = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leillão não encontraado com Id" + leilaoId));
 		if (!leilao.isAindaAtivo()) {
 			throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
-		}	
-		
+		}
+
 		UsuarioComprador usuarioComprador = (UsuarioComprador) compradorRepository.findById(compradorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
 
-		Oferta maiorOferta;
-		Oferta ultimoComprador;
+		Double maiorLanceInicial = leilao.getLanceInicial();
 
-		for (Oferta ofertas : leilao.getOfertas()) {
-			if (leilao.getComprador().equals(usuarioComprado))
+		for (Oferta oferta : leilao.getOfertas()) {
+			if (leilao.getComprador().equals(usuarioComprador))
 				continue;
 			if (leilao.isAindaAtivo())
 				continue;
-			if()
-			
-			
+			if (oferta.getStatusOferta() != StatusOferta.ATIVA)
+				continue;
+			if (maiorLanceInicial <= novoValor)
+				throw new IllegalArgumentException("Você já possui um lance igual ou maior neste leilão.");
 		}
 
-		// Verificar se o comprador deu o lance no leilao e percorrer os lances de
-		// determinado leilao verificar o ultimo lance
-		// caso ultimo lance subir e o status ainda estr ativo fazer nova oferta maior q
-		// a ultina
-		return null;
+		Oferta novaOferta = new Oferta();
+		novaOferta.setComprador(usuarioComprador);
+		novaOferta.setValorOferta(novoValor);
+		novaOferta.setMomentoOferta(LocalDateTime.now());
+		novaOferta.setStatusOferta(StatusOferta.ATIVA);
+		novaOferta.setLeilao(leilao);
+
+		
+		leilao.setComprador(usuarioComprador);
+		leilao.getOfertas().add(novaOferta);
+
+		// Persistir alterações
+		leilaoRepository.save(leilao);
+		return MyMaper.parseObject(novaOferta, OfertaDTO.class);
 	}
 
 	@Override
