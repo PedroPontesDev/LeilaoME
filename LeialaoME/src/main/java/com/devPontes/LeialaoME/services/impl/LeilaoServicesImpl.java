@@ -43,11 +43,6 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	@Autowired
    private OfertaRepositories ofertaRepository;
 
-	@Override
-	public LeilaoDTO abrirLeilaoComValorInicial(LeilaoDTO novoLeilao, Double lanceIniciaç) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public LeilaoDTO criarLeilao(Long vendedorId, LeilaoDTO novoLeilao) {
@@ -60,7 +55,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		return MyMaper.parseObject(leilao, LeilaoDTO.class);
 	}
 
-	@Override // ACHO Q ESTA ERRADO
+	@Override // ACHO Q ESTA ERRADO?
 	public LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, Long tempoMinimoHoras) {
 
 		Leilao entity = MyMaper.parseObject(leilao, Leilao.class);
@@ -104,7 +99,9 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	public UsuarioCompradorDTO definirGanhador(Long leilaoId) throws Exception {
 		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Vendedor não encontrado com o ID" + leilaoId));
-		//Fazer nova validações
+	
+		//Fazer novas validações	
+		
 		
 		// Garantir que existem ofertas
 	    if (leilaoExistente.getOfertas() == null || leilaoExistente.getOfertas().isEmpty()) {
@@ -113,11 +110,8 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	    
 		Oferta maiorOferta = leilaoExistente.getOfertas()
 							.stream()
-							.max(Comparator.comparing(Oferta::getValorOferta))
-							.get();
-		if(maiorOferta.getStatusOferta().equals(StatusOferta.PENDENTE)) {
-			maiorOferta.setStatusOferta(StatusOferta.GANHADORA);
-		}
+							.max(Comparator.comparing(Oferta::getValorOferta)).get();
+		
 		
 		UsuarioComprador vencedor = maiorOferta.getComprador();
 		maiorOferta.setComprador(vencedor);

@@ -13,19 +13,31 @@ public class UsuarioCompradorDTO implements Serializable {
     private Long id;
     private String username;
     private String biografia;
-    private byte[] fotoPerfil;
+    private String urlProfilePic;
 
     private List<OfertaDTO> ofertas = new ArrayList<>();
     private Set<LeilaoDTO> leiloesParticipados = new HashSet<>();
 
     public UsuarioCompradorDTO() {}
 
-    public UsuarioCompradorDTO(Long id, String username, String biografia, byte[] fotoPerfil) {
-        this.id = id;
-        this.username = username;
-        this.biografia = biografia;
-        this.fotoPerfil = fotoPerfil;
-    }
+    public UsuarioCompradorDTO(Long id, String username, String biografia, String urlProfilePic, List<OfertaDTO> ofertas,
+			Set<LeilaoDTO> leiloesParticipados) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.biografia = biografia;
+		this.setUrlProfilePic(urlProfilePic);
+		this.ofertas = ofertas;
+		this.leiloesParticipados = leiloesParticipados;
+	}
+    
+    public String getUrlProfilePic() {
+		return urlProfilePic;
+	}
+
+	public void setUrlProfilePic(String urlProfilePic) {
+		this.urlProfilePic = urlProfilePic;
+	}
 
     // Getters e Setters
     public Long getId() {
@@ -47,13 +59,6 @@ public class UsuarioCompradorDTO implements Serializable {
     }
     public void setBiografia(String biografia) {
         this.biografia = biografia;
-    }
-
-    public byte[] getFotoPerfil() {
-        return fotoPerfil;
-    }
-    public void setFotoPerfil(byte[] fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
     }
 
     public List<OfertaDTO> getOfertas() {
@@ -83,11 +88,15 @@ public class UsuarioCompradorDTO implements Serializable {
         return Objects.equals(id, other.id);
     }
 
-    @Override
-    public String toString() {
-        return "UsuarioCompradorDTO [id=" + id + ", username=" + username 
-                + ", biografia=" + biografia 
-                + ", ofertas=" + (ofertas != null ? ofertas.size() : 0) 
-                + ", leiloesParticipados=" + (leiloesParticipados != null ? leiloesParticipados.size() : 0) + "]";
-    }
+	@Override
+	public String toString() {
+		return "UsuarioCompradorDTO [id=" + id + ", username=" + username + ", biografia=" + biografia
+				+ ", urlProfilePic=" + urlProfilePic + ", ofertas=" + ofertas + ", leiloesParticipados="
+				+ leiloesParticipados + "]";
+	}
+
+    
+    
+
+	
 }

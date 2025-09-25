@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CheckConstraint;
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -40,10 +42,10 @@ public abstract class Usuario implements UserDetails, Serializable {
 	private String password;
 
 	@Lob
+	@Column()
 	private String biografia;
 
-	@Lob
-	private byte[] fotoPerfil;
+	private String urlFotoPerfil;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	@JoinTable(name = "tb_permissoes_usuarios", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "permissao_id"))
@@ -52,16 +54,26 @@ public abstract class Usuario implements UserDetails, Serializable {
 	public Usuario() {
 	}
 
-	public Usuario(Long id, String username, String password, String biografia, byte[] fotoPerfil,
+	public Usuario(Long id, String username, String password, String biografia, String urlFotoPerfil,
 			Set<Permissao> permissoes) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.biografia = biografia;
-		this.fotoPerfil = fotoPerfil;
+		this.setUrlFotoPerfil(urlFotoPerfil);
 		this.permissoes = permissoes;
 	}
 
+
+	public String getUrlFotoPerfil() {
+		return urlFotoPerfil;
+	}
+
+	public void setUrlFotoPerfil(String urlFotoPerfil) {
+		this.urlFotoPerfil = urlFotoPerfil;
+	}
+
+	
 	public Long getId() {
 		return id;
 	}
@@ -123,13 +135,6 @@ public abstract class Usuario implements UserDetails, Serializable {
 		this.biografia = biografia;
 	}
 
-	public byte[] getFotoPerfil() {
-		return fotoPerfil;
-	}
-
-	public void setFotoPerfil(byte[] fotoPerfil) {
-		this.fotoPerfil = fotoPerfil;
-	}
 
 	public Set<Permissao> getPermissoes() {
 		return permissoes;
@@ -159,7 +164,7 @@ public abstract class Usuario implements UserDetails, Serializable {
 	@Override
 	public String toString() {
 		return "Usuario [id=" + id + ", username=" + username + ", password=" + password + ", biografia=" + biografia
-				+ ", fotoPerfil=" + Arrays.toString(fotoPerfil) + ", permissoes=" + permissoes + "]";
+				+ ", urlFotoPerfil=" + urlFotoPerfil + ", permissoes=" + permissoes + "]";
 	}
 
 	

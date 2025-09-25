@@ -1,11 +1,8 @@
 package com.devPontes.LeialaoME.model.dto;
 
-import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
-
 public class PermissaoDTO {
     
 	private String nome;
-    private StatusOferta status; 
     
     // Construtor padrão necessário
     public PermissaoDTO() {}

@@ -37,7 +37,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		// Mapear DTO para entidade
 		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class);
 
-		// 2️⃣ Converter permissões do DTO para entidades (se houver)
+		// Converter permissões do DTO para entidades (se houver)
 		Set<Permissao> permissoes = novoUsuario.getPermissoes().stream().map(p -> {
 			Permissao permissao = new Permissao();
 			permissao.setUsuarioRole(UsuarioRole.valueOf(p.getNome()));

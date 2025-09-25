@@ -6,86 +6,96 @@ import java.util.Objects;
 import java.util.Set;
 
 public class UsuarioVendedorDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private String username;
-    private String biografia;
-    private byte[] fotoPerfil;
-    private String cnpj;
+	private Long id;
+	private String username;
+	private String biografia;
+	private String urlFotoPerfil;
+	private String cnpj;
 
-    private Set<LeilaoDTO> leiloesCadastrados = new HashSet<>();
+	private Set<LeilaoDTO> leiloesCadastrados = new HashSet<>();
 
-    public UsuarioVendedorDTO() {}
+	public UsuarioVendedorDTO() {
+	}
 
-    public UsuarioVendedorDTO(Long id, String username, String biografia, byte[] fotoPerfil, String cnpj) {
-        this.id = id;
-        this.username = username;
-        this.biografia = biografia;
-        this.fotoPerfil = fotoPerfil;
-        this.cnpj = cnpj;
-    }
+	public UsuarioVendedorDTO(Long id, String username, String biografia, String urlFotoPerfil, String cnpj) {
+		this.id = id;
+		this.username = username;
+		this.biografia = biografia;
+		this.urlFotoPerfil = urlFotoPerfil;
+		this.cnpj = cnpj;
+	}
 
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
+	// Getters e Setters
+	public Long getId() {
+		return id;
+	}
 
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getBiografia() {
-        return biografia;
-    }
-    public void setBiografia(String biografia) {
-        this.biografia = biografia;
-    }
+	public String getUrlFotoPerfil() {
+		return urlFotoPerfil;
+	}
 
-    public byte[] getFotoPerfil() {
-        return fotoPerfil;
-    }
-    public void setFotoPerfil(byte[] fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
-    }
+	public void setUrlFotoPerfil(String urlFotoPerfil) {
+		this.urlFotoPerfil = urlFotoPerfil;
+	}
 
-    public String getCnpj() {
-        return cnpj;
-    }
-    public void setCnpj(String cnpj) {
-        this.cnpj = cnpj;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public Set<LeilaoDTO> getLeiloesCadastrados() {
-        return leiloesCadastrados;
-    }
-    public void setLeiloesCadastrados(Set<LeilaoDTO> leiloesCadastrados) {
-        this.leiloesCadastrados = leiloesCadastrados;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    // Equals e HashCode (baseados no id)
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        UsuarioVendedorDTO other = (UsuarioVendedorDTO) obj;
-        return Objects.equals(id, other.id);
-    }
+	public String getBiografia() {
+		return biografia;
+	}
 
-    @Override
-    public String toString() {
-        return "UsuarioVendedorDTO [id=" + id + ", username=" + username 
-                + ", cnpj=" + cnpj 
-                + ", leiloesCadastrados=" + (leiloesCadastrados != null ? leiloesCadastrados.size() : 0) + "]";
-    }
+	public void setBiografia(String biografia) {
+		this.biografia = biografia;
+	}
+
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+
+	public Set<LeilaoDTO> getLeiloesCadastrados() {
+		return leiloesCadastrados;
+	}
+
+	public void setLeiloesCadastrados(Set<LeilaoDTO> leiloesCadastrados) {
+		this.leiloesCadastrados = leiloesCadastrados;
+	}
+
+	// Equals e HashCode (baseados no id)
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		UsuarioVendedorDTO other = (UsuarioVendedorDTO) obj;
+		return Objects.equals(id, other.id);
+	}
+
+	@Override
+	public String toString() {
+		return "UsuarioVendedorDTO [id=" + id + ", username=" + username + ", biografia=" + biografia
+				+ ", urlFotoPerfil=" + urlFotoPerfil + ", cnpj=" + cnpj + ", leiloesCadastrados=" + leiloesCadastrados
+				+ "]";
+	}
 }

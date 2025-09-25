@@ -24,57 +24,35 @@ public class CnpjCpfValidadorClient {
 	private static final Logger log = LoggerFactory.getLogger(CnpjCpfValidadorClient.class);
 
 	public boolean validarCnpj(String cnpj) throws Exception {
-
-		// Limpar mascara de como CNPJ VEM
-
+		// Limpar como CNPJ VEM
 		String cnpjRegex = "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$";
 		String cnpjSemMascaraRegex = "^\\d{14}$";
-
 		log.info("Trazendo o " + cnpjSemMascaraRegex + "Cnpj com regex" + cnpjRegex);
 
-		if (cnpj == null || (!Pattern.matches(cnpjRegex, cnpj) && !Pattern.matches(cnpjSemMascaraRegex, cnpj))) {
-			throw new Exception("CNPJ inválido! O CNPJ deve estar no formato correto.");
-		}
-
-		// Remover a máscara do CNPJ para enviar na API
-		String cnpjLimpo = cnpj.replaceAll("[^0-9]", "");
-		System.out.println("CNPJ limpo: " + cnpjLimpo); // Log do CNPJ limpo para depuração
-
+		if (cnpj == null || (!Pattern.matches(cnpjRegex, cnpj) && !Pattern.matches(cnpjSemMascaraRegex, cnpj))) throw new Exception("CNPJ inválido! O CNPJ deve estar no formato correto.");
+		
+		String cnpjLimpo = cnpj.replaceAll("[^0-9]", ""); // Remover a máscara do CNPJ para enviar na API
 		log.info("Cnpj Limpo" + cnpjLimpo);
-
-		// Instancia o RestTemplate monta a entity
-
-		RestTemplate restTemplate = new RestTemplate();
-
-		// Define url de chamada
-		String url = "https://receitaws.com.br/v1/cnpj/" + cnpjLimpo;
-
-		// Define Headers
-		HttpHeaders headers = new HttpHeaders();
+		
+		RestTemplate restTemplate = new RestTemplate(); // Instancia o RestTemplate monta a entity
+		String url = "https://receitaws.com.br/v1/cnpj/" + cnpjLimpo; // Define url de chamada
+		HttpHeaders headers = new HttpHeaders(); // Define Headers
 		headers.set("Authorization", "Bearer " + secretReceitaWS);
-
-		log.info(headers.toString());
-
-		// Cria a HTTP entity e usa o ResTemplate pra fazer chamadas com ResponseEntity
-
-		HttpEntity<String> entidade = new HttpEntity<>(headers);
-
+		HttpEntity<String> entidade = new HttpEntity<>(headers); // Cria a HTTP entity e usa o ResTemplate pra fazer
+																	// chamadas com ResponseEntity
 		ResponseEntity<String> resposta = restTemplate.exchange(url, HttpMethod.GET, entidade, String.class);
-
 		// Deserializando
-
-		ObjectMapper mapper = new ObjectMapper();
-
-		JsonNode node = mapper.readTree(resposta.getBody());
-
-		Boolean cpfReal = node.get("status").asText().equals("OK");
-
-		log.info(cpfReal.toString());
-
-		if (!cpfReal)
-			throw new Exception("CPF NÃO É REAL");
-		return cpfReal;
-
+		String situacao = null;
+		if (resposta.getStatusCode().is2xxSuccessful()) {
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode root = mapper.readTree(resposta.getBody());
+			situacao = root.path("situacao").asText();
+		}
+		if ("ATIVA".equalsIgnoreCase(situacao)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean validarCPf(String cpf) {
@@ -98,19 +76,19 @@ public class CnpjCpfValidadorClient {
 		}
 
 	}
-	
+
 	private static int calcularDigito(String str) {
 		int soma = 0;
 		int peso = str.length() + 1;
-		
-		for(char c : str.toCharArray()) {
+
+		for (char c : str.toCharArray()) {
 			soma += (c - '0') * peso--;
 		}
-		
+
 		int resto = soma % 11;
-		
+
 		return (resto < 2) ? 0 : 11 - resto;
-		
+
 	}
 
 }

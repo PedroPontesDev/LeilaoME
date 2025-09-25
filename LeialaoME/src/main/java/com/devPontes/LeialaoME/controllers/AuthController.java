@@ -3,7 +3,6 @@ package com.devPontes.LeialaoME.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,21 +39,24 @@ public class AuthController {
 	public UsuarioLoginResponseDTO login(@RequestBody UsuarioLoginRequestDTO request) {
 		Authentication auth = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), 
-																	 request.getPassword()));
-		UserDetails userDeitals = userDetailsService.loadUserByUsername(request.getUsername());
+																	 request.getPassword()));  //Chama o auth manaeger passando o user e pass
+		UserDetails userDeitals = userDetailsService.loadUserByUsername(request.getUsername()); //chama o user deitals carregando o user por username
 		
-		String token = jwtService.generateToken(userDeitals);
+		String token = jwtService.generateToken(userDeitals); //chama o metodo grador de jwt
 		
-		return new UsuarioLoginResponseDTO(request.getUsername(), token);
+		return new UsuarioLoginResponseDTO(request.getUsername(), token); 
 	}
 	
 
 	@PostMapping(path = "/cadastrar-comprador")
 	public ResponseEntity<UsuarioDTO> registrarUsuarioComprador(@RequestBody UsuarioDTO usuario) throws Exception {
-		UsuarioDTO saved =  userServices.cadastrarUsuarioComprador(usuario);
+		UsuarioDTO saved = userServices.cadastrarUsuarioComprador(usuario);
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
 	}
-	
-	
 
+	
+	public ResponseEntity<UsuarioDTO> registrarUsuarioVendedor(UsuarioDTO usuarioVendedor) throws Exception {
+		UsuarioDTO saved = userServices.cadastrarUsuarioComprador(usuarioVendedor);
+		return new ResponseEntity<>(saved, HttpStatus.CREATED);
+	}
 }

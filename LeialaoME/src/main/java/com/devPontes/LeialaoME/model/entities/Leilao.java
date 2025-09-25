@@ -31,15 +31,14 @@ public class Leilao implements Serializable {
 	@Lob
 	private String descricao;
 
-	@Lob
-	private byte[] fotoProduto;
+	private String urlfotoProduto;
 
 	private LocalDateTime inicio;
 
 	private LocalDateTime termino;
 
 	@Column
-	private Double valorDeIncremento; //Valor de Incremento == ValorDaforera?
+	private Double valorDeIncremento; // Valor de Incremento = INICIAL + ValorDaOFERTA;
 
 	@Column(name = "lance_inicial")
 	private Double lanceInicial;
@@ -47,7 +46,7 @@ public class Leilao implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "vendedor_id")
 	private UsuarioVendedor vendedor;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "comprador_id")
 	private UsuarioComprador comprador;
@@ -58,12 +57,12 @@ public class Leilao implements Serializable {
 	@Column
 	private boolean aindaAtivo = false;
 
-	public Leilao(Long id, String descricao, byte[] fotoProduto, LocalDateTime inicio, LocalDateTime termino,
+	public Leilao(Long id, String descricao, String urlfotoProduto, LocalDateTime inicio, LocalDateTime termino,
 			Double valorDeIncremento, Double lanceInicial, UsuarioVendedor vendedor, UsuarioComprador comprador,
 			List<Oferta> ofertas, boolean aindaAtivo) {
 		this.id = id;
 		this.descricao = descricao;
-		this.fotoProduto = fotoProduto;
+		this.urlfotoProduto = urlfotoProduto;
 		this.inicio = inicio;
 		this.termino = termino;
 		this.valorDeIncremento = valorDeIncremento;
@@ -93,12 +92,12 @@ public class Leilao implements Serializable {
 		this.descricao = descricao;
 	}
 
-	public byte[] getFotoProduto() {
-		return fotoProduto;
+	public String getUrlfotoProduto() {
+		return urlfotoProduto;
 	}
 
-	public void setFotoProduto(byte[] fotoProduto) {
-		this.fotoProduto = fotoProduto;
+	public void setUrlfotoProduto(String urlfotoProduto) {
+		this.urlfotoProduto = urlfotoProduto;
 	}
 
 	public LocalDateTime getInicio() {
@@ -116,6 +115,7 @@ public class Leilao implements Serializable {
 	public void setTermino(LocalDateTime termino) {
 		this.termino = termino;
 	}
+
 	public Double getValorDeIncremento() {
 		return valorDeIncremento;
 	}
@@ -164,8 +164,6 @@ public class Leilao implements Serializable {
 		this.aindaAtivo = aindaAtivo;
 	}
 
-	
-	
 	public UsuarioComprador getComprador() {
 		return comprador;
 	}
@@ -193,11 +191,10 @@ public class Leilao implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Leilao [id=" + id + ", descricao=" + descricao + ", fotoProduto=" + Arrays.toString(fotoProduto)
-				+ ", inicio=" + inicio + ", termino=" + termino + ", valorDeIncremento=" + valorDeIncremento
-				+ ", lanceInicial=" + lanceInicial + ", vendedor=" + vendedor + ", ofertas=" + ofertas + ", aindaAtivo="
-				+ aindaAtivo + "]";
+		return "Leilao [id=" + id + ", descricao=" + descricao + ", urlfotoProduto=" + urlfotoProduto + ", inicio="
+				+ inicio + ", termino=" + termino + ", valorDeIncremento=" + valorDeIncremento + ", lanceInicial="
+				+ lanceInicial + ", vendedor=" + vendedor + ", comprador=" + comprador + ", ofertas=" + ofertas
+				+ ", aindaAtivo=" + aindaAtivo + "]";
 	}
 
-	
 }

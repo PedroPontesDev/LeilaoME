@@ -1,6 +1,5 @@
 package com.devPontes.LeialaoME.services.impl;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +82,12 @@ public class OfertaServicesImpl implements OfertaService {
 	}
 
 	@Override
-	//Trabalhar com datas verificar se ofertas subiR
+	// Trabalhar com datas verificar se ofertas subiR
 	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) {
-		// TODO Auto-generated method stub
+		// Verificar se o comprador deu o lance no leilao e percorrer os lances de
+		// determinado leilao verificar o ultimo lance
+		// caso ultimo lance subir e o status ainda estr ativo fazer nova oferta maior q
+		// a ultina
 		return null;
 	}
 
@@ -93,26 +95,31 @@ public class OfertaServicesImpl implements OfertaService {
 	public Double calcularNovoLanceMinimo(Long leilaoId) {
 		Leilao leilao = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilao não encontrado com ID" + leilaoId));
-		 // Lance inicial do leilão
-	    double lanceMinimo = leilao.getLanceInicial() != null
-	            ? leilao.getLanceInicial()
-	            : 0.0;
+		// Lance inicial do leilão
 
-	    // Valor de incremento definido pelo leilão
-	    double incremento = leilao.getValorDeIncremento();
-	           
+		double lanceMinimo;
+
+		if (leilao.getLanceInicial() != null) {
+			lanceMinimo = leilao.getLanceInicial();
+		} else {
+			lanceMinimo = 0.0;
+		}
+
+		// Valor de incremento definido pelo leilão
+		double incremento = leilao.getValorDeIncremento();
+
 		for (Oferta oferta : leilao.getOfertas()) {
-			if(!ofertaValida(oferta)) {
+			if (!ofertaValida(oferta)) {
 				continue;
 			}
-			
+
 			double proximoLance = lanceMinimo + incremento;
-			
-			if(proximoLance > lanceMinimo) {
+
+			if (proximoLance > lanceMinimo) {
 				lanceMinimo = proximoLance;
 			}
 		}
-		
+
 		return lanceMinimo;
 
 	}

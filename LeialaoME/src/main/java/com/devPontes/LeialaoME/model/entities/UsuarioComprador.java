@@ -29,9 +29,9 @@ public class UsuarioComprador extends Usuario implements Serializable {
 	@OneToMany(mappedBy = "comprador")
 	private Set<Leilao> leiloesPaticipados = new HashSet<>();
 
-	public UsuarioComprador(Long id, String username, String password, String biografia, byte[] fotoPerfil,
+	public UsuarioComprador(Long id, String username, String password, String biografia, String urlFotoPerfil,
 			Set<Permissao> permissoes, String cpf, List<Oferta> ofertas) {
-		super(id, username, password, biografia, fotoPerfil, permissoes);
+		super(id, username, password, biografia, urlFotoPerfil, permissoes);
 		this.cpf = cpf;
 		this.ofertas = ofertas;
 	}
