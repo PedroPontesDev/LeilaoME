@@ -42,7 +42,7 @@ public abstract class Usuario implements UserDetails, Serializable {
 	private String password;
 
 	@Lob
-	@Column()
+	@Column(length = 225)
 	private String biografia;
 
 	private String urlFotoPerfil;
@@ -84,7 +84,9 @@ public abstract class Usuario implements UserDetails, Serializable {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return permissoes.stream().map(p -> (GrantedAuthority) () -> p.getUsuarioRole().name()).toList();
+		return permissoes
+				.stream()
+				.map(p -> (GrantedAuthority) () -> p.getUsuarioRole().name()).toList(); //Mapeano as role
 	}
 
 	@Override

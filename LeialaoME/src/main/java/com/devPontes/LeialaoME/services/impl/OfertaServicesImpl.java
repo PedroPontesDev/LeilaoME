@@ -20,6 +20,8 @@ import com.devPontes.LeialaoME.repositories.UsuarioCompradorRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioVendedorRepositories;
 import com.devPontes.LeialaoME.services.OfertaService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class OfertaServicesImpl implements OfertaService {
 
@@ -55,9 +57,8 @@ public class OfertaServicesImpl implements OfertaService {
 		ofertaNova.setComprador(comprador);
 		ofertaNova.setStatusOferta(StatusOferta.ATIVA);
 
-		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino())) {
+		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
-		}
 
 		// Calcula valor mínimo permitido
 		Double valorMinimo = calcularNovoLanceMinimo(leilaoId);
@@ -81,9 +82,34 @@ public class OfertaServicesImpl implements OfertaService {
 		return MyMaper.parseObject(ofertaNova, OfertaDTO.class);
 	}
 
-	@Override
 	// Trabalhar com datas verificar se ofertas subiR
+	@Override
+	@Transactional
 	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) {
+
+		 // 1. Buscar leilão e comprador pra ver se ecoincidem na mesma transação
+		Leilao leilao = leilaoRepository.findById(leilaoId)
+				.orElseThrow(() -> new LeilaoException("Leillão não encontraado com Id" + leilaoId));
+		if (!leilao.isAindaAtivo()) {
+			throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
+		}	
+		
+		UsuarioComprador usuarioComprador = (UsuarioComprador) compradorRepository.findById(compradorId)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
+
+		Oferta maiorOferta;
+		Oferta ultimoComprador;
+
+		for (Oferta ofertas : leilao.getOfertas()) {
+			if (leilao.getComprador().equals(usuarioComprado))
+				continue;
+			if (leilao.isAindaAtivo())
+				continue;
+			if()
+			
+			
+		}
+
 		// Verificar se o comprador deu o lance no leilao e percorrer os lances de
 		// determinado leilao verificar o ultimo lance
 		// caso ultimo lance subir e o status ainda estr ativo fazer nova oferta maior q
@@ -96,7 +122,6 @@ public class OfertaServicesImpl implements OfertaService {
 		Leilao leilao = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilao não encontrado com ID" + leilaoId));
 		// Lance inicial do leilão
-
 		double lanceMinimo;
 
 		if (leilao.getLanceInicial() != null) {

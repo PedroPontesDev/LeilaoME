@@ -37,15 +37,6 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		// Mapear DTO para entidade
 		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class);
 
-		// Converter permissões do DTO para entidades (se houver)
-		Set<Permissao> permissoes = novoUsuario.getPermissoes().stream().map(p -> {
-			Permissao permissao = new Permissao();
-			permissao.setUsuarioRole(UsuarioRole.valueOf(p.getNome()));
-			return permissao;
-		}).collect(Collectors.toSet());
-
-		user.getPermissoes().addAll(permissoes);
-
 		if(!CnpjCpfValidadorClient.validarCPf(novoUsuario.getCpf())) 
 											throw new Exception("CPF Não Pode Ser Validado como CPF");
 		
@@ -62,9 +53,6 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 		// Mapear de volta para DTO e refletir permissões do banco
 		UsuarioDTO dto = MyMaper.parseObject(salvo, UsuarioDTO.class);
-		dto.setPermissoes(salvo.getPermissoes().stream().filter(p -> p.getUsuarioRole() != null)
-				.map(p -> new PermissaoDTO(p.getUsuarioRole().name())).collect(Collectors.toSet()));
-
 		return dto;
 
 	}
@@ -77,7 +65,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	}
 
 	@Override
-	public byte[] fazerUploadDeImamgemDePerfil(MultipartFile file) {
+	public String fazerUploadDeImamgemDePerfil(MultipartFile file) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -101,13 +89,13 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	}
 
 	@Override
-	public UsuarioDTO findOfertasMaisCaras(Long ofertaId, Long userId, String username) {
+	public LeilaoDTO findOfertasMaisCaras(Long ofertaId, Long userId, String username) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public LeilaoDTO mostrarLeiloesAdquiridos(Long leiloesId, Long usuaroCompradorId, String username) {
+	public LeilaoDTO mostrarLeiloesAdquiridosDeUsuario(Long usuaroCompradorId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

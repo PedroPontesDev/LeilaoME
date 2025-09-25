@@ -11,10 +11,10 @@ public interface UsuarioCompradorService {
 
 	 UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception;
 	 UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId);
-	 byte[] fazerUploadDeImamgemDePerfil(MultipartFile file);
+	 String fazerUploadDeImamgemDePerfil(MultipartFile file);
 	 String escreverBiografia(Long usuarioId, String beografia);
 	 String atualizarUsername(Long usuarioId, String usernameNovo);
 	 String atualizarPassword(Long usuarioId, String passwordNova);
-	 UsuarioDTO findOfertasMaisCaras(Long ofertaId, Long userId, String username);
-	 LeilaoDTO mostrarLeiloesAdquiridos(Long leiloesId, Long usuaroCompradorId, String username);
+	 LeilaoDTO findOfertasMaisCaras(Long ofertaId, Long userId, String username);
+	 LeilaoDTO mostrarLeiloesAdquiridosDeUsuario(Long usuaroCompradorId);
 }

@@ -22,6 +22,14 @@ import com.devPontes.LeialaoME.security.services.CustomUserDetailsServices;
 @EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
+	//Configuração central do AuthenticantionManager
+	//Configuracão central do AuthProvider com DaoAuthProvider
+	//Configuragação central do BCrypt
+	
+	//Autorização de rotas em roles de users
+	
+	//tuo gerenciado pelo Spring Bean
+	
 	@Autowired
 	private CustomUserDetailsServices userDetailsServices;
 
