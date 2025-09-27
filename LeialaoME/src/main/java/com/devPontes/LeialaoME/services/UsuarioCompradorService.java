@@ -11,7 +11,7 @@ public interface UsuarioCompradorService {
 
 	 UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception;
 	 UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId);
-	 String fazerUploadDeImamgemDePerfil(MultipartFile file);
+	 String fazerUploadDeImamgemDePerfil(MultipartFile file) throws Exception;
 	 String escreverBiografia(Long usuarioId, String beografia);
 	 String atualizarUsername(Long usuarioId, String usernameNovo);
 	 String atualizarPassword(Long usuarioId, String passwordNova);

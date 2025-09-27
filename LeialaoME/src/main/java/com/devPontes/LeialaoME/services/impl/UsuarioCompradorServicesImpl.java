@@ -1,5 +1,7 @@
 package com.devPontes.LeialaoME.services.impl;
 
+import java.io.File;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -26,6 +28,12 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradorServicesImpl.class);
 
+	//private final S3Client s3Client;
+
+   // @Value("${aws.s3.bucket}")
+  //  private String bucketName;
+	
+	
 	@Autowired
 	private UsuarioRepositories usuarioRepository;
   
@@ -37,15 +45,14 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	
 	public UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception {
-		// Mapear DTO para entidade
-		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class);
+		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class); // Mapear DTO para entidade
 		user.setUrlFotoPerfil(novoUsuario.getFotoPerfil());
 
 		if (!CnpjCpfValidadorClient.validarCPf(user.getCpf()))
 			throw new Exception("CPF Não Pode Ser Validado como CPF");
 		
-		// Garantir que o usuário sempre receba ROLE_COMPRADOR
-		Permissao roleComprador = permissaoRepository.findByUsuarioRole(UsuarioRole.ROLE_COMPRADOR);
+	
+		Permissao roleComprador = permissaoRepository.findByUsuarioRole(UsuarioRole.ROLE_COMPRADOR); // Garantir que o usuário sempre receba ROLE_COMPRADOR
 		if (roleComprador == null) 
 			throw new RuntimeException("Permissão ROLE_COMPRADOR não encontrada no banco!");
 		user.getPermissoes().add(roleComprador);
@@ -61,25 +68,48 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 								.stream()
 								.map(p -> new PermissaoDTO(UsuarioRole.ROLE_COMPRADOR))
 								.collect(Collectors.toSet()));
-		
-		///Manipular o dto pra tentar resolve ro bug do json nao retornal o campo foto de urlFotoPerifl
-		///AH Q ODIO
-		///
 		return dto;
-
 	} 
 
 	@Override
 	public UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId) {
-		// TODO Auto-generated method stub
+		// TODO : buscar no banc usuario existente e atualizar campos vindo da request salvar e mapear de volta
 		return null;
 		
 		
 	}
 
 	@Override
-	public String fazerUploadDeImamgemDePerfil(MultipartFile file) {
-		// TODO Auto-generated method stub
+	public String fazerUploadDeImamgemDePerfil(MultipartFile file) throws Exception {
+		/* TODO: Utilizar o parametro file o objeto File  e o IOstream pra fazer um uppload salvar no banco. 
+		Lembrar de criar variaveis com o Objeto file criar para o diretorio/destion e nome de arquivo */
+		
+		try {
+
+			 // 1. Valida se não está vazio
+			if(file.isEmpty()) {
+				throw new RuntimeException("Aquivo vazio!");
+			}
+		
+			//2 .Gerar nome do arquivo UNICO E IMUTAVEL
+			String nomeArquivo = UUID.randomUUID() + "_" + file.getName();
+			
+			// 3. Caminho local (pasta "uploads" no projeto)
+			File pasta = new File("");  
+			
+			
+		
+			
+			
+			
+		}catch (Exception e) {
+			throw new RuntimeException("Upload não pôde ser concluido!");
+		}
+		
+		
+		
+		
+		
 		return null;
 	}
 
