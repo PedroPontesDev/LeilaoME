@@ -38,6 +38,8 @@ public class WebSecurityConfig {
 
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll()
+						.requestMatchers("/comprador/**").hasAnyRole("COMPRADOR")
+						.requestMatchers("/vendedor/**").hasAnyRole("COMPRADOR")
 						.requestMatchers("/leilao/**").hasAnyRole("COMPRADOR", "VENDEDOR")
 						.requestMatchers("/lances/**").hasAnyRole("COMPRADOR", "VENDEDOR")
 						.requestMatchers("/auth/cadastro-admin").hasAnyRole("ADMIN")
