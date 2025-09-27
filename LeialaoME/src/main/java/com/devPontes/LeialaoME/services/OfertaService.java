@@ -1,7 +1,5 @@
 package com.devPontes.LeialaoME.services;
 
-import java.math.BigDecimal;
-
 import org.springframework.stereotype.Service;
 
 import com.devPontes.LeialaoME.model.dto.OfertaDTO;

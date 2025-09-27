@@ -1,37 +1,36 @@
 package com.devPontes.LeialaoME.model.dto;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class UsuarioCompradorDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+import com.devPontes.LeialaoME.model.entities.Permissao;
+import com.devPontes.LeialaoME.model.entities.Usuario;
 
-    private Long id;
-    private String username;
-    private String biografia;
-    private String urlProfilePic;
+public class UsuarioCompradorDTO extends Usuario {
+	private static final long serialVersionUID = 1L;
 
-    private List<OfertaDTO> ofertas = new ArrayList<>();
-    private Set<LeilaoDTO> leiloesParticipados = new HashSet<>();
+	private String biografia;
+	private String urlProfilePic;
 
-    public UsuarioCompradorDTO() {}
+	private List<OfertaDTO> ofertas = new ArrayList<>();
+	private Set<LeilaoDTO> leiloesParticipados = new HashSet<>();
 
-    public UsuarioCompradorDTO(Long id, String username, String biografia, String urlProfilePic, List<OfertaDTO> ofertas,
+	public UsuarioCompradorDTO() {
+	}
+
+	public UsuarioCompradorDTO(Long id, String username, String password, String biografia, String urlFotoPerfil,
+			Set<Permissao> permissoes, String urlProfilePic, List<OfertaDTO> ofertas,
 			Set<LeilaoDTO> leiloesParticipados) {
-		super();
-		this.id = id;
-		this.username = username;
-		this.biografia = biografia;
-		this.setUrlProfilePic(urlProfilePic);
+		super(id, username, password, biografia, urlFotoPerfil, permissoes);
+		this.urlProfilePic = urlProfilePic;
 		this.ofertas = ofertas;
 		this.leiloesParticipados = leiloesParticipados;
 	}
-    
-    public String getUrlProfilePic() {
+
+	public String getUrlProfilePic() {
 		return urlProfilePic;
 	}
 
@@ -39,64 +38,58 @@ public class UsuarioCompradorDTO implements Serializable {
 		this.urlProfilePic = urlProfilePic;
 	}
 
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public String getBiografia() {
+		return biografia;
+	}
 
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public void setBiografia(String biografia) {
+		this.biografia = biografia;
+	}
 
-    public String getBiografia() {
-        return biografia;
-    }
-    public void setBiografia(String biografia) {
-        this.biografia = biografia;
-    }
+	public List<OfertaDTO> getOfertas() {
+		return ofertas;
+	}
 
-    public List<OfertaDTO> getOfertas() {
-        return ofertas;
-    }
-    public void setOfertas(List<OfertaDTO> ofertas) {
-        this.ofertas = ofertas;
-    }
+	public void setOfertas(List<OfertaDTO> ofertas) {
+		this.ofertas = ofertas;
+	}
 
-    public Set<LeilaoDTO> getLeiloesParticipados() {
-        return leiloesParticipados;
-    }
-    public void setLeiloesParticipados(Set<LeilaoDTO> leiloesParticipados) {
-        this.leiloesParticipados = leiloesParticipados;
-    }
+	public Set<LeilaoDTO> getLeiloesParticipados() {
+		return leiloesParticipados;
+	}
 
-    // Equals e HashCode (baseados no id)
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        UsuarioCompradorDTO other = (UsuarioCompradorDTO) obj;
-        return Objects.equals(id, other.id);
-    }
+	public void setLeiloesParticipados(Set<LeilaoDTO> leiloesParticipados) {
+		this.leiloesParticipados = leiloesParticipados;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(biografia, leiloesParticipados, ofertas, urlProfilePic);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UsuarioCompradorDTO other = (UsuarioCompradorDTO) obj;
+		return Objects.equals(biografia, other.biografia)
+				&& Objects.equals(leiloesParticipados, other.leiloesParticipados)
+				&& Objects.equals(ofertas, other.ofertas) && Objects.equals(urlProfilePic, other.urlProfilePic);
+	}
 
 	@Override
 	public String toString() {
-		return "UsuarioCompradorDTO [id=" + id + ", username=" + username + ", biografia=" + biografia
-				+ ", urlProfilePic=" + urlProfilePic + ", ofertas=" + ofertas + ", leiloesParticipados="
-				+ leiloesParticipados + "]";
+		return "UsuarioCompradorDTO [biografia=" + biografia + ", urlProfilePic=" + urlProfilePic + ", ofertas="
+				+ ofertas + ", leiloesParticipados=" + leiloesParticipados + "]";
 	}
 
-    
-    
-
+	
 	
 }

@@ -1,7 +1,6 @@
 package com.devPontes.LeialaoME.model.entities;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;

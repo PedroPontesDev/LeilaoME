@@ -1,18 +1,23 @@
 package com.devPontes.LeialaoME.model.dto;
 
+import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
+
 public class PermissaoDTO {
     
-	private String nome;
+	private UsuarioRole roles;
     
-    // Construtor padrão necessário
     public PermissaoDTO() {}
 
-    // Construtor opcional
-    public PermissaoDTO(String nome) {
-        this.nome = nome;
-    }
-  
-    // getters e setters
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public PermissaoDTO(UsuarioRole roles) {
+ 		this.roles = roles;
+ 	}
+
+	public UsuarioRole getRoles() {
+		return roles;
+	}
+
+	public void setRoles(UsuarioRole roles) {
+		this.roles = roles;
+	}
+
 }

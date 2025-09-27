@@ -23,9 +23,33 @@ public class Pagamento implements Serializable{
 
 	public Pagamento(Long id, LocalDateTime horarioDoPagamento, boolean foiConcluido, Double totalPagamento) {
 		this.id = id;
-		this.horarioDoPagamento = horarioDoPagamento;
+		this.setHorarioDoPagamento(horarioDoPagamento);
+		this.setFoiConcluido(foiConcluido);
+		this.setTotalPagamento(totalPagamento);
+	}
+
+	public boolean isFoiConcluido() {
+		return foiConcluido;
+	}
+
+	public void setFoiConcluido(boolean foiConcluido) {
 		this.foiConcluido = foiConcluido;
+	}
+
+	public Double getTotalPagamento() {
+		return totalPagamento;
+	}
+
+	public void setTotalPagamento(Double totalPagamento) {
 		this.totalPagamento = totalPagamento;
+	}
+
+	public LocalDateTime getHorarioDoPagamento() {
+		return horarioDoPagamento;
+	}
+
+	public void setHorarioDoPagamento(LocalDateTime horarioDoPagamento) {
+		this.horarioDoPagamento = horarioDoPagamento;
 	}
 	
 	

@@ -1,8 +1,6 @@
 package com.devPontes.LeialaoME.services.impl;
 
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +16,7 @@ import com.devPontes.LeialaoME.model.entities.Permissao;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
 import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
+import com.devPontes.LeialaoME.repositories.PermissaoRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioRepositories;
 import com.devPontes.LeialaoME.services.UsuarioCompradorService;
 import com.devPontes.LeialaoME.utils.CnpjCpfValidadorClient;
@@ -29,39 +28,53 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	@Autowired
 	private UsuarioRepositories usuarioRepository;
+  
+	@Autowired
+	private PermissaoRepositories permissaoRepository;
 
 	@Autowired
 	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+	
 	public UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception {
 		// Mapear DTO para entidade
 		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class);
+		user.setUrlFotoPerfil(novoUsuario.getFotoPerfil());
 
-		if(!CnpjCpfValidadorClient.validarCPf(novoUsuario.getCpf())) 
-											throw new Exception("CPF Não Pode Ser Validado como CPF");
+		if (!CnpjCpfValidadorClient.validarCPf(user.getCpf()))
+			throw new Exception("CPF Não Pode Ser Validado como CPF");
 		
 		// Garantir que o usuário sempre receba ROLE_COMPRADOR
-		Permissao roleComprador = new Permissao();
-		roleComprador.setUsuarioRole(UsuarioRole.ROLE_COMPRADOR);
+		Permissao roleComprador = permissaoRepository.findByUsuarioRole(UsuarioRole.ROLE_COMPRADOR);
+		if (roleComprador == null) 
+			throw new RuntimeException("Permissão ROLE_COMPRADOR não encontrada no banco!");
 		user.getPermissoes().add(roleComprador);
-
-		// Criptografar senha
+		
 		user.setPassword(encoder.encode(user.getPassword()));
-
-		// Salvar no banco
+		
 		UsuarioComprador salvo = usuarioRepository.save(user);
 
-		// Mapear de volta para DTO e refletir permissões do banco
 		UsuarioDTO dto = MyMaper.parseObject(salvo, UsuarioDTO.class);
+
+		//Manipular o dto pra tentar resolver o bug do json voltando c permissao nula msm c roles no banco
+		dto.setPermissoes(user.getPermissoes()
+								.stream()
+								.map(p -> new PermissaoDTO(UsuarioRole.ROLE_COMPRADOR))
+								.collect(Collectors.toSet()));
+		
+		///Manipular o dto pra tentar resolve ro bug do json nao retornal o campo foto de urlFotoPerifl
+		///AH Q ODIO
+		///
 		return dto;
 
-	}
-
+	} 
 
 	@Override
 	public UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId) {
 		// TODO Auto-generated method stub
 		return null;
+		
+		
 	}
 
 	@Override
@@ -99,6 +112,5 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }

@@ -1,13 +1,9 @@
 package com.devPontes.LeialaoME.model.dto;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
-import com.devPontes.LeialaoME.model.entities.Permissao;
-import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 
 public class UsuarioDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -19,7 +15,7 @@ public class UsuarioDTO implements Serializable {
 
 	private String biografia;
 
-	private byte[] fotoPerfil;
+	private String fotoPerfil;
 
 	private Set<PermissaoDTO> permissoes = new HashSet<>();
 	
@@ -28,7 +24,7 @@ public class UsuarioDTO implements Serializable {
 	public UsuarioDTO() {
 	}
 
-	public UsuarioDTO(Long id, String username, String password, String biografia, byte[] fotoPerfil,
+	public UsuarioDTO(Long id, String username, String password, String biografia, String fotoPerfil,
 			Set<PermissaoDTO> permissoes) {
 		this.id = id;
 		this.username = username;
@@ -39,7 +35,7 @@ public class UsuarioDTO implements Serializable {
 	}
 	
 	
-	public UsuarioDTO(Long id, String username, String password, String biografia, byte[] fotoPerfil,
+	public UsuarioDTO(Long id, String username, String password, String biografia, String fotoPerfil,
 			Set<PermissaoDTO> permissoes, String cpf) {
 		this.id = id;
 		this.username = username;
@@ -94,11 +90,13 @@ public class UsuarioDTO implements Serializable {
 		this.permissoes = permissoes;
 	}
 
-	public byte[] getFotoPerfil() {
+	
+
+	public String getFotoPerfil() {
 		return fotoPerfil;
 	}
 
-	public void setFotoPerfil(byte[] fotoPerfil) {
+	public void setFotoPerfil(String fotoPerfil) {
 		this.fotoPerfil = fotoPerfil;
 	}
 
@@ -126,7 +124,7 @@ public class UsuarioDTO implements Serializable {
 	@Override
 	public String toString() {
 		return "UsuarioDTO [id=" + id + ", username=" + username + ", password=" + password + ", biografia=" + biografia
-				+ ", fotoPerfil=" + Arrays.toString(fotoPerfil) + ", permissoes=" + permissoes + "]";
+				+ ", fotoPerfil=" + fotoPerfil + ", permissoes=" + permissoes + ", cpf=" + cpf + "]";
 	}
 
 }

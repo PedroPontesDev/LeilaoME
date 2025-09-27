@@ -72,7 +72,7 @@ public class OfertaServicesImpl implements OfertaService {
 		leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta() + valorMinimo);
 
 		// Adiciona oferta ao leilão
-		leilaoExistente.getOfertas().add(ofertaNova);
+		leilaoExistente.getOfertas().add(ofertaNova); 
 
 		// Salva oferta e leilão
 		ofertaRepository.save(ofertaNova);

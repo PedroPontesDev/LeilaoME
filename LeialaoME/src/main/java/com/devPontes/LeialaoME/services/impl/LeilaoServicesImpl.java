@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import com.devPontes.LeialaoME.model.entities.Leilao;
 import com.devPontes.LeialaoME.model.entities.Oferta;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
-import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.LeilaoRepositories;
 import com.devPontes.LeialaoME.repositories.OfertaRepositories;

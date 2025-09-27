@@ -54,9 +54,9 @@ public class AuthController {
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
 	}
 
-	
+	/*
 	public ResponseEntity<UsuarioDTO> registrarUsuarioVendedor(UsuarioDTO usuarioVendedor) throws Exception {
 		UsuarioDTO saved = userServices.cadastrarUsuarioComprador(usuarioVendedor);
 		return new ResponseEntity<>(saved, HttpStatus.CREATED);
-	}
+	}*/
 }
