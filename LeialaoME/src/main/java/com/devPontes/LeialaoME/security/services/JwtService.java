@@ -40,7 +40,9 @@ public class JwtService {
 	public String validateToken(String token) {
 		Algorithm alg = Algorithm.HMAC512(secret);
 
-		return JWT.require(alg).withIssuer("Leilao-WebService").build().verify(token).getSubject();
+		return JWT.require(alg)
+				.withIssuer("Leilao-WebService").build()
+				.verify(token).getSubject();
 	}
 
 	private Date calculateExpiration() {

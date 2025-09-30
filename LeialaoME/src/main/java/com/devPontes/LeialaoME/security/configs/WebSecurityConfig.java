@@ -35,27 +35,29 @@ public class WebSecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	    http
+	        .csrf(csrf -> csrf.disable())
+	        .authorizeHttpRequests(auth -> auth
+	            .requestMatchers("/auth/**").permitAll()
+	            .requestMatchers("/v1/comprador/**").hasAuthority("ROLE_COMPRADOR")
+	            .anyRequest().authenticated()
+	        )
+	        .sessionManagement(session -> session
+	            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+	        );
 
-		http.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll()
-						.requestMatchers("/comprador/**").hasAnyRole("COMPRADOR")
-						.requestMatchers("/vendedor/**").hasAnyRole("COMPRADOR")
-						.requestMatchers("/leilao/**").hasAnyRole("COMPRADOR", "VENDEDOR")
-						.requestMatchers("/lances/**").hasAnyRole("COMPRADOR", "VENDEDOR")
-						.requestMatchers("/auth/cadastro-admin").hasAnyRole("ADMIN")
-						.anyRequest().fullyAuthenticated())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-		return http.build();
+	    return http.build();
 	}
+
 
 	@Bean
-	public AuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsServices);
-		authProvider.setPasswordEncoder(passwordEncoder());
-		return authProvider;
+	public AuthenticationProvider authenticationProvider() {  //Atualizção temq setar o objeto nao passar no construtotor
+	    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+	    authProvider.setUserDetailsService(userDetailsServices);
+	    authProvider.setPasswordEncoder(passwordEncoder());
+	    return authProvider;
 	}
-
+	
 	@Bean
 	public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();

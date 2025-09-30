@@ -47,16 +47,4 @@ public class AuthController {
 		return new UsuarioLoginResponseDTO(request.getUsername(), token); 
 	}
 	
-
-	@PostMapping(path = "/cadastrar-comprador")
-	public ResponseEntity<UsuarioDTO> registrarUsuarioComprador(@RequestBody UsuarioDTO usuario) throws Exception {
-		UsuarioDTO saved = userServices.cadastrarUsuarioComprador(usuario);
-	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
-	}
-
-	/*
-	public ResponseEntity<UsuarioDTO> registrarUsuarioVendedor(UsuarioDTO usuarioVendedor) throws Exception {
-		UsuarioDTO saved = userServices.cadastrarUsuarioComprador(usuarioVendedor);
-		return new ResponseEntity<>(saved, HttpStatus.CREATED);
-	}*/
 }
