@@ -4,7 +4,9 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import com.devPontes.LeialaoME.model.entities.Leilao;
 import com.devPontes.LeialaoME.model.entities.Oferta;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
+import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.LeilaoRepositories;
 import com.devPontes.LeialaoME.repositories.OfertaRepositories;
@@ -106,21 +109,20 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	        throw new LeilaoException("Nenhuma oferta encontrada neste leilão.");
 	    }
 	    
-		Oferta maiorOferta = leilaoExistente.getOfertas()
+		Optional<Oferta> maiorOferta = leilaoExistente.getOfertas()
 							.stream()
-							.max(Comparator.comparing(Oferta::getValorOferta)).get();
+							 .filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+							 .filter(o -> o.getValorOferta() != null)
+							.max(Comparator.comparing(Oferta::getValorOferta));
 		
 		
-		UsuarioComprador vencedor = maiorOferta.getComprador();
-		maiorOferta.setComprador(vencedor);
+		UsuarioComprador vencedor = maiorOferta.get().getComprador();
+		maiorOferta.get().setComprador(vencedor);
 		leilaoExistente.setComprador(vencedor);
 		
 		leilaoRepository.save(leilaoExistente);
-		ofertaRepository.save(maiorOferta);
-		compradorRepository.save(vencedor);
-		
-
-		// Precisa verificar a maior oferta dentro do leilao, verificar se esta ativo
+	
+		// Verfica a maior oferta dentro do leilao, verificar se esta ativo
 		// e setar o ganhador verificando qual é a oferta mais cara baseado
 		// Nas ofertas dadas pelos compradores
 		

@@ -47,6 +47,7 @@ public class CnpjCpfValidadorClient {
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode root = mapper.readTree(resposta.getBody());
 			situacao = root.path("situacao").asText();
+			
 		}
 		if ("ATIVA".equalsIgnoreCase(situacao)) {
 			return true;

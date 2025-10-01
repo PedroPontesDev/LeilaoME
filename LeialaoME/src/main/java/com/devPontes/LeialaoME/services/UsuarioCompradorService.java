@@ -1,7 +1,9 @@
 package com.devPontes.LeialaoME.services;
 
+import java.util.Map;
 import java.util.Set;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +16,7 @@ public interface UsuarioCompradorService {
 
 	 UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception;
 	 UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId);
-	 String fazerUploadDeImamgemDePerfil(Long id, MultipartFile file) throws Exception;
+	 Map<String, Object> fazerUploadDeImamgemDePerfil(Long id, MultipartFile file) throws Exception;
 	 String escreverBiografia(Long usuarioId, String beografia);
 	 String atualizarUsername(Long usuarioId, String usernameNovo);
 	 String atualizarPassword(Long usuarioId, String passwordNova);
