@@ -31,11 +31,12 @@ public class JwtService {
 			String token = JWT.create()
 					.withIssuer("Leilao-WebService")
 					.withSubject(userDetails.getUsername())
-					.withExpiresAt(calculateExpiration()).withClaim("roles", userDetails.
-																		getAuthorities()
-																		.stream()
-																		.map(GrantedAuthority::getAuthority)
-																		.collect(Collectors.toList()))
+					.withExpiresAt(calculateExpiration())
+					.withClaim("roles", userDetails.getAuthorities()
+													.stream()
+													.map(GrantedAuthority::getAuthority)
+													
+													.collect(Collectors.toList()))
 																		.sign(alg);
 			return token;
 

@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service
-public class JwtTokenFilter {
+public class JwtTokenFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private JwtService jwtService;
@@ -47,6 +48,10 @@ public class JwtTokenFilter {
 			authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
 			SecurityContextHolder.getContext().setAuthentication(authToken);
+			
+			logger.info("Token recebido: " + token);
+			logger.info("Username extraído: " + username);
+
 		}
 
 		filterChain.doFilter(request, response);
