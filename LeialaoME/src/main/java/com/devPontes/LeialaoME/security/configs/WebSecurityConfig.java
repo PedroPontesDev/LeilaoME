@@ -28,7 +28,7 @@ public class WebSecurityConfig {
 	        .csrf(csrf -> csrf.disable())
 	        .authorizeHttpRequests(auth -> auth
 	            .requestMatchers("/auth/**").permitAll()
-	            .requestMatchers("/v1/comprador/**").permitAll()
+	            .requestMatchers("/v1/comprador/**").hasAuthority("ROLE_COMPRADOR") //JA TENTEI COMPRADOR ´SO APENAS TBM
 	        )
 	        .sessionManagement(session -> session
 	            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

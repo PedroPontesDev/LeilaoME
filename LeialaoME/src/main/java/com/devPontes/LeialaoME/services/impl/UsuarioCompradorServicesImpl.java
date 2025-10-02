@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,13 +30,15 @@ import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.PermissaoRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioCompradorRepositories;
+import com.devPontes.LeialaoME.repositories.UsuarioRepositories;
 import com.devPontes.LeialaoME.services.UsuarioCompradorService;
 import com.devPontes.LeialaoME.utils.CnpjCpfValidadorClient;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
+
+	@Autowired
+    private final UsuarioRepositories usuarioRepositories;
 
 	@Autowired
 	private UsuarioCompradorRepositories usuarioRepository;
@@ -46,10 +47,16 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	private PermissaoRepositories permissaoRepository;
 	
 	@Autowired
-	private 
-
-	@Autowired
 	private BCryptPasswordEncoder encoder;
+	
+	public UsuarioCompradorServicesImpl(UsuarioRepositories usuarioRepositories,
+			UsuarioCompradorRepositories usuarioRepository, PermissaoRepositories permissaoRepository,
+			BCryptPasswordEncoder encoder) {
+		this.usuarioRepositories = usuarioRepositories;
+		this.usuarioRepository = usuarioRepository;
+		this.permissaoRepository = permissaoRepository;
+		this.encoder = encoder;
+	}
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradorServicesImpl.class);
 
@@ -92,7 +99,9 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	 * @throws Exception caso algo dê errado
 	 */
 	public Map<String, Object> fazerUploadDeImamgemDePerfil(Long userId, MultipartFile file) throws Exception {
-
+		var entidade = usuarioRepository.findById(userId)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + userId));
+		
 		// 1️ Verifica se o arquivo está vazio
 		if (file.isEmpty()) {
 			throw new RuntimeException("Arquivo vazio!");
@@ -106,9 +115,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 		// 3️ Gera um nome único para o arquivo, evitando sobrescrita
 		String nomeArquivo = UUID.randomUUID() + "_FRONTEND_  " + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_"); // remove
-																															// caracteres
-																															// especiais
-
+			
 		// 4️ Cria a pasta de upload se não existir
 		File pasta = new File(uploadDir);
 		if (!pasta.exists()) {
@@ -128,17 +135,20 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 			}
 		}
 
-		// ria URL relativa para o frontend acessar a imagem
+		// cria URL relativa para o frontend acessar a imagem
 		String urlRelativa = "/uploads/" + nomeArquivo;
-
-		// 8️ Retorna informações do arquivo para o frontend
+		entidade.setUrlFotoPerfil(urlRelativa);
+		
+		// Retorna informações do arquivo para o frontend
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", "Upload concluído com sucesso!");
 		response.put("url", urlRelativa);
 		response.put("fileName", file.getOriginalFilename());
 		response.put("size", file.getSize()); // tamanho em bytes
-
-		log.info("Upload feito para usuário {} -> {}", userId, urlRelativa);
+		
+		log.info("Upload feito para usuário {} -> {}", userId, urlRelativa + "Para Onjeto/Entidade: " + entidade);
+		
+		usuarioRepositories.save(entidade);
 
 		return response;
 	}
@@ -203,21 +213,11 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	@Override
 	public Set<OfertaDTO> findOfertasMaisCaras(Long userId, Double minimumValue) {
-		// TODO: Achar as ofertas mais caras dadas por um comprador por SQL
+		// TODO: Achar as ofertas mais caras dadas por um comprador por JPQL
 
 		throw new UnsupportedOperationException("Não implementado ainda");
 	}
 
-	/*
-	 * public OfertaDTO findOfertaMaisBaixa(Long userId, Double maximumValue) { //
-	 * TODO: Achar as ofertas mais caras dadas por um comprador por SQL var entidade
-	 * = usuarioRepository.findById(usuarioId) .orElseThrow(() -> new
-	 * UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
-	 * 
-	 * 
-	 * 
-	 * throw new UnsupportedOperationException("Não implementado ainda"); }
-	 */
 
 	@Override
 	public Set<LeilaoDTO> findLeiloesAdquiridosDeUsuario(Long usuarioCompradorId) {
@@ -230,5 +230,6 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }

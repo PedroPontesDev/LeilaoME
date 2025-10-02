@@ -28,9 +28,7 @@ public class AuthServices {
 	public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request) {
 		 // autenticação correta
         auth.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-
+            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         // carregar detalhes do usuário
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
 

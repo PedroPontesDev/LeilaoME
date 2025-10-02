@@ -14,7 +14,7 @@ import com.devPontes.LeialaoME.services.impl.AuthServices;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/v1/auth")
 public class AuthController {
 
 	@Autowired
