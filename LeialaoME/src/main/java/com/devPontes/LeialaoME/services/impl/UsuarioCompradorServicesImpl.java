@@ -44,13 +44,18 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	@Autowired
 	private PermissaoRepositories permissaoRepository;
+	
+	@Autowired
+	private 
 
 	@Autowired
 	private BCryptPasswordEncoder encoder;
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradorServicesImpl.class);
 
-	private final String nameDir = "C:\\Users\\user\\Documents\\dumps\\uploads"; // pasta relativa dentro do projeto
+	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha
+	// permissão)
+	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
 
 	@Override
 	public UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception {
@@ -78,88 +83,63 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		return dto;
 	}
 
-	@Override
+	/**
+	 * Faz upload de imagem de perfil do usuário.
+	 * 
+	 * @param userId id do usuário (pode ser usado para associar a imagem)
+	 * @param file   MultipartFile enviado pelo frontend
+	 * @return Map com informações do upload
+	 * @throws Exception caso algo dê errado
+	 */
 	public Map<String, Object> fazerUploadDeImamgemDePerfil(Long userId, MultipartFile file) throws Exception {
-		// Trabalhando com JsonNode para frontend consumir como JSON é feio mas funciona
-		// bem
 
-		// Primeiro, buscamos o usuário no banco pelo ID. Se não existir, lançamos
-		// exceção.
-		// Isso evita tentar salvar uma foto para um usuário que não existe.
-		UsuarioComprador usuarioExistente = (UsuarioComprador) usuarioRepository.findById(userId).orElseThrow(
-				() -> new UsuarioNaoEncontradoException("Não foi possível carregar a foto deste usuário!"));
-
-		// Verifica se o arquivo enviado não está vazio.
-		// Evita criar arquivos zerados ou quebrar a lógica do upload.
-		if (file.isEmpty())
+		// 1️ Verifica se o arquivo está vazio
+		if (file.isEmpty()) {
 			throw new RuntimeException("Arquivo vazio!");
+		}
 
-		// Valida o tipo do arquivo. Aqui estamos aceitando apenas imagens jpg, jpeg ou
-		// png.
-		// getContentType() retorna o MIME type, mas aqui simplificamos usando endsWith.
-		// Se não for imagem, lançamos exceção. Isso previne uploads de arquivos
-		// inválidos.
+		// 2️ Valida o tipo do arquivo
 		String contentType = file.getContentType();
-
-		if (contentType == null || 
-		   !(contentType.equals("image/jpeg") || contentType.equals("image/png"))) {
-		    throw new Exception("Servidor só pode consumir imagens JPG ou PNG!");
+		if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png"))) {
+			throw new Exception("Servidor só pode consumir imagens JPG ou PNG!");
 		}
 
-		
-		// Criamos um nome único para o arquivo, usando UUID + nome original.
-		// Substituímos caracteres especiais no nome para evitar problemas no sistema de
-		// arquivos.
-		String nomeArquivo = UUID.randomUUID() + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+		// 3️ Gera um nome único para o arquivo, evitando sobrescrita
+		String nomeArquivo = UUID.randomUUID() + "_FRONTEND_  " + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_"); // remove
+																															// caracteres
+																															// especiais
 
-		// Criamos o diretório se ele não existir ainda.
-		// nameDir é uma pasta que definimos como destino dos uploads.
-		File pasta = new File(nameDir);
+		// 4️ Cria a pasta de upload se não existir
+		File pasta = new File(uploadDir);
 		if (!pasta.exists()) {
-			pasta.mkdir(); // mkdir cria apenas a pasta especificada, não subpastas.
+			pasta.mkdirs(); // cria a pasta e subpastas
 		}
 
-		// Criamos o Path completo do arquivo final (pasta + nome do arquivo)
-		// Path é melhor que File para manipulação de caminhos modernos no Java.
-		Path diretorio = Paths.get(pasta.getAbsolutePath(), nomeArquivo);
+		// 5️ Cria o Path completo do arquivo
+		Path caminhoArquivo = Paths.get(pasta.getAbsolutePath(), nomeArquivo);
 
-		// Aqui abrimos um InputStream para ler os bytes do MultipartFile
-		// e um OutputStream para gravar no disco.
-		// Fazemos isso em um try-with-resources para garantir que os streams serão
-		// fechados automaticamente.
-		try (InputStream input = file.getInputStream(); OutputStream output = Files.newOutputStream(diretorio)) {
+		// 6️ Abre InputStream do MultipartFile e OutputStream do Path
+		try (InputStream input = file.getInputStream(); OutputStream output = Files.newOutputStream(caminhoArquivo)) {
 
-			byte[] buffer = new byte[8192]; // Buffer de 8KB, lê por blocos para não carregar tudo na memória
+			byte[] buffer = new byte[8192]; // lê 8KB por vez
 			int bytesLidos;
-
-			// Enquanto houver bytes para ler do arquivo, vamos escrevendo no disco
-			// output.write escreve exatamente os bytes lidos no buffer, começando do 0 até
-			// bytesLidos
 			while ((bytesLidos = input.read(buffer)) != -1) {
-				output.write(buffer, 0, bytesLidos);
+				output.write(buffer, 0, bytesLidos); // escreve no disco
 			}
 		}
 
-		// Geramos a URL relativa do arquivo, que é o que vamos devolver ao front-end
-		// Isso permite que o React ou outro cliente consiga acessar a imagem depois.
+		// ria URL relativa para o frontend acessar a imagem
+		String urlRelativa = "/uploads/" + nomeArquivo;
 
-		String urlRelativa = "/uploads/" + (nomeArquivo);
-
-		// Atualizamos o usuário com a URL da foto de perfil
-		usuarioExistente.setUrlFotoPerfil(urlRelativa);
-		usuarioRepository.save(usuarioExistente);
-
-		// Retornamos a URL relativa para o front-end com JSONODE
-		ObjectMapper objMapper = new ObjectMapper();
-		JsonNode responseBody = objMapper.createObjectNode().put("url", urlRelativa);
-
-		// Cria uma resposta JSON simples
+		// 8️ Retorna informações do arquivo para o frontend
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", "Upload concluído com sucesso!");
 		response.put("url", urlRelativa);
 		response.put("fileName", file.getOriginalFilename());
 		response.put("size", file.getSize()); // tamanho em bytes
+
 		log.info("Upload feito para usuário {} -> {}", userId, urlRelativa);
+
 		return response;
 	}
 
