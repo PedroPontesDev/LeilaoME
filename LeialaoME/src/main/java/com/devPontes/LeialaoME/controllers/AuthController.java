@@ -13,7 +13,7 @@ import com.devPontes.LeialaoME.security.dtos.UsuarioLoginRequestDTO;
 import com.devPontes.LeialaoME.security.dtos.UsuarioLoginResponseDTO;
 import com.devPontes.LeialaoME.services.impl.AuthServices;
 
-@CrossOrigin(origins = "http://192.168.1.2:5173")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthController {

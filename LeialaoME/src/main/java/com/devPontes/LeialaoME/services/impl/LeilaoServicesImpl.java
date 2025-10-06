@@ -64,12 +64,12 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		if (!entity.isAindaAtivo())
 			throw new LeilaoException("Leilão está inativo!");
 
-		// Calcula duração atual
+		// Calcula duração atual com objeto Duration
 		Duration duracaoAtual = Duration.between(entity.getInicio(), entity.getTermino());
 
 		// Se o leilão já é menor que o mínimo, lança exceção
 		if (duracaoAtual.toHours() < tempoMinimoHoras)
-			throw new LeilaoException("O leilão não possui margem/tempo suficiente para abrir.");
+			throw new LeilaoException("O leilão não possui margem/tempo para abrir.");
 
 		// Se duracaoAtual do leilao for maior que tempo minimo esperado em horas eu
 		// seto o tempo
@@ -109,15 +109,16 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	        throw new LeilaoException("Nenhuma oferta encontrada neste leilão.");
 	    }
 	    
-		Optional<Oferta> maiorOferta = leilaoExistente.getOfertas()
+		Oferta maiorOferta = leilaoExistente.getOfertas()
 							.stream()
 							 .filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
 							 .filter(o -> o.getValorOferta() != null)
-							.max(Comparator.comparing(Oferta::getValorOferta));
+							 .max(Comparator.comparing(Oferta::getValorOferta)
+									 .thenComparing(o -> o .getComprador().getId())).get(); //Tratar erros depos
 		
 		
-		UsuarioComprador vencedor = maiorOferta.get().getComprador();
-		maiorOferta.get().setComprador(vencedor);
+		UsuarioComprador vencedor = maiorOferta.getComprador();
+		maiorOferta.setComprador(vencedor);
 		leilaoExistente.setComprador(vencedor);
 		
 		leilaoRepository.save(leilaoExistente);

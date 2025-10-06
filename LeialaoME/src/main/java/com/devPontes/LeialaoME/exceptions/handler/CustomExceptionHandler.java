@@ -34,7 +34,7 @@ public class CustomExceptionHandler {
 
 	// Tratar oferta inválida / NEGADA
 	@ExceptionHandler(OfertaNegadaException.class)
-	public ResponseEntity<ExceptionResponse> handleLeilaoEncerrado(OfertaNegadaException ex, WebRequest request) {
+	public ResponseEntity<ExceptionResponse> handleOfertaEncerrado(OfertaNegadaException ex, WebRequest request) {
 		ExceptionResponse erro = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
 	}

@@ -1,6 +1,7 @@
 package com.devPontes.LeialaoME.services.impl;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,16 +40,13 @@ public class OfertaServicesImpl implements OfertaService {
 
 	@Override
 	public OfertaDTO fazerPropostaParaLeilao(OfertaDTO ofertaDTO, Long leilaoId, Long compradorId) {
-		// Busca leilão
 		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilão não encontrado com ID " + leilaoId));
 
-		// Verifica se leilão está ativo
 		if (!leilaoExistente.isAindaAtivo()) {
 			throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
 		}
 
-		// Busca comprador
 		UsuarioComprador comprador = (UsuarioComprador) compradorRepository.findById(compradorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado com ID " + compradorId));
 
@@ -72,7 +70,7 @@ public class OfertaServicesImpl implements OfertaService {
 		leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta() + valorMinimo);
 
 		// Adiciona oferta ao leilão
-		leilaoExistente.getOfertas().add(ofertaNova); 
+		leilaoExistente.getOfertas().add(ofertaNova);
 
 		// Salva oferta e leilão
 		ofertaRepository.save(ofertaNova);
@@ -81,7 +79,6 @@ public class OfertaServicesImpl implements OfertaService {
 		// Retorna DTO atualizado
 		return MyMaper.parseObject(ofertaNova, OfertaDTO.class);
 	}
-
 
 	@Override
 	@Transactional
@@ -95,21 +92,31 @@ public class OfertaServicesImpl implements OfertaService {
 			throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
 		}
 
+		Oferta oferta = leilao.getOfertas()
+				.stream()
+				.filter(l -> l.getComprador().getId().equals(compradorId))
+				.max(Comparator.comparingDouble(Oferta::getValorOferta).reversed())
+				.get();
+		
+		
 		UsuarioComprador usuarioComprador = (UsuarioComprador) compradorRepository.findById(compradorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
 
 		Double maiorLanceInicial = leilao.getLanceInicial();
 
-		for (Oferta oferta : leilao.getOfertas()) {
-			if (leilao.getComprador().equals(usuarioComprador))
-				continue;
-			if (leilao.isAindaAtivo())
-				continue;
-			if (oferta.getStatusOferta() != StatusOferta.ATIVA)
-				continue;
-			if (maiorLanceInicial <= novoValor)
-				throw new IllegalArgumentException("Você já possui um lance igual ou maior neste leilão.");
-		}
+		Double lanceMaisAltoAtual = calcularNovoLanceMinimo(leilaoId);
+		
+		if (!leilao.getComprador().equals(usuarioComprador))
+			throw new IllegalArgumentException("Usuário não é o comprador.");
+		if (!leilao.isAindaAtivo())
+			throw new IllegalArgumentException("Leilão não está ativo");
+		if (oferta.getStatusOferta() != StatusOferta.ATIVA)
+			throw new IllegalArgumentException("Oferta de leilão não é mais válida");
+		if (maiorLanceInicial <= novoValor)
+			throw new IllegalArgumentException("Você já possui um lance igual ou maior neste leilão.");
+
+		if (oferta.getValorOferta() < lanceMaisAltoAtual)
+			throw new IllegalArgumentException("Seu lance ainda é o maior aualmente.");
 
 		Oferta novaOferta = new Oferta();
 		novaOferta.setComprador(usuarioComprador);
@@ -118,7 +125,6 @@ public class OfertaServicesImpl implements OfertaService {
 		novaOferta.setStatusOferta(StatusOferta.ATIVA);
 		novaOferta.setLeilao(leilao);
 
-		
 		leilao.setComprador(usuarioComprador);
 		leilao.getOfertas().add(novaOferta);
 

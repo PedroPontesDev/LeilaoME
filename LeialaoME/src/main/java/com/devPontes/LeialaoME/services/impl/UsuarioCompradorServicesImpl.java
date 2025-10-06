@@ -116,22 +116,22 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		// 3️ Gera um nome único para o arquivo, evitando sobrescrita
 		String nomeArquivo = UUID.randomUUID() + "_FRONTEND_  " + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_"); // remove
 			
-		// 4️ Cria a pasta de upload se não existir
+		// 4️ Cria a pasta de upload se não existir COM OBJETO fiLE
 		File pasta = new File(uploadDir);
 		if (!pasta.exists()) {
 			pasta.mkdirs(); // cria a pasta e subpastas
 		}
 
-		// 5️ Cria o Path completo do arquivo
+		// 5️ Cria o Path completo do arquivo com objeto Path e Paths!!
 		Path caminhoArquivo = Paths.get(pasta.getAbsolutePath(), nomeArquivo);
 
-		// 6️ Abre InputStream do MultipartFile e OutputStream do Path
+		// 6️ Abre InputStream do MultipartFile e OutputStream do Path com file vindo do frontend e Files.outPut do objeto java
 		try (InputStream input = file.getInputStream(); OutputStream output = Files.newOutputStream(caminhoArquivo)) {
 
 			byte[] buffer = new byte[8192]; // lê 8KB por vez
 			int bytesLidos;
 			while ((bytesLidos = input.read(buffer)) != -1) {
-				output.write(buffer, 0, bytesLidos); // escreve no disco
+				output.write(buffer, 0, bytesLidos); // escreve no disco passando da posição zero até o final qu seriam bufferlidos
 			}
 		}
 
