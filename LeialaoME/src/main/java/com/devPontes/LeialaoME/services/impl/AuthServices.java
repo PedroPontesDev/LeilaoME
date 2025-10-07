@@ -33,13 +33,10 @@ public class AuthServices {
 	public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request) {
         try {
             // 1️ Autenticar usuário (lança exceção se inválido)
-            auth.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
-
+            auth.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()) );
             // 2️ Carregar detalhes do usuário
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-
+            
             // 3️ Gerar token JWT
             String token = jwtService.generateToken(userDetails);
             log.info("Login bem-sucedido para usuário {}. Token gerado.", request.getUsername());

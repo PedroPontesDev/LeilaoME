@@ -88,36 +88,57 @@ public class OfertaServicesImpl implements OfertaService {
 
 		Leilao leilao = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leillão não encontraado com Id" + leilaoId));
+		
 		if (!leilao.isAindaAtivo()) {
 			throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
 		}
-
-		Oferta oferta = leilao.getOfertas()
-				.stream()
-				.filter(l -> l.getComprador().getId().equals(compradorId))
-				.max(Comparator.comparingDouble(Oferta::getValorOferta).reversed())
-				.get();
-		
 		
 		UsuarioComprador usuarioComprador = (UsuarioComprador) compradorRepository.findById(compradorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
 
-		Double maiorLanceInicial = leilao.getLanceInicial();
-
-		Double lanceMaisAltoAtual = calcularNovoLanceMinimo(leilaoId);
+		// 2. Pegar a oferta mais alta do leilão
+		Oferta ofertaMaisAlta = leilao.getOfertas()
+				.stream()
+				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+				.max(Comparator.comparingDouble(Oferta::getValorOferta))
+				.orElse(null);
 		
-		if (!leilao.getComprador().equals(usuarioComprador))
-			throw new IllegalArgumentException("Usuário não é o comprador.");
-		if (!leilao.isAindaAtivo())
-			throw new IllegalArgumentException("Leilão não está ativo");
-		if (oferta.getStatusOferta() != StatusOferta.ATIVA)
+		// 3. Pegar a oferta anterior do mesmo comprador (se houver)
+		Oferta ofertaAnteriorDoMesmoComprador = leilao.getOfertas()
+									  .stream()
+				                      .filter(o -> o.getComprador().getId().equals(compradorId))
+				                      .max(Comparator.comparingDouble(Oferta::getValorOferta))
+				                      .orElse(null);
+		
+		Double lanceMaisAltoAtual = (ofertaMaisAlta != null) ? 
+									ofertaMaisAlta.getValorOferta() : leilao.getLanceInicial();
+
+		Double lanceMinimoPermitido = lanceMaisAltoAtual + (leilao.getValorDeIncremento() != null ? 
+															leilao.getValorDeIncremento() : 0.0);
+
+		
+	    if (novoValor < lanceMinimoPermitido) {
+	        throw new IllegalArgumentException("O lance mínimo permitido é de R$ " + lanceMinimoPermitido);
+	    }
+
+	    if (ofertaAnteriorDoMesmoComprador != null && novoValor <= ofertaAnteriorDoMesmoComprador.getValorOferta()) {
+	        throw new IllegalArgumentException("Seu novo lance deve ser maior que seu lance anterior de R$ " + ofertaAnteriorDoMesmoComprador.getValorOferta());
+	    }
+	    
+		if (ofertaMaisAlta != null && ofertaMaisAlta.getStatusOferta() != StatusOferta.ATIVA)
 			throw new IllegalArgumentException("Oferta de leilão não é mais válida");
-		if (maiorLanceInicial <= novoValor)
-			throw new IllegalArgumentException("Você já possui um lance igual ou maior neste leilão.");
-
-		if (oferta.getValorOferta() < lanceMaisAltoAtual)
-			throw new IllegalArgumentException("Seu lance ainda é o maior aualmente.");
-
+		
+		if (ofertaMaisAlta != null && novoValor <= ofertaMaisAlta.getValorOferta() && novoValor <= lanceMaisAltoAtual) 
+		        throw new IllegalArgumentException("Seu novo lance deve ser maior que o seu lance anterior.");
+		
+		if(ofertaAnteriorDoMesmoComprador != null) {
+			ofertaAnteriorDoMesmoComprador.setStatusOferta(StatusOferta.INTATIVA);
+			ofertaRepository.save(ofertaAnteriorDoMesmoComprador);
+		}
+		
+		leilao.setValorDeIncremento(lanceMinimoPermitido);
+		leilao.setComprador(usuarioComprador);
+		
 		Oferta novaOferta = new Oferta();
 		novaOferta.setComprador(usuarioComprador);
 		novaOferta.setValorOferta(novoValor);
@@ -125,7 +146,6 @@ public class OfertaServicesImpl implements OfertaService {
 		novaOferta.setStatusOferta(StatusOferta.ATIVA);
 		novaOferta.setLeilao(leilao);
 
-		leilao.setComprador(usuarioComprador);
 		leilao.getOfertas().add(novaOferta);
 
 		// Persistir alterações
