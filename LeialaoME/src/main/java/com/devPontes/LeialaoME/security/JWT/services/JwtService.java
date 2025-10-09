@@ -1,4 +1,4 @@
-package com.devPontes.LeialaoME.security.services;
+package com.devPontes.LeialaoME.security.JWT.services;
 
 import java.time.Instant;
 import java.util.Date;
@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.devPontes.LeialaoME.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.devPontes.LeialaoME.model.entities.Usuario;
 
 @Service
 public class JwtService {
+
 
 	@Value("${jwt.secret}")
 	private String secret;
@@ -24,6 +26,8 @@ public class JwtService {
 
 	public String generateToken(UserDetails userDetails) {
 
+		Long userId = ((Usuario) userDetails).getId(); // PAra passar pro front
+		
 		try {
 
 			Algorithm alg = Algorithm.HMAC256(secret);
@@ -32,16 +36,14 @@ public class JwtService {
 					.withIssuer("Leilao-WebService")
 					.withSubject(userDetails.getUsername())
 					.withExpiresAt(calculateExpiration())
+					.withClaim("id", userId)
 					.withClaim("roles", userDetails.getAuthorities()
-													.stream()
-													.map(GrantedAuthority::getAuthority)
-													
-													.collect(Collectors.toList()))
-																		.sign(alg);
+													.stream().map(GrantedAuthority::getAuthority)
+													.collect(Collectors.toList())).sign(alg);
 			return token;
 
 		} catch (JWTCreationException ex) {
-			throw new JWTCreationException("Erro ao gerar token" + ex.getMessage());
+			throw new JWTCreationException("Erro ao gerar token" + ex.getMessage(), ex);
 		}
 
 	}
@@ -60,3 +62,4 @@ public class JwtService {
 	}
 
 }
+

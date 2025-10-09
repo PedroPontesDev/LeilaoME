@@ -36,6 +36,16 @@ public class UsuarioVendedor extends Usuario implements Serializable {
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
+	
+	
+
+	public Set<Leilao> getLeilaoCadastrado() {
+		return leilaoCadastrado;
+	}
+
+	public void setLeilaoCadastrado(Set<Leilao> leilaoCadastrado) {
+		this.leilaoCadastrado = leilaoCadastrado;
+	}
 
 	@Override
 	public String toString() {

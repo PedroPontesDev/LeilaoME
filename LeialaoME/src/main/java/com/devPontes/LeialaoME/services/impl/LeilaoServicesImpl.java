@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
 import com.devPontes.LeialaoME.exceptions.LeilaoException;
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
 import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
@@ -40,10 +40,9 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 	@Autowired
 	private UsuarioVendedorRepositories vendedorRepository;
-	
-	@Autowired
-   private OfertaRepositories ofertaRepository;
 
+	@Autowired
+	private OfertaRepositories ofertaRepository;
 
 	@Override
 	public LeilaoDTO criarLeilao(Long vendedorId, LeilaoDTO novoLeilao) {
@@ -100,35 +99,32 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	public UsuarioCompradorDTO definirGanhador(Long leilaoId) throws Exception {
 		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Vendedor não encontrado com o ID" + leilaoId));
-	
-		//Fazer novas validações	
-		
-		
+
+		// Fazer novas validações como verificar se ganhou no tempo final
+
 		// Garantir que existem ofertas
-	    if (leilaoExistente.getOfertas() == null || leilaoExistente.getOfertas().isEmpty()) {
-	        throw new LeilaoException("Nenhuma oferta encontrada neste leilão.");
-	    }
-	    
-		Oferta maiorOferta = leilaoExistente.getOfertas()
-							.stream()
-							 .filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
-							 .filter(o -> o.getValorOferta() != null)
-							 .max(Comparator.comparing(Oferta::getValorOferta)
-									 .thenComparing(o -> o .getComprador().getId())).get(); //Tratar erros depos
-		
-		
+		if (leilaoExistente.getOfertas() == null || leilaoExistente.getOfertas().isEmpty()) {
+			throw new LeilaoException("Nenhuma oferta encontrada neste leilão.");
+		}
+
+		Oferta maiorOferta = leilaoExistente.getOfertas().stream()
+				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+				.filter(o -> o.getValorOferta() != null)
+				.max(Comparator.comparing(Oferta::getValorOferta).thenComparing(o -> o.getComprador().getId())).get(); // Tratar
+																														// erros
+																														// depos
+
 		UsuarioComprador vencedor = maiorOferta.getComprador();
 		maiorOferta.setComprador(vencedor);
 		leilaoExistente.setComprador(vencedor);
-		
+
 		leilaoRepository.save(leilaoExistente);
-	
+
 		// Verfica a maior oferta dentro do leilao, verificar se esta ativo
 		// e setar o ganhador verificando qual é a oferta mais cara baseado
 		// Nas ofertas dadas pelos compradores
-		
+
 		return MyMaper.parseObject(vencedor, UsuarioCompradorDTO.class);
-		
 
 	}
 
@@ -136,6 +132,35 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	public Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes, String descricaoLeilao) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public LeilaoDTO criarLeilaoFuturo(LeilaoDTO novoLeilao, LocalDateTime tempoInicio, LocalDateTime tempoFim) {
+		Leilao leilao = MyMaper.parseObject(novoLeilao, Leilao.class);
+
+		if (leilao == null)
+			throw new IllegalArgumentException("Dados do leilão inválidos.");
+
+		if (!leilao.isAindaAtivo())
+			throw new LeilaoEncerradoException("");
+
+		if (tempoInicio == null || tempoFim == null)
+			throw new IllegalArgumentException("As datas de início e término devem ser informadas.");
+
+		if (leilao.getLanceInicial() == null)
+			throw new IllegalArgumentException("Leilão deve começar com algum valor numérico!");
+
+		if (tempoInicio.isBefore(LocalDateTime.now()))
+			throw new IllegalArgumentException("Leilão eve começar num momento futuro!");
+
+	    if (tempoFim.isBefore(tempoInicio)) 
+	        throw new IllegalArgumentException("A data de término deve ser posterior ao início do leilão!");
+
+		leilao.setInicio(tempoInicio);
+		leilao.setTermino(tempoFim);
+
+		Leilao salvo = leilaoRepository.save(leilao);
+		return MyMaper.parseObject(salvo, LeilaoDTO.class);
 	}
 
 }

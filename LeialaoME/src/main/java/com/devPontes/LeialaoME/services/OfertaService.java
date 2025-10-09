@@ -13,5 +13,9 @@ public interface OfertaService {
 
 	Double calcularNovoLanceMinimo(Long leilaoId);
 
+	
+	OfertaDTO negarOfertaDeLeilao(Long usarioVendedorId, Long LeilaoId);
+
+	OfertaDTO aceitarOfertaDeLeilao(Long usarioVendedorId, Long leilaoId, Long ofertaId);
 
 }

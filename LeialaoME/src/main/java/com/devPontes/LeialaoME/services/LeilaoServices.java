@@ -1,6 +1,7 @@
 package com.devPontes.LeialaoME.services;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +13,8 @@ import com.devPontes.LeialaoME.model.dto.UsuarioCompradorDTO;
 public interface LeilaoServices {
 
 	LeilaoDTO criarLeilao(Long vendedorId, LeilaoDTO novoLeilao);
+	
+	LeilaoDTO criarLeilaoFuturo(LeilaoDTO novoLeilao, LocalDateTime tempoInicio, LocalDateTime tempoFim);
 
 	LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO novoLeilao, Long tempoNecessario);
 
@@ -22,4 +25,5 @@ public interface LeilaoServices {
 	Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes, String descricaoLeilao);
 	
 	void fecharLeilao(Long leilaoId, String status);
+
 }

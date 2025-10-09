@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
 import com.devPontes.LeialaoME.services.impl.UsuarioCompradorServicesImpl;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
 @RestController
 @RequestMapping("/v1/comprador")
 public class UsuarioCompradoController {
@@ -29,15 +29,14 @@ public class UsuarioCompradoController {
 
 	@Autowired
 	UsuarioCompradorServicesImpl compradorServices;
-
-	@PreAuthorize("ROLE_COMPRADOR")
+	
 	@PostMapping("/{id}/upload-foto")
 	public ResponseEntity<Map<String, Object>> uploadFoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws Exception {
 		Map<String, Object> caminho =  compradorServices.fazerUploadDeImamgemDePerfil(id, file);
 		return new ResponseEntity<>(caminho, HttpStatus.ACCEPTED);
 	}
 
-
+	
 	@PostMapping(path = "/cadastrar-comprador")
 	public ResponseEntity<UsuarioDTO> registrarUsuarioComprador(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved = compradorServices.cadastrarUsuarioComprador(usuario);

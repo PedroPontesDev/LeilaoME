@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.devPontes.LeialaoME.security.dtos.UsuarioLoginRequestDTO;
-import com.devPontes.LeialaoME.security.dtos.UsuarioLoginResponseDTO;
+import com.devPontes.LeialaoME.security.DTO.UsuarioLoginRequestDTO;
+import com.devPontes.LeialaoME.security.DTO.UsuarioLoginResponseDTO;
 import com.devPontes.LeialaoME.services.impl.AuthServices;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthController {
