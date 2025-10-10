@@ -48,6 +48,8 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	public LeilaoDTO criarLeilao(Long vendedorId, LeilaoDTO novoLeilao) {
 		UsuarioVendedor vendedor = vendedorRepository.findById(vendedorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado com o ID" + vendedorId));
+		
+		
 		Leilao leilao = MyMaper.parseObject(novoLeilao, Leilao.class);
 		leilao.setVendedor(vendedor);
 
@@ -55,7 +57,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		return MyMaper.parseObject(leilao, LeilaoDTO.class);
 	}
 
-	@Override // ACHO Q ESTA ERRADO?
+	@Override 
 	public LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, Long tempoMinimoHoras) {
 
 		Leilao entity = MyMaper.parseObject(leilao, Leilao.class);

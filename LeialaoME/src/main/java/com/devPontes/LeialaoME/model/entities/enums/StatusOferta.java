@@ -3,10 +3,12 @@ package com.devPontes.LeialaoME.model.entities.enums;
 public enum StatusOferta {
 	
 	ATIVA,
-	INTATIVA,
+	INATIVA,
 	GANHADORA,
-	PERDEDORA;
-
+	PERDEDORA,
+	PENDENTE,
+	ACEITA,
+	NEGADA;
 	
 
 }

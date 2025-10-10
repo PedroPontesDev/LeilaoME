@@ -60,18 +60,19 @@ public class OfertaServicesImpl implements OfertaService {
 
 		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
+		
 
 		// Calcula valor mínimo permitido
 		Double valorMinimo = calcularNovoLanceMinimo(leilaoId);
-
+		
 		// Valida valor da oferta
 		if (ofertaNova.getValorOferta() < valorMinimo) {
 			throw new LeilaoException("O valor da oferta deve ser igual ou maior que: " + valorMinimo);
 		}
 
+		
 		// Atualiza valor incrementado no leilão
 		leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta() + valorMinimo);
-
 		// Adiciona oferta ao leilão
 		leilaoExistente.getOfertas().add(ofertaNova);
 
@@ -109,12 +110,15 @@ public class OfertaServicesImpl implements OfertaService {
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
 
 		// 2. Pegar a oferta mais alta do leilão
-		Oferta ofertaMaisAlta = leilao.getOfertas().stream().filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+		Oferta ofertaMaisAlta = leilao.getOfertas()
+				.stream().
+				filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
 				.max(Comparator.comparingDouble(Oferta::getValorOferta)).orElse(null);
 
 		// 3. Pegar a oferta anterior do mesmo comprador (se houver)
 		Oferta ofertaAnteriorDoMesmoComprador = leilao.getOfertas().stream()
-				.filter(o -> o.getComprador().getId().equals(compradorId))
+				.filter(o -> o.getComprador().getId()
+						.equals(compradorId))
 				.max(Comparator.comparingDouble(Oferta::getValorOferta)).orElse(null);
 
 		Double lanceMaisAltoAtual = (ofertaMaisAlta != null) ? ofertaMaisAlta.getValorOferta()
@@ -218,7 +222,7 @@ public class OfertaServicesImpl implements OfertaService {
 		
 		for(Oferta oferta : leilaoVendedor.getOfertas()) {
 			if(oferta.getId().equals(ofertaId) && oferta.getStatusOferta() == StatusOferta.ATIVA) {
-				oferta.setStatusOferta(StatusOferta.INTATIVA);
+				oferta.setStatusOferta(StatusOferta.ACEITA);
 				ofertaNegada = ofertaRepository.save(oferta);
 				break;
 			}
@@ -228,7 +232,19 @@ public class OfertaServicesImpl implements OfertaService {
 	}
 
 	@Override
-	public OfertaDTO negarOfertaDeLeilao(Long usarioVendedorId, Long LeilaoId) {
+	public OfertaDTO negarOfertaDeLeilao(Long usarioVendedorId, Long LeilaoId, Long ofertaId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OfertaDTO findOfertasMaisCarasDeComprador(String cpfComprador, Double valorMinimo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OfertaDTO findOfertasMaisCarasRecebidasDeVendedor(String cnpjVendedor, Double valorMinimo) {
 		// TODO Auto-generated method stub
 		return null;
 	}

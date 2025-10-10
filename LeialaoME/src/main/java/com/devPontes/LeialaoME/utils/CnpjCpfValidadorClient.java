@@ -19,11 +19,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CnpjCpfValidadorClient {
 
 	@Value("${JWT_SECRET_AWS}")
-	String secretReceitaWS;
+	static String secretReceitaWS;
 
 	private static final Logger log = LoggerFactory.getLogger(CnpjCpfValidadorClient.class);
 
-	public boolean validarCnpj(String cnpj) throws Exception {
+	public static boolean validarCnpj(String cnpj) throws Exception {
 		// Limpar como CNPJ VEM
 		String cnpjRegex = "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$";
 		String cnpjSemMascaraRegex = "^\\d{14}$";
