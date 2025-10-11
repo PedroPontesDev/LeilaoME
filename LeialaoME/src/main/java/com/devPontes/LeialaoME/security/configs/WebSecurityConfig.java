@@ -46,6 +46,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/v1/auth/**").permitAll()
                 .requestMatchers("/v1/comprador/cadastrar-comprador").permitAll()
                 .requestMatchers("/v1/comprador/*/upload-foto").authenticated()
+                .requestMatchers("/v1/leilao/criar-leilao").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             )

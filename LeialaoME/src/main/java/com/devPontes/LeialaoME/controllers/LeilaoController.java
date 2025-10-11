@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,7 @@ public class LeilaoController {
 	UsuarioVendedorServicesImpl vendedorServices;
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
+	@PostMapping(path = "/criar-leilao")
 	public ResponseEntity<LeilaoDTO> criarLeilao(@RequestBody LeilaoDTO leilaoNovo, @RequestParam Long vendedorId) {
 		log.info("🧱 Iniciando criação de leilão pelo vendedor ID {}", vendedorId);
 		LeilaoDTO novoLeilao = leilaoServices.criarLeilao(vendedorId, leilaoNovo);

@@ -56,8 +56,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradorServicesImpl.class);
 
-	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha
-	// permissão)
+	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha permissão)
 	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
 
 	@Override
