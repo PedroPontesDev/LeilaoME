@@ -11,16 +11,15 @@ import com.devPontes.LeialaoME.model.dto.OfertaDTO;
 import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
 
 @Service
-public interface UsuarioCompradorService {
+public interface UsuarioVendedorService {
 
-	 UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception;
-	 UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId);
+	 UsuarioDTO atualizarUsuarioVendedor(UsuarioDTO update, Long usuarioId);
 	 Map<String, Object> fazerUploadDeImamgemDePerfil(Long id, MultipartFile file) throws Exception;
 	 String escreverBiografia(Long usuarioId, String beografia);
 	 String atualizarUsername(Long usuarioId, String usernameNovo);
 	 String atualizarPassword(Long usuarioId, String passwordNova);
-	 Set<LeilaoDTO>findLeiloesAdquiridosDeUsuario(Long usuarioCompradorId);
-	 Set<OfertaDTO> findOfertasMaisCaras(String cpfComprador, Double minimumValue);
-	 Set<OfertaDTO> findOfertaMaisBaixa(String cpfComprador, Double maximumValue);
+	 Set<LeilaoDTO>findLeiloesParticipados(Long usuarioCompradorId);
+	 Set<OfertaDTO> findOfertasMaisCarasRecebidas(String cnpjComprador, Double minimumValue);
+	 Set<OfertaDTO> findOfertaMaisBaixaRecebida(String cnpjComprador, Double maximumValue);
 
 }

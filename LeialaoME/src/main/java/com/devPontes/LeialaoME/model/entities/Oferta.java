@@ -38,7 +38,7 @@ public class Oferta implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "vendedor_id", nullable = false)
-	private UsuarioVendedor vendor;
+	private UsuarioVendedor vendedor;
 
 	@ManyToOne
 	@JoinColumn(name = "leilao_id", nullable = false)
@@ -57,7 +57,7 @@ public class Oferta implements Serializable {
 		this.valorOferta = valorOferta;
 		this.statusOferta = statusOferta;
 		this.comprador = comprador;
-		this.vendor = vendor;
+		this.vendedor = vendor;
 		this.leilao = leilao;
 		this.momentoOferta = momentoOferta;
 	}
@@ -112,12 +112,12 @@ public class Oferta implements Serializable {
 
 	
 	
-	public UsuarioVendedor getVendor() {
-		return vendor;
+	public UsuarioVendedor getVendedor() {
+		return vendedor;
 	}
 
-	public void setVendor(UsuarioVendedor vendor) {
-		this.vendor = vendor;
+	public void setVendor(UsuarioVendedor vendedor) {
+		this.vendedor = vendedor;
 	}
 
 	@Override

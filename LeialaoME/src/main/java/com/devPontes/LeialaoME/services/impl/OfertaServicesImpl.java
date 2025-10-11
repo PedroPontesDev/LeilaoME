@@ -1,9 +1,8 @@
 package com.devPontes.LeialaoME.services.impl;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,17 +59,15 @@ public class OfertaServicesImpl implements OfertaService {
 
 		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
-		
 
 		// Calcula valor mínimo permitido
 		Double valorMinimo = calcularNovoLanceMinimo(leilaoId);
-		
+
 		// Valida valor da oferta
 		if (ofertaNova.getValorOferta() < valorMinimo) {
 			throw new LeilaoException("O valor da oferta deve ser igual ou maior que: " + valorMinimo);
 		}
 
-		
 		// Atualiza valor incrementado no leilão
 		leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta() + valorMinimo);
 		// Adiciona oferta ao leilão
@@ -110,15 +107,12 @@ public class OfertaServicesImpl implements OfertaService {
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
 
 		// 2. Pegar a oferta mais alta do leilão
-		Oferta ofertaMaisAlta = leilao.getOfertas()
-				.stream().
-				filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+		Oferta ofertaMaisAlta = leilao.getOfertas().stream().filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
 				.max(Comparator.comparingDouble(Oferta::getValorOferta)).orElse(null);
 
 		// 3. Pegar a oferta anterior do mesmo comprador (se houver)
 		Oferta ofertaAnteriorDoMesmoComprador = leilao.getOfertas().stream()
-				.filter(o -> o.getComprador().getId()
-						.equals(compradorId))
+				.filter(o -> o.getComprador().getId().equals(compradorId))
 				.max(Comparator.comparingDouble(Oferta::getValorOferta)).orElse(null);
 
 		Double lanceMaisAltoAtual = (ofertaMaisAlta != null) ? ofertaMaisAlta.getValorOferta()
@@ -126,8 +120,6 @@ public class OfertaServicesImpl implements OfertaService {
 
 		Double lanceMinimoPermitido = lanceMaisAltoAtual
 				+ (leilao.getValorDeIncremento() != null ? leilao.getValorDeIncremento() : 0.0);
-
-		// Faz validações de ofertas caso subam e de compradores anteriores
 
 		if (novoValor < lanceMinimoPermitido) {
 			throw new IllegalArgumentException("O lance mínimo permitido é de R$ " + lanceMinimoPermitido);
@@ -145,19 +137,19 @@ public class OfertaServicesImpl implements OfertaService {
 			throw new IllegalArgumentException("Seu novo lance deve ser maior que o seu lance anterior.");
 
 		if (ofertaAnteriorDoMesmoComprador != null) {
-			ofertaAnteriorDoMesmoComprador.setStatusOferta(StatusOferta.INTATIVA);
+			ofertaAnteriorDoMesmoComprador.setStatusOferta(StatusOferta.INATIVA);
 			ofertaRepository.save(ofertaAnteriorDoMesmoComprador);
 		}
 
-		leilao.setComprador(usuarioComprador);
-
+		
 		Oferta novaOferta = new Oferta();
-		novaOferta.setComprador(usuarioComprador);
+		  
 		novaOferta.setValorOferta(novoValor);
 		novaOferta.setMomentoOferta(LocalDateTime.now());
 		novaOferta.setStatusOferta(StatusOferta.ATIVA);
 		novaOferta.setLeilao(leilao);
 
+		if(ofertaMaisAlta != null) leilao.setComprador(ofertaMaisAlta.getComprador());
 		leilao.getOfertas().add(novaOferta);
 
 		// Persistir alterações
@@ -169,6 +161,7 @@ public class OfertaServicesImpl implements OfertaService {
 	public Double calcularNovoLanceMinimo(Long leilaoId) {
 		Leilao leilao = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilao não encontrado com ID" + leilaoId));
+		
 		// Lance inicial do leilão
 		double lanceMinimo;
 
@@ -211,42 +204,67 @@ public class OfertaServicesImpl implements OfertaService {
 	public OfertaDTO aceitarOfertaDeLeilao(Long usarioVendedorId, Long leilaoId, Long ofertaId) {
 		UsuarioVendedor usuarioVendedor = (UsuarioVendedor) vendedorRepository.findById(usarioVendedorId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontradro!"));
-		
-		Leilao leilaoVendedor = usuarioVendedor
-				.getLeilaoCadastrado()
-				.stream()
-				.filter(l -> l.getVendedor().getId().equals(usarioVendedorId))
-				.findFirst().orElse(null);
-		
-		Oferta ofertaNegada = null;
-		
-		for(Oferta oferta : leilaoVendedor.getOfertas()) {
-			if(oferta.getId().equals(ofertaId) && oferta.getStatusOferta() == StatusOferta.ATIVA) {
+
+		Leilao leilaoVendedor = usuarioVendedor.getLeilaoCadastrado().stream()
+				.filter(l -> l.getVendedor().getId().equals(usarioVendedorId)).findFirst().orElse(null);
+
+		Oferta ofertaAceita = null;
+
+		for (Oferta oferta : leilaoVendedor.getOfertas()) {
+			if (oferta.getId().equals(ofertaId) && oferta.getStatusOferta() == StatusOferta.ATIVA) {
 				oferta.setStatusOferta(StatusOferta.ACEITA);
-				ofertaNegada = ofertaRepository.save(oferta);
+				ofertaAceita = ofertaRepository.save(oferta);
 				break;
 			}
 		}
-		
+
+		return MyMaper.parseObject(ofertaAceita, OfertaDTO.class);
+	}
+
+	@Override
+	public OfertaDTO negarOfertaDeLeilao(Long usuarioVendedorId, Long LeilaoId, Long ofertaId) {
+		UsuarioVendedor usuarioVendedor = (UsuarioVendedor) vendedorRepository.findById(usuarioVendedorId)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontradro!"));
+
+		Leilao leilaoVendedor = usuarioVendedor.getLeilaoCadastrado().stream()
+				.filter(l -> l.getVendedor().getId() == usuarioVendedorId).findFirst().orElse(null);
+
+		Oferta ofertaNegada = null;
+		for (Oferta o : leilaoVendedor.getOfertas()) {
+			if (o.getId().equals(ofertaId) && o.getStatusOferta() == StatusOferta.ATIVA) {
+				o.setStatusOferta(StatusOferta.NEGADA);
+				ofertaNegada = ofertaRepository.save(o);
+				break;
+			}
+		}
+
 		return MyMaper.parseObject(ofertaNegada, OfertaDTO.class);
 	}
 
 	@Override
-	public OfertaDTO negarOfertaDeLeilao(Long usarioVendedorId, Long LeilaoId, Long ofertaId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<OfertaDTO> findOfertasMaisCarasDeComprador(String cpfComprador, Double valorMinimo) {
+		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeComprador(cpfComprador, valorMinimo);
+		if (oferta != null) {
+			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);
+		} else {
+			throw new IllegalArgumentException(
+					"Não foi possivel achar nenhuma oferta sob esse valor pro comprador" + cpfComprador);
+		}
+
 	}
 
 	@Override
-	public OfertaDTO findOfertasMaisCarasDeComprador(String cpfComprador, Double valorMinimo) {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(String cnpjVendedor, Double valorMinimo) {
+		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeVendedor(cnpjVendedor, valorMinimo);
+		if (oferta != null) {
+			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);
+		} else {
+			throw new IllegalArgumentException(
+					"Não foi possivel achar nenhuma oferta sob esse valor pro comprador" + cnpjVendedor);
+		}
+
 	}
 
-	@Override
-	public OfertaDTO findOfertasMaisCarasRecebidasDeVendedor(String cnpjVendedor, Double valorMinimo) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 }

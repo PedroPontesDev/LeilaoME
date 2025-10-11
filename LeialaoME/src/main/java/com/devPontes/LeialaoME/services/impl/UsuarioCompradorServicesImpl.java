@@ -34,29 +34,25 @@ import com.devPontes.LeialaoME.repositories.UsuarioRepositories;
 import com.devPontes.LeialaoME.services.UsuarioCompradorService;
 import com.devPontes.LeialaoME.utils.CnpjCpfValidadorClient;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	@Autowired
-    private final UsuarioRepositories usuarioRepositories;
+	private UsuarioRepositories usuarioRepositories;
 
 	@Autowired
 	private UsuarioCompradorRepositories usuarioRepository;
 
 	@Autowired
 	private PermissaoRepositories permissaoRepository;
-	
+
 	@Autowired
 	private BCryptPasswordEncoder encoder;
-	
-	public UsuarioCompradorServicesImpl(UsuarioRepositories usuarioRepositories,
-			UsuarioCompradorRepositories usuarioRepository, PermissaoRepositories permissaoRepository,
-			BCryptPasswordEncoder encoder) {
-		this.usuarioRepositories = usuarioRepositories;
-		this.usuarioRepository = usuarioRepository;
-		this.permissaoRepository = permissaoRepository;
-		this.encoder = encoder;
-	}
+
+	@Autowired
+	OfertaServicesImpl ofertaServices;
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradorServicesImpl.class);
 
@@ -65,6 +61,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
 
 	@Override
+	@Transactional
 	public UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception {
 
 		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class);
@@ -98,10 +95,11 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	 * @return Map com informações do upload
 	 * @throws Exception caso algo dê errado
 	 */
+	@Transactional
 	public Map<String, Object> fazerUploadDeImamgemDePerfil(Long userId, MultipartFile file) throws Exception {
 		var entidade = usuarioRepository.findById(userId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + userId));
-		
+
 		// 1️ Verifica se o arquivo está vazio
 		if (file.isEmpty()) {
 			throw new RuntimeException("Arquivo vazio!");
@@ -114,8 +112,9 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		}
 
 		// 3️ Gera um nome único para o arquivo, evitando sobrescrita
-		String nomeArquivo = UUID.randomUUID() + "_FRONTEND_  " + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_"); // remove
-			
+		String nomeArquivo = UUID.randomUUID() + "_FRONTEND_  " + "_"
+				+ file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_"); // remove
+
 		// 4️ Cria a pasta de upload se não existir COM OBJETO fiLE
 		File pasta = new File(uploadDir);
 		if (!pasta.exists()) {
@@ -125,35 +124,38 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		// 5️ Cria o Path completo do arquivo com objeto Path e Paths!!
 		Path caminhoArquivo = Paths.get(pasta.getAbsolutePath(), nomeArquivo);
 
-		// 6️ Abre InputStream do MultipartFile e OutputStream do Path com file vindo do frontend e Files.outPut do objeto java
+		// 6️ Abre InputStream do MultipartFile e OutputStream do Path com file vindo do
+		// frontend e Files.outPut do objeto java
 		try (InputStream input = file.getInputStream(); OutputStream output = Files.newOutputStream(caminhoArquivo)) {
 
 			byte[] buffer = new byte[8192]; // lê 8KB por vez
 			int bytesLidos;
 			while ((bytesLidos = input.read(buffer)) != -1) {
-				output.write(buffer, 0, bytesLidos); // escreve no disco passando da posição zero até o final qu seriam bufferlidos
+				output.write(buffer, 0, bytesLidos); // escreve no disco passando da posição zero até o final qu ter bufferlidos
+						
 			}
 		}
 
 		// cria URL relativa para o frontend acessar a imagem
 		String urlRelativa = "/uploads/" + nomeArquivo;
 		entidade.setUrlFotoPerfil(urlRelativa);
-		
+
 		// Retorna informações do arquivo para o frontend
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", "Upload concluído com sucesso!");
 		response.put("url", urlRelativa);
 		response.put("fileName", file.getOriginalFilename());
 		response.put("size", file.getSize()); // tamanho em bytes
-		
+
 		log.info("Upload feito para usuário {} -> {}", userId, urlRelativa + "Para Onjeto/Entidade: " + entidade);
-		
+
 		usuarioRepositories.save(entidade);
 
 		return response;
 	}
 
 	@Override
+	@Transactional
 	public UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId) {
 		var entidade = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
@@ -179,6 +181,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	}
 
 	@Override
+	@Transactional
 	public String escreverBiografia(Long usuarioId, String biografia) {
 		var entidade = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
@@ -193,6 +196,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	}
 
 	@Override
+	@Transactional
 	public String atualizarUsername(Long usuarioId, String usernameNovo) {
 		var entidade = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
@@ -203,21 +207,21 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		// Salva as alterações
 		UsuarioComprador salvo = (UsuarioComprador) usuarioRepository.save(entidade);
 
-		return entidade.getBiografia();
+		return entidade.getUsername();
 	}
 
 	@Override
+	@Transactional
 	public String atualizarPassword(Long usuarioId, String passwordNova) {
 		throw new UnsupportedOperationException("Não implementado ainda");
 	}
 
 	@Override
-	public Set<OfertaDTO> findOfertasMaisCaras(Long userId, Double minimumValue) {
-		// TODO: Achar as ofertas mais caras dadas por um comprador por JPQL
+	public Set<OfertaDTO> findOfertasMaisCaras(String cpfComprador, Double minimumValue) {
+		var ofertaMaisCaras = ofertaServices.findOfertasMaisCarasDeComprador(cpfComprador, minimumValue);
+		return ofertaMaisCaras;
 
-		throw new UnsupportedOperationException("Não implementado ainda");
 	}
-
 
 	@Override
 	public Set<LeilaoDTO> findLeiloesAdquiridosDeUsuario(Long usuarioCompradorId) {
@@ -226,10 +230,9 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	}
 
 	@Override
-	public OfertaDTO findOfertaMaisBaixa(Long userId, Double maximumValue) {
+	public Set<OfertaDTO> findOfertaMaisBaixa(String cpfComprador, Double maximumValue) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }

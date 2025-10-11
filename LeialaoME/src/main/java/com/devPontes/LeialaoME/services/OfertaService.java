@@ -1,5 +1,7 @@
 package com.devPontes.LeialaoME.services;
 
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
 import com.devPontes.LeialaoME.model.dto.OfertaDTO;
@@ -17,8 +19,8 @@ public interface OfertaService {
 
 	OfertaDTO negarOfertaDeLeilao(Long usarioVendedorId, Long LeilaoId, Long ofertaId);
 	
-	OfertaDTO findOfertasMaisCarasDeComprador(String cpfComprador, Double valorMinimo);
+	Set<OfertaDTO> findOfertasMaisCarasDeComprador(String cpfComprador, Double valorMinimo);
 	
-	OfertaDTO findOfertasMaisCarasRecebidasDeVendedor(String cnpjVendedor, Double valorMinimo);
+	Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(String cnpjVendedor, Double valorMinimo);
 
 }
