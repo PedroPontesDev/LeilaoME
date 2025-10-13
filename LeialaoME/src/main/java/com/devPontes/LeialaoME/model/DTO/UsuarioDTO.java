@@ -1,4 +1,4 @@
-package com.devPontes.LeialaoME.model.dto;
+package com.devPontes.LeialaoME.model.DTO;
 
 import java.io.Serializable;
 import java.util.HashSet;

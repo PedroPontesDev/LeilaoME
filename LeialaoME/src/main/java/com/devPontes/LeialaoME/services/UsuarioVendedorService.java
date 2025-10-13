@@ -6,9 +6,10 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
-import com.devPontes.LeialaoME.model.dto.OfertaDTO;
-import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
+import com.devPontes.LeialaoME.model.DTO.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.OfertaDTO;
+import com.devPontes.LeialaoME.model.DTO.UsuarioDTO;
+import com.devPontes.LeialaoME.model.entities.Usuario;
 
 @Service
 public interface UsuarioVendedorService {
@@ -20,6 +21,6 @@ public interface UsuarioVendedorService {
 	 String atualizarPassword(Long usuarioId, String passwordNova);
 	 Set<LeilaoDTO>findLeiloesParticipados(Long usuarioCompradorId);
 	 Set<OfertaDTO> findOfertasMaisCarasRecebidas(String cnpjComprador, Double minimumValue);
-	 Set<OfertaDTO> findOfertaMaisBaixaRecebida(String cnpjComprador, Double maximumValue);
+	 Set<OfertaDTO> findOfertaMaisBaixaRecebida(Usuario usuarioLogado, String cnpjComprador, Double maximumValue);
 
 }

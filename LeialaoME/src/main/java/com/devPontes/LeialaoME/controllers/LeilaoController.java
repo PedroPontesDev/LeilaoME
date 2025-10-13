@@ -1,5 +1,7 @@
 package com.devPontes.LeialaoME.controllers;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.LeilaoDTO;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.services.impl.LeilaoServicesImpl;
 import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
@@ -40,6 +43,11 @@ public class LeilaoController {
 		return new ResponseEntity<>(novoLeilao, HttpStatus.OK);		
 	}
 	
+	@GetMapping(path = "/find-all")
+	public ResponseEntity<List<LeilaoDTO>> findAll() {
+		var all = leilaoServices.findAll();
+		return new ResponseEntity<>(all, HttpStatus.OK);
+	}
 	
 
 }

@@ -10,9 +10,10 @@ import org.springframework.stereotype.Service;
 import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
 import com.devPontes.LeialaoME.exceptions.LeilaoException;
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
-import com.devPontes.LeialaoME.model.dto.OfertaDTO;
+import com.devPontes.LeialaoME.model.DTO.OfertaDTO;
 import com.devPontes.LeialaoME.model.entities.Leilao;
 import com.devPontes.LeialaoME.model.entities.Oferta;
+import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
 import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
@@ -41,7 +42,7 @@ public class OfertaServicesImpl implements OfertaService {
 	private UsuarioVendedorRepositories vendedorRepository;
 
 	@Override
-	public OfertaDTO fazerPropostaParaLeilao(OfertaDTO ofertaDTO, Long leilaoId, Long compradorId) {
+	public OfertaDTO fazerPropostaParaLeilao(OfertaDTO ofertaDTO, Long leilaoId, Usuario usuarioLogado) {
 		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilão não encontrado com ID " + leilaoId));
 
@@ -49,13 +50,14 @@ public class OfertaServicesImpl implements OfertaService {
 			throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
 		}
 
-		UsuarioComprador comprador = (UsuarioComprador) compradorRepository.findById(compradorId)
-				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado com ID " + compradorId));
+		UsuarioComprador comprador = (UsuarioComprador) compradorRepository.findById(usuarioLogado.getId())
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado com ID " + usuarioLogado.getId()));
 
 		// Converte DTO para entidade
 		Oferta ofertaNova = MyMaper.parseObject(ofertaDTO, Oferta.class);
 		ofertaNova.setComprador(comprador);
 		ofertaNova.setStatusOferta(StatusOferta.ATIVA);
+		ofertaNova.setVendor(leilaoExistente.getVendedor());
 
 		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
@@ -68,10 +70,9 @@ public class OfertaServicesImpl implements OfertaService {
 			throw new LeilaoException("O valor da oferta deve ser igual ou maior que: " + valorMinimo);
 		}
 
-		// Atualiza valor incrementado no leilão
-		leilaoExistente.setValorDeIncremento(ofertaNova.getValorOferta() + valorMinimo);
-		// Adiciona oferta ao leilão
+		// Adiciona oferta ao leilão e vice versa
 		leilaoExistente.getOfertas().add(ofertaNova);
+		ofertaNova.setLeilao(leilaoExistente);
 
 		// Salva oferta e leilão
 		ofertaRepository.save(ofertaNova);
@@ -154,6 +155,7 @@ public class OfertaServicesImpl implements OfertaService {
 
 		// Persistir alterações
 		leilaoRepository.save(leilao);
+		ofertaRepository.save(novaOferta);
 		return MyMaper.parseObject(novaOferta, OfertaDTO.class);
 	}
 
@@ -172,7 +174,7 @@ public class OfertaServicesImpl implements OfertaService {
 		}
 
 		// Valor de incremento definido pelo leilão
-		double incremento = leilao.getValorDeIncremento();
+		double incremento = (leilao.getValorDeIncremento() != null) ? leilao.getValorDeIncremento() : 0.0;
 
 		for (Oferta oferta : leilao.getOfertas()) {
 			if (!ofertaValida(oferta)) {
@@ -201,12 +203,12 @@ public class OfertaServicesImpl implements OfertaService {
 	}
 
 	@Override
-	public OfertaDTO aceitarOfertaDeLeilao(Long usarioVendedorId, Long leilaoId, Long ofertaId) {
-		UsuarioVendedor usuarioVendedor = (UsuarioVendedor) vendedorRepository.findById(usarioVendedorId)
+	public OfertaDTO aceitarOfertaDeLeilao(Usuario usuarioLogado, Long leilaoId, Long ofertaId) {
+		UsuarioVendedor usuarioVendedor = (UsuarioVendedor) vendedorRepository.findById(usuarioLogado.getId())
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontradro!"));
 
 		Leilao leilaoVendedor = usuarioVendedor.getLeilaoCadastrado().stream()
-				.filter(l -> l.getVendedor().getId().equals(usarioVendedorId)).findFirst().orElse(null);
+				.filter(l -> l.getVendedor().getId().equals(usuarioLogado.getId())).findFirst().orElse(null);
 
 		Oferta ofertaAceita = null;
 
@@ -217,17 +219,19 @@ public class OfertaServicesImpl implements OfertaService {
 				break;
 			}
 		}
+		
+		leilaoVendedor.setValorDeIncremento(ofertaAceita.getValorOferta());
 
 		return MyMaper.parseObject(ofertaAceita, OfertaDTO.class);
 	}
 
 	@Override
-	public OfertaDTO negarOfertaDeLeilao(Long usuarioVendedorId, Long LeilaoId, Long ofertaId) {
-		UsuarioVendedor usuarioVendedor = (UsuarioVendedor) vendedorRepository.findById(usuarioVendedorId)
+	public OfertaDTO negarOfertaDeLeilao(Usuario usuarioLogado, Long LeilaoId, Long ofertaId) {
+		UsuarioVendedor usuarioVendedor = (UsuarioVendedor) vendedorRepository.findById(usuarioLogado.getId())
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontradro!"));
 
 		Leilao leilaoVendedor = usuarioVendedor.getLeilaoCadastrado().stream()
-				.filter(l -> l.getVendedor().getId() == usuarioVendedorId).findFirst().orElse(null);
+				.filter(l -> l.getVendedor().getId() == usuarioLogado.getId()).findFirst().orElse(null);
 
 		Oferta ofertaNegada = null;
 		for (Oferta o : leilaoVendedor.getOfertas()) {
@@ -242,7 +246,7 @@ public class OfertaServicesImpl implements OfertaService {
 	}
 
 	@Override
-	public Set<OfertaDTO> findOfertasMaisCarasDeComprador(String cpfComprador, Double valorMinimo) {
+	public Set<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, String cpfComprador, Double valorMinimo) {
 		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeComprador(cpfComprador, valorMinimo);
 		if (oferta != null) {
 			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);
@@ -254,7 +258,7 @@ public class OfertaServicesImpl implements OfertaService {
 	}
 
 	@Override
-	public Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(String cnpjVendedor, Double valorMinimo) {
+	public Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(Usuario usuarioLogado, String cnpjVendedor, Double valorMinimo) {
 		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeVendedor(cnpjVendedor, valorMinimo);
 		if (oferta != null) {
 			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);

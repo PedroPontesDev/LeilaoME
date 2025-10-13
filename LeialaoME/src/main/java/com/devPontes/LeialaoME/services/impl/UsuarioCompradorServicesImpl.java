@@ -20,11 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
-import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
-import com.devPontes.LeialaoME.model.dto.OfertaDTO;
-import com.devPontes.LeialaoME.model.dto.PermissaoDTO;
-import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
+import com.devPontes.LeialaoME.model.DTO.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.OfertaDTO;
+import com.devPontes.LeialaoME.model.DTO.PermissaoDTO;
+import com.devPontes.LeialaoME.model.DTO.UsuarioDTO;
 import com.devPontes.LeialaoME.model.entities.Permissao;
+import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
 import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
@@ -216,8 +217,8 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	}
 
 	@Override
-	public Set<OfertaDTO> findOfertasMaisCaras(String cpfComprador, Double minimumValue) {
-		var ofertaMaisCaras = ofertaServices.findOfertasMaisCarasDeComprador(cpfComprador, minimumValue);
+	public Set<OfertaDTO> findOfertasMaisCaras(Usuario usuarioLogado, String cpfComprador, Double minimumValue) {
+		var ofertaMaisCaras = ofertaServices.findOfertasMaisCarasDeComprador(usuarioLogado, cpfComprador, minimumValue);
 		return ofertaMaisCaras;
 
 	}

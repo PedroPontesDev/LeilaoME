@@ -1,4 +1,4 @@
-package com.devPontes.LeialaoME.model.dto;
+package com.devPontes.LeialaoME.model.DTO;
 
 import java.util.ArrayList;
 import java.util.HashSet;

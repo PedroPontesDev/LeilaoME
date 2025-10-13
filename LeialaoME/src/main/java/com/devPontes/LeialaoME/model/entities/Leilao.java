@@ -48,12 +48,11 @@ public class Leilao implements Serializable {
 	@JoinColumn(name = "vendedor_id")
 	private UsuarioVendedor vendedor;
 
-
 	@ManyToOne
 	@JoinColumn(name = "comprador_id")
 	private UsuarioComprador comprador;
 
-	@OneToMany(mappedBy = "leilao", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "leilao", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	private List<Oferta> ofertas = new ArrayList<>();
 
 	@Column

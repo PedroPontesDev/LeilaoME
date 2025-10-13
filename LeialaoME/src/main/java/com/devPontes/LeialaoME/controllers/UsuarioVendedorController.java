@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
+import com.devPontes.LeialaoME.model.DTO.UsuarioDTO;
 import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})

@@ -4,20 +4,23 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
 import com.devPontes.LeialaoME.exceptions.LeilaoException;
-import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.LeilaoDTO;
 import com.devPontes.LeialaoME.model.entities.Leilao;
 import com.devPontes.LeialaoME.model.entities.Oferta;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
 import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
+import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.LeilaoRepositories;
 import com.devPontes.LeialaoME.repositories.OfertaRepositories;
@@ -54,14 +57,22 @@ public class LeilaoServicesImpl implements LeilaoServices {
 													.orElseThrow(() -> new RuntimeException("Você não pode criar leilão para outro vendedor!"));
 			
 		//Validações
-		if (leilao.getInicio() == null || leilao.getTermino() == null) throw new IllegalArgumentException("Datas de início e término devem ser informadas.");
-		
-		if(leilao.getInicio().isBefore(LocalDateTime.now())) throw new IllegalArgumentException("Leilão não deve inicar no passado");
-		
-		if(leilao.getTermino().isBefore(leilao.getInicio())) throw new IllegalArgumentException("A data de término deve ser posterior à data de início.");
-		
-		if(leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0) throw new IllegalArgumentException("Leilão deve começar com um valor de lance inicial válido.");
+	    LocalDateTime agora = LocalDateTime.now();
+	    LocalDateTime limiteFuturo = agora.plusDays(1); // exemplo: só permite criar para hoje ou amanhã
 
+	    if (leilao.getInicio().isBefore(agora))
+	        throw new IllegalArgumentException("Leilão não pode iniciar no passado!");
+
+	    if (leilao.getInicio().isAfter(limiteFuturo))
+	        throw new IllegalArgumentException("Leilão não pode iniciar tão no futuro!");
+
+	    if (leilao.getTermino().isBefore(leilao.getInicio()))
+	        throw new IllegalArgumentException("A data de término deve ser posterior à data de início.");
+
+	    if (leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0) 
+	        throw new IllegalArgumentException("Leilão deve começar com um valor de lance inicial válido.");
+
+		
 		//Configurações
 		leilao.setVendedor(vendedor);
 		leilao.setAindaAtivo(true);
@@ -116,11 +127,25 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	
 	@Override
 	@Transactional
-	public LeilaoDTO definirGanhador(Long leilaoId) throws Exception {
+	public LeilaoDTO definirGanhador(Long leilaoId, Usuario usuarioLogado) throws Exception {
 		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Vendedor não encontrado com o ID" + leilaoId));
 
+		//SOMENTE ADMINS PODEM EXECUTAR ESSE METODO
+		boolean isAdmin = usuarioLogado
+							.getPermissoes()
+							.stream()
+							.anyMatch(p -> p.getUsuarioRole().name().equals("ROLE_ADMIN"));
+		
+		if(!isAdmin) {
+			throw new SecurityException("Somente Admins podem definir ganhador");
+		}
+		
 		// Fazer novas validações como verificar se ganhou no tempo final
+	
+		if(LocalDateTime.now().isBefore(leilaoExistente.getTermino())) 
+			throw new LeilaoException("O horario leilão não foi encerrado!");
+		
 
 		// Garantir que existem ofertas
 		if (leilaoExistente.getOfertas() == null && leilaoExistente.getOfertas().isEmpty()) {
@@ -152,7 +177,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	}
 	
 	@Override 
-	public LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, Long tempoMinimoHoras) {
+	public LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, Long tempoMinimoHoras, Usuario usuarioLogado) {
 
 		Leilao entity = MyMaper.parseObject(leilao, Leilao.class);
 
@@ -187,7 +212,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	}
 
 	@Override
-	public Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes, String descricaoLeilao) {
+	public Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -195,6 +220,22 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	@Override
 	public void fecharLeilao(Long leilaoId, String statusOferta) {
 
+	}
+
+	@Override
+	public List<LeilaoDTO> findAll() {
+		var all = leilaoRepository.findAll()
+					.stream()
+					.limit(50)
+					.collect(Collectors.toList());
+		
+		return MyMaper.parseListObjects(all, LeilaoDTO.class);
+	}
+
+	@Override
+	public List<LeilaoDTO> findLeiloesDeUsuarioLogado(Usuario usuarioLogado, String cnpj, Long leilãoId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
