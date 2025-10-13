@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,6 +47,7 @@ public class Leilao implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "vendedor_id")
 	private UsuarioVendedor vendedor;
+
 
 	@ManyToOne
 	@JoinColumn(name = "comprador_id")
@@ -154,15 +157,7 @@ public class Leilao implements Serializable {
 	public void setOfertas(List<Oferta> ofertas) {
 		this.ofertas = ofertas;
 	}
-
-	public boolean isIndaAtivo() {
-		return aindaAtivo;
-	}
-
-	public void setIndaAtivo(boolean aindaAtivo) {
-		this.aindaAtivo = aindaAtivo;
-	}
-
+	
 	public UsuarioComprador getComprador() {
 		return comprador;
 	}

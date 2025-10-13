@@ -26,7 +26,6 @@ import com.devPontes.LeialaoME.model.dto.PermissaoDTO;
 import com.devPontes.LeialaoME.model.dto.UsuarioDTO;
 import com.devPontes.LeialaoME.model.dto.UsuarioVendedorDTO;
 import com.devPontes.LeialaoME.model.entities.Permissao;
-import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
 import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
@@ -56,6 +55,10 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 	@Autowired
 	OfertaServicesImpl ofertaServices;
 	
+	@Autowired
+	CnpjCpfValidadorClient cnpjValidator;
+	
+	
 	private static final Logger log = LoggerFactory.getLogger(UsuarioVendedorServicesImpl.class);
 	
 	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha
@@ -66,7 +69,10 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 		UsuarioVendedor entidade = vendedorRepository.findById(compradorId)
 												     .orElseThrow(() -> 
 												     	new UsuarioNaoEncontradoException("Usuario não encontrado com ID" + compradorId));
-		return MyMaper.parseObject(entidade, UsuarioVendedorDTO.class);
+		
+		var entidadeDto = MyMaper.parseObject(entidade, UsuarioVendedorDTO.class);
+		
+		return entidadeDto;
 	}
 
 
@@ -75,7 +81,7 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 
 		UsuarioVendedor user = (UsuarioVendedor) MyMaper.parseObject(novoUsuario, UsuarioVendedor.class);
 
-		if (!CnpjCpfValidadorClient.validarCnpj(user.getCnpj())) {
+		if (!cnpjValidator.validarCnpj(user.getCnpj())) {
 			throw new Exception("CNPJ Não Pode Ser Validado como CNPJ REAL");
 		}
 

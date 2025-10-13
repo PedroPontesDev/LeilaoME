@@ -6,19 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devPontes.LeialaoME.model.dto.LeilaoDTO;
+import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.services.impl.LeilaoServicesImpl;
-import com.devPontes.LeialaoME.services.impl.UsuarioCompradorServicesImpl;
 import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
 
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
+@CrossOrigin(origins = {"http://localhost:5173"})
 @RestController
 @RequestMapping("/v1/leilao")
 public class LeilaoController {
@@ -29,19 +29,17 @@ public class LeilaoController {
 	LeilaoServicesImpl leilaoServices;
 	
 	@Autowired
-	UsuarioCompradorServicesImpl compradorServices;
-	
-	@Autowired
 	UsuarioVendedorServicesImpl vendedorServices;
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
 	@PostMapping(path = "/criar-leilao")
-	public ResponseEntity<LeilaoDTO> criarLeilao(@RequestBody LeilaoDTO leilaoNovo, @RequestParam Long vendedorId) {
-		log.info("🧱 Iniciando criação de leilão pelo vendedor ID {}", vendedorId);
-		LeilaoDTO novoLeilao = leilaoServices.criarLeilao(vendedorId, leilaoNovo);
+	public ResponseEntity<LeilaoDTO> criarLeilao(@RequestBody LeilaoDTO leilaoNovo, @AuthenticationPrincipal Usuario usuarioLogado) {
+		log.info("🧱 Iniciando criação de leilão pelo vendedor ID {}", usuarioLogado.getUsername());
+		LeilaoDTO novoLeilao = leilaoServices.criarLeilao(leilaoNovo, usuarioLogado);
 		if(novoLeilao != null) log.info("Leilão sendo criado com sucesso: {}" + leilaoNovo.getDescricao());
 		return new ResponseEntity<>(novoLeilao, HttpStatus.OK);		
 	}
+	
 	
 
 }

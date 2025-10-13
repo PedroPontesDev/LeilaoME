@@ -18,25 +18,16 @@ public class UsuarioDTO implements Serializable {
 	private String fotoPerfil;
 
 	private Set<PermissaoDTO> permissoes = new HashSet<>();
-	
+
 	private String cpf;
+
+	private String cnpj;
 
 	public UsuarioDTO() {
 	}
 
 	public UsuarioDTO(Long id, String username, String password, String biografia, String fotoPerfil,
-			Set<PermissaoDTO> permissoes) {
-		this.id = id;
-		this.username = username;
-		this.password = password;
-		this.biografia = biografia;
-		this.fotoPerfil = fotoPerfil;
-		this.permissoes = permissoes;
-	}
-	
-	
-	public UsuarioDTO(Long id, String username, String password, String biografia, String fotoPerfil,
-			Set<PermissaoDTO> permissoes, String cpf) {
+			Set<PermissaoDTO> permissoes, String cpf, String cnpj) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
@@ -44,6 +35,15 @@ public class UsuarioDTO implements Serializable {
 		this.fotoPerfil = fotoPerfil;
 		this.permissoes = permissoes;
 		this.cpf = cpf;
+		this.cnpj = cnpj;
+	}
+
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
 	}
 
 	public String getCpf() {
@@ -89,8 +89,6 @@ public class UsuarioDTO implements Serializable {
 	public void setPermissoes(Set<PermissaoDTO> permissoes) {
 		this.permissoes = permissoes;
 	}
-
-	
 
 	public String getFotoPerfil() {
 		return fotoPerfil;

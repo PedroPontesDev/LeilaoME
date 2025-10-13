@@ -1,147 +1,46 @@
 package com.devPontes.LeialaoME.model.dto;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
-public class LeilaoDTO implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class LeilaoDTO {
 
-	private Long id;
-	private String descricao;
-	private LocalDateTime inicio;
-	private LocalDateTime termino;
-	private Double lanceInicial;
-	private Double valorIncrementadoAposLance;
-	private boolean ativo;
-	private UsuarioVendedorDTO vendedor;
-	private List<OfertaDTO> ofertas;
-	private UsuarioCompradorDTO possivelVencedor;
+    private Long id;
+    private String descricao;
+    private LocalDateTime inicio;
+    private LocalDateTime termino;
+    private Double lanceInicial;
+    private Double valorIncrementadoAposLance;
+    private Boolean aindaAtivo;
 
-	public LeilaoDTO() {
-	}
+    private Long vendedorId;
+    private Long vencedorId;
 
-	public LeilaoDTO(Long id, String descricao, LocalDateTime inicio, LocalDateTime termino, Double lanceInicial,
-			Double valorIncrementadoAposLance, boolean ativo, UsuarioVendedorDTO vendedor, List<OfertaDTO> ofertas,
-			UsuarioCompradorDTO possivelVencedor) {
-		super();
-		this.id = id;
-		this.descricao = descricao;
-		this.inicio = inicio;
-		this.termino = termino;
-		this.lanceInicial = lanceInicial;
-		this.valorIncrementadoAposLance = valorIncrementadoAposLance;
-		this.ativo = ativo;
-		this.vendedor = vendedor;
-		this.ofertas = ofertas;
-		this.possivelVencedor = possivelVencedor;
-	}
+    // Getters/Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public Long getId() {
-		return id;
-	}
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public LocalDateTime getInicio() { return inicio; }
+    public void setInicio(LocalDateTime inicio) { this.inicio = inicio; }
 
-	public String getDescricao() {
-		return descricao;
-	}
+    public LocalDateTime getTermino() { return termino; }
+    public void setTermino(LocalDateTime termino) { this.termino = termino; }
 
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
+    public Double getLanceInicial() { return lanceInicial; }
+    public void setLanceInicial(Double lanceInicial) { this.lanceInicial = lanceInicial; }
 
-	public LocalDateTime getInicio() {
-		return inicio;
-	}
+    public Double getValorIncrementadoAposLance() { return valorIncrementadoAposLance; }
+    public void setValorIncrementadoAposLance(Double valorIncrementadoAposLance) { this.valorIncrementadoAposLance = valorIncrementadoAposLance; }
 
-	public void setInicio(LocalDateTime inicio) {
-		this.inicio = inicio;
-	}
+    public Boolean getAindaAtivo() { return aindaAtivo; }
+    public void setAindaAtivo(Boolean aindaAtivo) { this.aindaAtivo = aindaAtivo; }
 
-	public LocalDateTime getTermino() {
-		return termino;
-	}
+    public Long getVendedorId() { return vendedorId; }
+    public void setVendedorId(Long vendedorId) { this.vendedorId = vendedorId; }
 
-	public void setTermino(LocalDateTime termino) {
-		this.termino = termino;
-	}
+    public Long getVencedorId() { return vencedorId; }
+    public void setVencedorId(Long vencedorId) { this.vencedorId = vencedorId; }
 
-	public Double getLanceInicial() {
-		return lanceInicial;
-	}
-
-	public void setLanceInicial(Double lanceInicial) {
-		this.lanceInicial = lanceInicial;
-	}
-
-	public Double getValorIncrementadoAposLance() {
-		return valorIncrementadoAposLance;
-	}
-
-	public void setValorIncrementadoAposLance(Double valorIncrementadoAposLance) {
-		this.valorIncrementadoAposLance = valorIncrementadoAposLance;
-	}
-
-	public List<OfertaDTO> getOfertas() {
-		return ofertas;
-	}
-
-	public void setOfertas(List<OfertaDTO> ofertas) {
-		this.ofertas = ofertas;
-	}
-
-	public boolean isAtivo() {
-		return ativo;
-	}
-
-	public void setAtivo(boolean ativo) {
-		this.ativo = ativo;
-	}
-
-	public UsuarioVendedorDTO getVendedor() {
-		return vendedor;
-	}
-
-	public void setVendedor(UsuarioVendedorDTO vendedor) {
-		this.vendedor = vendedor;
-	}
-
-	public UsuarioCompradorDTO getPossivelVencedor() {
-		return possivelVencedor;
-	}
-
-	public void setPossivelVencedor(UsuarioCompradorDTO possivelVencedor) {
-		this.possivelVencedor = possivelVencedor;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		LeilaoDTO other = (LeilaoDTO) obj;
-		return Objects.equals(id, other.id);
-	}
-
-	@Override
-	public String toString() {
-		return "LeilaoDTO [id=" + id + ", descricao=" + descricao + ", inicio=" + inicio + ", termino=" + termino
-				+ ", lanceInicial=" + lanceInicial + ", valorIncrementadoAposLance=" + valorIncrementadoAposLance
-				+ ", ativo=" + ativo + ", vendedor=" + vendedor + ", ofertas=" + ofertas + ", possivelVencedor="
-				+ possivelVencedor + "]";
-	}
-
-	// Getters e Setters
 }
