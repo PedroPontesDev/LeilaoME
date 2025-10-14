@@ -11,12 +11,14 @@ import com.devPontes.LeialaoME.model.entities.Oferta;
 public interface OfertaRepositories extends JpaRepository<Oferta, Long> {
 
 	@Query("SELECT o FROM Oferta o WHERE o.comprador.cpf = :cpfComprador "
-			+ "AND o.valorOferta >= :valorMinimo ORDER BY o.valorOferta DESC")
+			+ "AND o.valorOferta >= :valorMinimo")
 	Set<Oferta> findOfertasMaisCarasDeComprador(@Param("cpfComprador") String cpfComprador, @Param("valorMinimo") Double valorMinimo);
-
-	@Query("SELECT o FROM Oferta o WHERE o.vendedor.cnpj = :cnpjVendedor "
-			+ "AND o.valorOferta >= :valorMinimo ORDER BY o.valorOferta DESC")
-	Set<Oferta> findOfertasMaisCarasDeVendedor(@Param("cnpjVendedor") String cnpjComprador, @Param("valorMinimo") Double valorMinimo);
+	
+	@Query("SELECT o FROM Oferta o " +
+		       "WHERE o.vendedor.cnpj = :cnpjVendedor " +
+		       "AND o.valorOferta >= :valorMinimo " +
+		       "ORDER BY o.valorOferta")
+	Set<Oferta> findOfertasMaisCarasDeVendedor(@Param("cnpjVendedor") String cnpjVendedor, @Param("valorMinimo") Double valorMinimo);
 
 	
 }

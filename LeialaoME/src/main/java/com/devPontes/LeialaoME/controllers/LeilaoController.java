@@ -43,6 +43,8 @@ public class LeilaoController {
 		return new ResponseEntity<>(novoLeilao, HttpStatus.OK);		
 	}
 	
+	
+	
 	@GetMapping(path = "/find-all")
 	public ResponseEntity<List<LeilaoDTO>> findAll() {
 		var all = leilaoServices.findAll();

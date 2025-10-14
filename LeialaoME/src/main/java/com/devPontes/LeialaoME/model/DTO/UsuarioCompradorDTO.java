@@ -1,95 +1,43 @@
 package com.devPontes.LeialaoME.model.DTO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
-import com.devPontes.LeialaoME.model.entities.Permissao;
-import com.devPontes.LeialaoME.model.entities.Usuario;
+public class UsuarioCompradorDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-public class UsuarioCompradorDTO extends Usuario {
-	private static final long serialVersionUID = 1L;
+    private Long id;
+    private String username;
+    private String biografia;
+    private String urlProfilePic;
+    private String cpf;
 
-	private String biografia;
-	private String urlProfilePic;
+    private List<OfertaDTO> ofertas = new ArrayList<>();
+    private Set<LeilaoDTO> leiloesParticipados = new HashSet<>();
 
-	private List<OfertaDTO> ofertas = new ArrayList<>();
-	private Set<LeilaoDTO> leiloesParticipados = new HashSet<>();
+    public UsuarioCompradorDTO() {}
 
-	public UsuarioCompradorDTO() {
-	}
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public UsuarioCompradorDTO(Long id, String username, String password, String biografia, String urlFotoPerfil,
-			Set<Permissao> permissoes, String urlProfilePic, List<OfertaDTO> ofertas,
-			Set<LeilaoDTO> leiloesParticipados) {
-		super(id, username, password, biografia, urlFotoPerfil, permissoes);
-		this.urlProfilePic = urlProfilePic;
-		this.ofertas = ofertas;
-		this.leiloesParticipados = leiloesParticipados;
-	}
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-	public String getUrlProfilePic() {
-		return urlProfilePic;
-	}
+    public String getBiografia() { return biografia; }
+    public void setBiografia(String biografia) { this.biografia = biografia; }
 
-	public void setUrlProfilePic(String urlProfilePic) {
-		this.urlProfilePic = urlProfilePic;
-	}
+    public String getUrlProfilePic() { return urlProfilePic; }
+    public void setUrlProfilePic(String urlProfilePic) { this.urlProfilePic = urlProfilePic; }
 
-	public String getBiografia() {
-		return biografia;
-	}
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
-	public void setBiografia(String biografia) {
-		this.biografia = biografia;
-	}
+    public List<OfertaDTO> getOfertas() { return ofertas; }
+    public void setOfertas(List<OfertaDTO> ofertas) { this.ofertas = ofertas; }
 
-	public List<OfertaDTO> getOfertas() {
-		return ofertas;
-	}
-
-	public void setOfertas(List<OfertaDTO> ofertas) {
-		this.ofertas = ofertas;
-	}
-
-	public Set<LeilaoDTO> getLeiloesParticipados() {
-		return leiloesParticipados;
-	}
-
-	public void setLeiloesParticipados(Set<LeilaoDTO> leiloesParticipados) {
-		this.leiloesParticipados = leiloesParticipados;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hash(biografia, leiloesParticipados, ofertas, urlProfilePic);
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		UsuarioCompradorDTO other = (UsuarioCompradorDTO) obj;
-		return Objects.equals(biografia, other.biografia)
-				&& Objects.equals(leiloesParticipados, other.leiloesParticipados)
-				&& Objects.equals(ofertas, other.ofertas) && Objects.equals(urlProfilePic, other.urlProfilePic);
-	}
-
-	@Override
-	public String toString() {
-		return "UsuarioCompradorDTO [biografia=" + biografia + ", urlProfilePic=" + urlProfilePic + ", ofertas="
-				+ ofertas + ", leiloesParticipados=" + leiloesParticipados + "]";
-	}
-
-	
-	
+    public Set<LeilaoDTO> getLeiloesParticipados() { return leiloesParticipados; }
+    public void setLeiloesParticipados(Set<LeilaoDTO> leiloesParticipados) { this.leiloesParticipados = leiloesParticipados; }
 }
