@@ -7,9 +7,9 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.devPontes.LeialaoME.model.DTO.LeilaoDTO;
-import com.devPontes.LeialaoME.model.DTO.OfertaDTO;
-import com.devPontes.LeialaoME.model.DTO.UsuarioDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 
 @Service

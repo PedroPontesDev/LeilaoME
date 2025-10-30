@@ -21,7 +21,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.devPontes.LeialaoME.security.JWT.services.JwtTokenFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -40,18 +39,21 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable())
+            .cors(Customizer.withDefaults())   // ativa CORS
+            .csrf(csrf -> csrf.disable())      // desativa CSRF
             .authorizeHttpRequests(auth -> auth
+                // Rotas públicas
                 .requestMatchers("/v1/auth/**").permitAll()
                 .requestMatchers("/v1/comprador/cadastrar-comprador").permitAll()
+                .requestMatchers("/v1/vendedor/cadastrar-vendedor").permitAll()
+                // Rotas privadas por role
                 .requestMatchers("/v1/comprador/*/upload-foto").hasRole("COMPRADOR")
                 .requestMatchers("/v1/leilao/criar-leilao").hasRole("VENDEDOR")
-                .requestMatchers("/h2-console/**").permitAll()
+
+                // Qualquer outra rota precisa de autenticação
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -59,19 +61,23 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
-        // Só o seu frontend local pode acessar
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        
+
+        // Origens permitidas
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://192.168.0.100:5173"));
+
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        
+
         // Cabeçalhos permitidos
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));
-        
-        // Permite enviar cookies/jwt
+
+        // Expõe o header Authorization para o frontend
+        configuration.setExposedHeaders(List.of("Authorization"));
+
+        // Permite envio de cookies e credenciais
         configuration.setAllowCredentials(true);
 
+        // Registra para todas as rotas
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 

@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.devPontes.LeialaoME.security.DTO.UsuarioLoginRequestDTO;
-import com.devPontes.LeialaoME.security.DTO.UsuarioLoginResponseDTO;
-import com.devPontes.LeialaoME.services.impl.AuthServices;
+import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
+import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginRequestDTO;
+import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginResponseDTO;
+import com.devPontes.LeialaoME.services.impl.AuthServicesImpl;
+import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
 @RestController
@@ -19,7 +21,10 @@ import com.devPontes.LeialaoME.services.impl.AuthServices;
 public class AuthController {
 
 	@Autowired
-	AuthServices authServices;
+	AuthServicesImpl authServices;
+	
+	@Autowired
+	UsuarioVendedorServicesImpl vendedorServices;
 	
 	@PostMapping(path = "/login")
 	public ResponseEntity<UsuarioLoginResponseDTO> login(@RequestBody UsuarioLoginRequestDTO request) {
@@ -27,4 +32,11 @@ public class AuthController {
 		return new ResponseEntity<UsuarioLoginResponseDTO>(token, HttpStatus.OK);
 	}
 	
+
+	@PostMapping(path = "/cadastrar-vendedor")
+	public ResponseEntity<UsuarioDTO> registrarUsuarioVendedor(@RequestBody UsuarioDTO usuario) throws Exception {
+		UsuarioDTO saved = vendedorServices.cadastrarUsuarioVendedor(usuario);
+	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
+	}
+
 }

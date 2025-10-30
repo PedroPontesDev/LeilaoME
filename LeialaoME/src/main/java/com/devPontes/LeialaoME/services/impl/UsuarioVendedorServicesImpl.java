@@ -20,11 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
-import com.devPontes.LeialaoME.model.DTO.LeilaoDTO;
-import com.devPontes.LeialaoME.model.DTO.OfertaDTO;
-import com.devPontes.LeialaoME.model.DTO.PermissaoDTO;
-import com.devPontes.LeialaoME.model.DTO.UsuarioDTO;
-import com.devPontes.LeialaoME.model.DTO.UsuarioVendedorDTO;
+import com.devPontes.LeialaoME.integrations.CnpjCpfValidadorClient;
+import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.PermissaoDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.UsuarioVendedorDTO;
 import com.devPontes.LeialaoME.model.entities.Permissao;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
@@ -34,7 +35,6 @@ import com.devPontes.LeialaoME.repositories.PermissaoRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioVendedorRepositories;
 import com.devPontes.LeialaoME.services.UsuarioVendedorService;
-import com.devPontes.LeialaoME.utils.CnpjCpfValidadorClient;
 
 import jakarta.transaction.Transactional;
 

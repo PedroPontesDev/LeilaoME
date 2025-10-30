@@ -20,10 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
-import com.devPontes.LeialaoME.model.DTO.LeilaoDTO;
-import com.devPontes.LeialaoME.model.DTO.OfertaDTO;
-import com.devPontes.LeialaoME.model.DTO.PermissaoDTO;
-import com.devPontes.LeialaoME.model.DTO.UsuarioDTO;
+import com.devPontes.LeialaoME.integrations.CnpjCpfValidadorClient;
+import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.PermissaoDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
 import com.devPontes.LeialaoME.model.entities.Permissao;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
@@ -33,7 +34,6 @@ import com.devPontes.LeialaoME.repositories.PermissaoRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioCompradorRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioRepositories;
 import com.devPontes.LeialaoME.services.UsuarioCompradorService;
-import com.devPontes.LeialaoME.utils.CnpjCpfValidadorClient;
 
 import jakarta.transaction.Transactional;
 
@@ -55,15 +55,14 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	@Autowired
 	OfertaServicesImpl ofertaServices;
 
+	@Autowired
+	CnpjCpfValidadorClient cpfValidator;
+	
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradorServicesImpl.class);
-
-	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha permissão)
-	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
+	
 
 	@Override
-	@Transactional
 	public UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception {
-
 		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class);
 
 		if (!CnpjCpfValidadorClient.validarCPf(user.getCpf())) {
@@ -83,9 +82,12 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		dto.setPermissoes(user.getPermissoes().stream().map(p -> new PermissaoDTO(UsuarioRole.ROLE_COMPRADOR))
 				.collect(Collectors.toSet()));
 
-		log.info("Usuário cadastrado com sucesso: {}", user.getUsername());
+		log.info("Usuário cadastrado com sucesso: {}", user.getCpf());
 		return dto;
 	}
+
+	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha permissão)
+	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
 
 	/**
 	 * Faz upload de imagem de perfil do usuário.
@@ -105,7 +107,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 			throw new RuntimeException("Arquivo vazio!");
 		}
 
-		// 2️ Valida o tipo do arquivo
+		// 2️ Valida o tipo MIME do arquivo
 		String contentType = file.getContentType();
 		if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png"))) {
 			throw new Exception("Servidor só pode consumir imagens JPG ou PNG!");
@@ -217,13 +219,6 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	}
 
 	@Override
-	public Set<OfertaDTO> findOfertasMaisCaras(Usuario usuarioLogado, String cpfComprador, Double minimumValue) {
-		var ofertaMaisCaras = ofertaServices.findOfertasMaisCarasDeComprador(usuarioLogado, cpfComprador, minimumValue);
-		return ofertaMaisCaras;
-
-	}
-
-	@Override
 	public Set<LeilaoDTO> findLeiloesAdquiridosDeUsuario(Long usuarioCompradorId) {
 		// TODO: mostrar historico de leiloes adquiridos por id de usuario
 		throw new UnsupportedOperationException("Não implementado ainda");
@@ -234,5 +229,14 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Set<OfertaDTO> findOfertasMaisCarasComprador(Usuario usuarioLogado, String cpfComprador, Double minimumValue) {
+		var ofertasCaras = ofertaServices.findOfertasMaisCarasDeComprador(usuarioLogado, cpfComprador, minimumValue);
+		return ofertasCaras;
+			
+		
+	}
+
 
 }

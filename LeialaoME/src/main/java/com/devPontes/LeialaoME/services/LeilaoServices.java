@@ -7,7 +7,8 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.devPontes.LeialaoME.model.DTO.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 
 @Service
@@ -24,6 +25,8 @@ public interface LeilaoServices {
 	LeilaoDTO verificarEstadoDeLeilao(Long leilaoId);
 
 	LeilaoDTO definirGanhador(Long leilaoId, Usuario usuarioLogado) throws Exception; //SOMENTE ADMINS EXECUTAM ESSE METODO
+	
+	Set<OfertaDTO> visualizarOfertasDeLeilao(Usuario usuarioLogado, Long leilaoId);
 	
 	Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes);
 	

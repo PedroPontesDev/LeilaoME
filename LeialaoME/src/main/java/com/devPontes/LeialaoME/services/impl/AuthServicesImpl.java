@@ -7,21 +7,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.devPontes.LeialaoME.security.DTO.UsuarioLoginRequestDTO;
-import com.devPontes.LeialaoME.security.DTO.UsuarioLoginResponseDTO;
+import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginRequestDTO;
+import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginResponseDTO;
 import com.devPontes.LeialaoME.security.JWT.services.JwtService;
 import com.devPontes.LeialaoME.security.services.CustomUserDetailsService;
 
 @Service
-public class AuthServices {
+public class AuthServicesImpl {
 
     private final AuthenticationManager auth;
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
 
-    private static final Logger log = LoggerFactory.getLogger(AuthServices.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthServicesImpl.class);
 
-    public AuthServices(AuthenticationManager auth, JwtService jwtService,
+    public AuthServicesImpl(AuthenticationManager auth, JwtService jwtService,
                         CustomUserDetailsService userDetailsService) {
         this.auth = auth;
         this.jwtService = jwtService;

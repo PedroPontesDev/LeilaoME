@@ -16,8 +16,7 @@ public interface OfertaRepositories extends JpaRepository<Oferta, Long> {
 	
 	@Query("SELECT o FROM Oferta o " +
 		       "WHERE o.vendedor.cnpj = :cnpjVendedor " +
-		       "AND o.valorOferta >= :valorMinimo " +
-		       "ORDER BY o.valorOferta")
+		       "AND o.valorOferta >= :valorMinimo")
 	Set<Oferta> findOfertasMaisCarasDeVendedor(@Param("cnpjVendedor") String cnpjVendedor, @Param("valorMinimo") Double valorMinimo);
 
 	

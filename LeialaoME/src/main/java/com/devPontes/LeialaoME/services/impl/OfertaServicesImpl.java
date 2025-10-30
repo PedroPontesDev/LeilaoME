@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
 import com.devPontes.LeialaoME.exceptions.LeilaoException;
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
-import com.devPontes.LeialaoME.model.DTO.OfertaDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.entities.Leilao;
 import com.devPontes.LeialaoME.model.entities.Oferta;
 import com.devPontes.LeialaoME.model.entities.Usuario;
@@ -62,6 +62,10 @@ public class OfertaServicesImpl implements OfertaService {
 		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
 
+		if(ofertaNova.getMomentoOferta().isBefore(leilaoExistente.getInicio())) {
+			throw new LeilaoException("A oferta não deve ser feita antes do leilão ter iniciado");
+		}
+		
 		// Calcula valor mínimo permitido
 		Double valorMinimo = calcularNovoLanceMinimo(leilaoId);
 
@@ -108,27 +112,18 @@ public class OfertaServicesImpl implements OfertaService {
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
 
 		// 2. Pegar a oferta mais alta do leilão
-		Oferta ofertaMaisAlta = leilao.getOfertas().stream().filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
-				.max(Comparator.comparingDouble(Oferta::getValorOferta)).orElse(null);
+		Oferta ofertaMaisAlta = leilao
+				.getOfertas()
+				.stream()
+				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+				.max(Comparator.comparingDouble(Oferta::getValorOferta))
+				.orElse(null);
 
-		// 3. Pegar a oferta anterior do mesmo comprador (se houver)
-		Oferta ofertaAnteriorDoMesmoComprador = leilao.getOfertas().stream()
-				.filter(o -> o.getComprador().getId().equals(compradorId))
-				.max(Comparator.comparingDouble(Oferta::getValorOferta)).orElse(null);
-
-		Double lanceMaisAltoAtual = (ofertaMaisAlta != null) ? ofertaMaisAlta.getValorOferta()
-				: leilao.getLanceInicial();
-
-		Double lanceMinimoPermitido = lanceMaisAltoAtual
-				+ (leilao.getValorDeIncremento() != null ? leilao.getValorDeIncremento() : 0.0);
-
+	
+		Double lanceMinimoPermitido = calcularNovoLanceMinimo(leilaoId);
+	
 		if (novoValor < lanceMinimoPermitido) {
 			throw new IllegalArgumentException("O lance mínimo permitido é de R$ " + lanceMinimoPermitido);
-		}
-
-		if (ofertaAnteriorDoMesmoComprador != null && novoValor <= ofertaAnteriorDoMesmoComprador.getValorOferta()) {
-			throw new IllegalArgumentException("Seu novo lance deve ser maior que seu lance anterior de R$ "
-					+ ofertaAnteriorDoMesmoComprador.getValorOferta());
 		}
 
 		if (ofertaMaisAlta != null && ofertaMaisAlta.getStatusOferta() != StatusOferta.ATIVA)
@@ -137,10 +132,6 @@ public class OfertaServicesImpl implements OfertaService {
 		if (ofertaMaisAlta != null && novoValor <= ofertaMaisAlta.getValorOferta())
 			throw new IllegalArgumentException("Seu novo lance deve ser maior que o seu lance anterior.");
 
-		if (ofertaAnteriorDoMesmoComprador != null) {
-			ofertaAnteriorDoMesmoComprador.setStatusOferta(StatusOferta.INATIVA);
-			ofertaRepository.save(ofertaAnteriorDoMesmoComprador);
-		}
 
 		Oferta novaOferta = new Oferta();
 
@@ -150,7 +141,8 @@ public class OfertaServicesImpl implements OfertaService {
 		novaOferta.setLeilao(leilao);
 
 		if (ofertaMaisAlta != null)
-			leilao.setComprador(ofertaMaisAlta.getComprador());
+			
+		leilao.setComprador(usuarioComprador); //Commprador no contexto atual do novo lance
 		leilao.getOfertas().add(novaOferta);
 
 		// Persistir alterações
@@ -168,13 +160,17 @@ public class OfertaServicesImpl implements OfertaService {
 		double lanceMinimo;
 
 		if (leilao.getLanceInicial() != null) {
-			lanceMinimo = leilao.getLanceInicial();
+			lanceMinimo = leilao.getLanceInicial(); 
 		} else {
 			lanceMinimo = 0.0;
 		}
 
 		// Valor de incremento definido pelo leilão
-		double incremento = (leilao.getValorDeIncremento() != null) ? leilao.getValorDeIncremento() : 0.0;
+		double incremento = 0.0;
+		
+		if(leilao.getValorDeIncremento() != null) {
+			incremento = leilao.getValorDeIncremento();
+		}
 
 		for (Oferta oferta : leilao.getOfertas()) {
 			if (!ofertaValida(oferta)) {
@@ -205,9 +201,6 @@ public class OfertaServicesImpl implements OfertaService {
 	@Override
 	@Transactional
 	public OfertaDTO aceitarOfertaDeLeilao(Usuario usuarioLogado, Long leilaoId, Long ofertaId) {
-		UsuarioVendedor usuarioVendedor = (UsuarioVendedor) vendedorRepository.findById(usuarioLogado.getId())
-				.orElseThrow(() -> new UsuarioNaoEncontradoException("Vendedor não encontrado!"));
-
 		Leilao leilao = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilão não encontrado para o ID " + leilaoId));
 
@@ -232,7 +225,10 @@ public class OfertaServicesImpl implements OfertaService {
 			if (oferta.getId().equals(ofertaExistente.getId()) && oferta.getStatusOferta() == StatusOferta.ATIVA) {
 				oferta.setStatusOferta(StatusOferta.ACEITA);
 				ofertaExistente = ofertaRepository.save(oferta);
+				
+				//incrementa no leilao o valor apos a a oferta ter sido aceita confrome Status
 				leilao.setValorDeIncremento(leilao.getLanceInicial() + oferta.getValorOferta());
+				leilao.setComprador(oferta.getComprador());
 				leilaoRepository.save(leilao);
 				ofertaAceita = true;
 				break;
@@ -268,7 +264,9 @@ public class OfertaServicesImpl implements OfertaService {
 	@Override
 	public Set<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, String cpfComprador,
 			Double valorMinimo) {
-		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeComprador(cpfComprador, valorMinimo);
+		
+		String cpfLogado = ((UsuarioComprador) usuarioLogado).getCpf();
+		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeComprador(cpfLogado, valorMinimo);
 		if (oferta != null) {
 			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);
 		} else {
@@ -282,7 +280,7 @@ public class OfertaServicesImpl implements OfertaService {
 	public Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(Usuario usuarioLogado, String cnpjVendedor,
 			Double valorMinimo) {
 
-		String cnpjLogado = ((UsuarioVendedor) usuarioLogado).getCnpj();
+		String cnpjLogado = ((UsuarioVendedor) usuarioLogado).getCnpj(); //Pega o cnpj logado no contexto de Security com Cast pra UsuarioVendedor
 		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeVendedor(cnpjLogado, valorMinimo);
 		if (!oferta.isEmpty()) {
 			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);

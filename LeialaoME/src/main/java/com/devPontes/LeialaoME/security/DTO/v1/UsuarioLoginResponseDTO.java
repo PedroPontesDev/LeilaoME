@@ -1,4 +1,4 @@
-package com.devPontes.LeialaoME.security.DTO;
+package com.devPontes.LeialaoME.security.DTO.v1;
 
 import java.io.Serializable;
 

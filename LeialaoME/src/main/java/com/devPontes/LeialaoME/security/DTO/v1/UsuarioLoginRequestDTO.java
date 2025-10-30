@@ -1,4 +1,4 @@
-package com.devPontes.LeialaoME.security.DTO;
+package com.devPontes.LeialaoME.security.DTO.v1;
 
 import java.io.Serializable;
 
@@ -9,7 +9,7 @@ public class UsuarioLoginRequestDTO implements Serializable {
     private String password;
 
     public UsuarioLoginRequestDTO() {}
-
+    
     public UsuarioLoginRequestDTO(String username, String password) {
         this.username = username;
         this.password = password;

@@ -1,4 +1,4 @@
-package com.devPontes.LeialaoME.model.DTO;
+package com.devPontes.LeialaoME.model.DTO.v1;
 
 import java.time.LocalDateTime;
 
