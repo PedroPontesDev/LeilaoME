@@ -1,7 +1,5 @@
 package com.devPontes.LeialaoME.controllers;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
-
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devPontes.LeialaoME.integrations.OpenRouteServiceClient;
-import com.devPontes.LeialaoME.model.DTO.v1.CordenadasRequestDTO;
 @RestController
 @RequestMapping("/api/ors")
 public class OpenRouteController {
@@ -31,10 +28,10 @@ public class OpenRouteController {
      *   ]
      * }
      * @throws Exception 
-     */
+    
     @PostMapping("/matrix")
     public ResponseEntity<?> calcularDistancia(
-            @RequestBody CordenadasRequestDTO cordenadas) throws Exception {
+            @RequestBody com.devPontes.LeialaoME.model.DTO.CordenadasRequestDTO cordenadas) throws Exception {
 
         
     	if(cordenadas.getCoordinates().size() <= 0 || cordenadas.getCoordinates().isEmpty()) throw new Exception("Cordneadas presicam ser incluidas com LAT E LONG"); 
@@ -54,4 +51,6 @@ public class OpenRouteController {
 
         return ResponseEntity.ok(resultado);
     }
+    
+     */
 }
