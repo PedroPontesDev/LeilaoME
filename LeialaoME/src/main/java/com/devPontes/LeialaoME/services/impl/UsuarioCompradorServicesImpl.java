@@ -25,6 +25,7 @@ import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.PermissaoDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.UsuarioUpdateDTO;
 import com.devPontes.LeialaoME.model.entities.Permissao;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
@@ -57,9 +58,8 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	@Autowired
 	CnpjCpfValidadorClient cpfValidator;
-	
+
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradorServicesImpl.class);
-	
 
 	@Override
 	public UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception {
@@ -79,15 +79,11 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		UsuarioComprador salvo = usuarioRepository.save(user);
 
 		UsuarioDTO dto = MyMaper.parseObject(salvo, UsuarioDTO.class);
-		dto.setPermissoes(user.getPermissoes().stream().map(p -> new PermissaoDTO(UsuarioRole.ROLE_COMPRADOR))
-				.collect(Collectors.toSet()));
+
 
 		log.info("Usuário cadastrado com sucesso: {}", user.getCpf());
 		return dto;
 	}
-
-	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha permissão)
-	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
 
 	/**
 	 * Faz upload de imagem de perfil do usuário.
@@ -97,6 +93,11 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	 * @return Map com informações do upload
 	 * @throws Exception caso algo dê errado
 	 */
+
+	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha
+	// permissão)
+	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
+
 	@Transactional
 	public Map<String, Object> fazerUploadDeImamgemDePerfil(Long userId, MultipartFile file) throws Exception {
 		var entidade = usuarioRepository.findById(userId)
@@ -133,8 +134,9 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 			byte[] buffer = new byte[8192]; // lê 8KB por vez
 			int bytesLidos;
 			while ((bytesLidos = input.read(buffer)) != -1) {
-				output.write(buffer, 0, bytesLidos); // escreve no disco passando da posição zero até o final qu ter bufferlidos
-						
+				output.write(buffer, 0, bytesLidos); // escreve no disco passando da posição zero até o final qu ter
+														// bufferlidos
+
 			}
 		}
 
@@ -149,7 +151,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		response.put("fileName", file.getOriginalFilename());
 		response.put("size", file.getSize()); // tamanho em bytes
 
-		log.info("Upload feito para usuário {} -> {}", userId, urlRelativa + "Para Onjeto/Entidade: " + entidade);
+		log.info("Upload feito para usuário {} -> {}", userId, urlRelativa + "Para Objeto/Entidade: " + entidade);
 
 		usuarioRepositories.save(entidade);
 
@@ -158,23 +160,29 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	@Override
 	@Transactional
-	public UsuarioDTO atualizarUsuarioComprador(UsuarioDTO update, Long usuarioId) {
+	public UsuarioDTO atualizarUsuarioComprador(UsuarioUpdateDTO update, Long usuarioId) throws Exception {
 		var entidade = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
 
-		if (update.getBiografia() != null)
-			entidade.setBiografia(update.getBiografia());
+		if (update.biografia() != null)
+			entidade.setBiografia(update.biografia());
 
-		if (update.getPassword() != null)
-			entidade.setPassword(encoder.encode(update.getPassword()));
+		// Atualização de senha
+		if (update.newPassword() != null && update.oldPassword() != null) {
+			if (update.newPassword().length() < 6) {
+				throw new Exception("A nova senha deve conter pelo menos 6 carcters!");
+			}
 
-		if (update.getUsername() != null)
-			entidade.setUsername(update.getUsername());
+			if (!encoder.matches(update.oldPassword(), entidade.getPassword())) {
+				throw new Exception("A senha antiga é incorreta !");
+			}
 
-		if (update.getFotoPerfil() != null)
-			entidade.setUrlFotoPerfil(update.getFotoPerfil());
+			entidade.setPassword(encoder.encode(update.newPassword()));
+		}
 
-		// Salva as alterações
+		if (update.username() != null)
+			entidade.setUsername(update.username());
+
 		UsuarioComprador salvo = (UsuarioComprador) usuarioRepository.save(entidade);
 
 		// Retorna o DTO atualizado
@@ -188,7 +196,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		var entidade = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
 
-		if (entidade.getBiografia() != null)
+		if (entidade.getBiografia() == null)
 			entidade.setBiografia(biografia);
 
 		// Salva as alterações
@@ -203,7 +211,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		var entidade = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
 
-		if (entidade.getUsername() != null)
+		if (entidade.getUsername() != null && entidade.getUsername().length() > 10)
 			entidade.setUsername(usernameNovo);
 
 		// Salva as alterações
@@ -215,7 +223,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	@Override
 	@Transactional
 	public String atualizarPassword(Long usuarioId, String passwordNova) {
-		throw new UnsupportedOperationException("Não implementado ainda");
+		return null;
 	}
 
 	@Override
@@ -231,12 +239,11 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	}
 
 	@Override
-	public Set<OfertaDTO> findOfertasMaisCarasComprador(Usuario usuarioLogado, String cpfComprador, Double minimumValue) {
+	public Set<OfertaDTO> findOfertasMaisCarasComprador(Usuario usuarioLogado, String cpfComprador,
+			Double minimumValue) {
 		var ofertasCaras = ofertaServices.findOfertasMaisCarasDeComprador(usuarioLogado, cpfComprador, minimumValue);
 		return ofertasCaras;
-			
-		
-	}
 
+	}
 
 }

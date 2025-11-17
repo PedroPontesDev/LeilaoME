@@ -10,12 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.UsuarioUpdateDTO;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 
 @Service
 public interface UsuarioVendedorService {
 
-	 UsuarioDTO atualizarUsuarioVendedor(UsuarioDTO update, Long usuarioId);
+	 UsuarioDTO atualizarUsuarioVendedor(UsuarioUpdateDTO update, Long usuarioId) throws Exception;
 	 Map<String, Object> fazerUploadDeImamgemDePerfil(Long id, MultipartFile file) throws Exception;
 	 String escreverBiografia(Long usuarioId, String beografia);
 	 String atualizarUsername(Long usuarioId, String usernameNovo);
@@ -23,5 +24,6 @@ public interface UsuarioVendedorService {
 	 Set<LeilaoDTO>findLeiloesParticipados(Long usuarioCompradorId);
 	 Set<OfertaDTO> findOfertasMaisCarasRecebidas(String cnpjComprador, Double minimumValue);
 	 Set<OfertaDTO> findOfertaMaisBaixaRecebida(Usuario usuarioLogado, String cnpjComprador, Double maximumValue);
+	
 
 }

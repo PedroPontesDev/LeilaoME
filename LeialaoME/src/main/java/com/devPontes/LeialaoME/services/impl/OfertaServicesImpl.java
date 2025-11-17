@@ -96,8 +96,8 @@ public class OfertaServicesImpl implements OfertaService {
 	 * @return OfertaDTO com as info no JSON da atulização do novo lance com as
 	 *         ofertas atualizadas
 	 * @throws Exception caso algo dê errado mas sera tratado
-	 */
-	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) {
+	 */	
+	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) { //Usar o AuthenticationPrincipal
 
 		// 1. Buscar leilão e comprador pra ver se ecoincidem na mesma transação
 
@@ -195,7 +195,7 @@ public class OfertaServicesImpl implements OfertaService {
 			return false;
 		if (oferta.getStatusOferta() != StatusOferta.ATIVA)
 			return false;
-		return true;
+			return true;
 	}
 
 	@Override

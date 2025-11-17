@@ -25,6 +25,7 @@ import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.PermissaoDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
+import com.devPontes.LeialaoME.model.DTO.v1.UsuarioUpdateDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioVendedorDTO;
 import com.devPontes.LeialaoME.model.entities.Permissao;
 import com.devPontes.LeialaoME.model.entities.Usuario;
@@ -96,9 +97,6 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 		UsuarioVendedor salvo = usuarioRepository.save(user);
 
 		UsuarioDTO dto = MyMaper.parseObject(salvo, UsuarioDTO.class);
-		dto.setPermissoes(user.getPermissoes().stream().map(p -> new PermissaoDTO(UsuarioRole.ROLE_VENDEDOR))
-				.collect(Collectors.toSet()));
-
 		return dto;
 	}
 	
@@ -172,21 +170,29 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 
 	@Override
 	@Transactional
-	public UsuarioDTO atualizarUsuarioVendedor(UsuarioDTO update, Long usuarioId) {
+	public UsuarioDTO atualizarUsuarioVendedor(UsuarioUpdateDTO update, Long usuarioId) throws Exception {
 		var entidade = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
 
-		if (update.getBiografia() != null)
-			entidade.setBiografia(update.getBiografia());
+		if (update.biografia() != null)
+			entidade.setBiografia(update.biografia());
 
-		if (update.getPassword() != null)
-			entidade.setPassword(encoder.encode(update.getPassword()));
+		// Atualização de senha
+		if (update.newPassword() != null && update.oldPassword() != null) {
+			if (update.newPassword().length() < 6) {
+				throw new Exception("A nova senha deve conter pelo menos 6 carcters!");
+			}
 
-		if (update.getUsername() != null)
-			entidade.setUsername(update.getUsername());
+			if (!encoder.matches(update.oldPassword(), entidade.getPassword())) {
+				throw new Exception("A senha antiga é incorreta !");
+			}
 
-		if (update.getFotoPerfil() != null)
-			entidade.setUrlFotoPerfil(update.getFotoPerfil());
+			entidade.setPassword(encoder.encode(update.newPassword()));
+		}
+
+		if (update.username() != null)
+			entidade.setUsername(update.username());
+
 		
 		UsuarioVendedor salvo = (UsuarioVendedor) usuarioRepository.save(entidade);
 		return MyMaper.parseObject(salvo, UsuarioDTO.class);

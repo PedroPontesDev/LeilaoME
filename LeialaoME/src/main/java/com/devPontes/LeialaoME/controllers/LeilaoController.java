@@ -65,10 +65,11 @@ public class LeilaoController {
 
 	
 	@GetMapping(path = "/visualizar-ofertas/{leilaoId}")
- 	public ResponseEntity<Set<OfertaDTO>> visualizarOfertasDeLeilao(Usuario usuarioLogado, Long leilaoId) {
+ 	public ResponseEntity<Set<OfertaDTO>> visualizarOfertasDeLeilao(@AuthenticationPrincipal Usuario usuarioLogado, Long leilaoId) {
  		var ofertas = leilaoServices.visualizarOfertasDeLeilao(usuarioLogado, leilaoId);
  		return new ResponseEntity<>(ofertas, HttpStatus.OK);
  	}
+	
 	@GetMapping(path = "/find-all")
 	public ResponseEntity<List<LeilaoDTO>> findAll() {
 		var all = leilaoServices.findAll();

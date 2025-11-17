@@ -1,4 +1,4 @@
-package com.devPontes.LeialaoME.services.impl;
+package com.devPontes.LeialaoME.security.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginRequestDTO;
 import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginResponseDTO;
 import com.devPontes.LeialaoME.security.JWT.services.JwtService;
-import com.devPontes.LeialaoME.security.services.CustomUserDetailsService;
 
 @Service
 public class AuthServicesImpl {

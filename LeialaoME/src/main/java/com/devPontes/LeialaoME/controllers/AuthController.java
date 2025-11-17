@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
 import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginRequestDTO;
 import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginResponseDTO;
-import com.devPontes.LeialaoME.services.impl.AuthServicesImpl;
+import com.devPontes.LeialaoME.security.services.AuthServicesImpl;
 import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})

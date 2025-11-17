@@ -26,20 +26,24 @@ public class JwtService {
 
 	public String generateToken(UserDetails userDetails) {
 
-		Long userId = ((Usuario) userDetails).getId(); // PAra passar pro front
+		Long userId = ((Usuario) userDetails).getId(); // Para passar pro front caso nessecite de passar a id pelas claims além das roles
 		
 		try {
 
 			Algorithm alg = Algorithm.HMAC256(secret);
 
-			String token = JWT.create()
-					.withIssuer("Leilao-WebService")
-					.withSubject(userDetails.getUsername())
-					.withExpiresAt(calculateExpiration())
-					.withClaim("id", userId)
-					.withClaim("roles", userDetails.getAuthorities()
-													.stream().map(GrantedAuthority::getAuthority)
-													.collect(Collectors.toList())).sign(alg);
+			String token = JWT
+							  .create()
+							  .withIssuer("")
+							  .withClaim("id", userId)
+							  .withClaim("roles", userDetails.getAuthorities()
+									  						 .stream()
+									  						 .map(g -> g.getAuthority()).toList())
+									  						  
+							  .sign(alg);
+							
+						
+					     
 			return token;
 
 		} catch (JWTCreationException ex) {
@@ -47,6 +51,10 @@ public class JwtService {
 		}
 
 	}
+	
+	
+	
+
 
 	public String validateToken(String token) {
 		Algorithm alg = Algorithm.HMAC256(secret);
