@@ -222,8 +222,24 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	@Override
 	@Transactional
-	public String atualizarPassword(Long usuarioId, String passwordNova) {
-		return null;
+	public String atualizarPassword(Long usuarioId, String passwordNova, String oldPassword) throws Exception {
+		UsuarioComprador usuario =  (UsuarioComprador) usuarioRepositories.findById(usuarioId)
+											           .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado com ID" + usuarioId));
+		
+		if (passwordNova != null && oldPassword != null) {
+			if (passwordNova.length() < 6) {
+				throw new Exception("A nova senha deve conter pelo menos 6 carcters!");
+			}
+
+			if (!encoder.matches(oldPassword, usuario.getPassword())) {
+				throw new Exception("A senha antiga é incorreta !");
+			}
+
+			usuario.setPassword(encoder.encode(passwordNova));
+		}
+		
+		return passwordNova;
+
 	}
 
 	@Override

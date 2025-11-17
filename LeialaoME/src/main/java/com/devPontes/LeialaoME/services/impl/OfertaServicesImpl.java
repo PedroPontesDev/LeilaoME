@@ -91,7 +91,8 @@ public class OfertaServicesImpl implements OfertaService {
 	/**
 	 * Faz novos lances apos ofertas chegarem ao maximo
 	 * 
-	 * @param leilaoId  id do leilao que fara o PUT de novo lance
+	 * @param compradorId comprador logado que é responsavel pelo PUT
+	 * @param leilaoId  id do leilao que recebera o PUT de novo lance
 	 * @param novoValor novoValor que vem da request
 	 * @return OfertaDTO com as info no JSON da atulização do novo lance com as
 	 *         ofertas atualizadas
@@ -215,30 +216,33 @@ public class OfertaServicesImpl implements OfertaService {
 			throw new IllegalArgumentException("Esta oferta não pertence a este leilão!");
 		}
 
-		// Debug temporário
-		System.out.println("Ofertas carregadas:");
-		leilao.getOfertas()
-				.forEach(o -> System.out.println(" - ID: " + o.getId() + ", Status: " + o.getStatusOferta()));
-
 		boolean ofertaAceita = false;
+		Oferta ofertaAceitaFinal = null;
+		
 		for (Oferta oferta : leilao.getOfertas()) {
 			if (oferta.getId().equals(ofertaExistente.getId()) && oferta.getStatusOferta() == StatusOferta.ATIVA) {
 				oferta.setStatusOferta(StatusOferta.ACEITA);
-				ofertaExistente = ofertaRepository.save(oferta);
-				
-				//incrementa no leilao o valor apos a a oferta ter sido aceita confrome Status
-				leilao.setValorDeIncremento(leilao.getLanceInicial() + oferta.getValorOferta());
+				leilao.setValorDeIncremento(oferta.getValorOferta());
 				leilao.setComprador(oferta.getComprador());
-				leilaoRepository.save(leilao);
+				
 				ofertaAceita = true;
-				break;
+				ofertaAceitaFinal = oferta;
+			} else {
+				oferta.setStatusOferta(StatusOferta.INATIVA);
 			}
 		}
+	
 		if (!ofertaAceita) {
 			throw new IllegalArgumentException("Nenhuma oferta ativa encontrada para aceitar!");
 		}
-
-		return MyMaper.parseObject(ofertaExistente, OfertaDTO.class);
+		
+		// Debug temporário
+		System.out.println("Ofertas carregadas: \n");
+		leilao.getOfertas()
+				.forEach(o -> System.out.println(" - ID: " + o.getId() + ", Status: " + o.getStatusOferta()));
+		ofertaRepository.saveAll(leilao.getOfertas());
+		leilaoRepository.save(leilao);
+		return MyMaper.parseObject(ofertaAceitaFinal, OfertaDTO.class);
 	}
 
 	@Override

@@ -102,7 +102,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 			throw new IllegalArgumentException("Leilão deve começar com algum valor numérico!");
 
 		if (tempoInicio.isBefore(LocalDateTime.now()))
-			throw new IllegalArgumentException("Leilão eve começar num momento futuro!");
+			throw new IllegalArgumentException("Leilão deve começar num momento futuro!");
 
 	    if (tempoFim.isBefore(tempoInicio)) 
 	        throw new IllegalArgumentException("A data de término deve ser posterior ao início do leilão!");
@@ -142,12 +142,14 @@ public class LeilaoServicesImpl implements LeilaoServices {
 			throw new LeilaoException("O horario leilão não foi encerrado!");
 
 		// Garantir que existem ofertas
-		if (leilaoExistente.getOfertas() == null || leilaoExistente.getOfertas().isEmpty()) {
+		if (leilaoExistente.getOfertas() == null && leilaoExistente.getOfertas().isEmpty()) {
 			throw new LeilaoException("Nenhuma oferta encontrada neste leilão.");
 		}
 
 
-		Oferta maiorOferta = leilaoExistente.getOfertas().stream()
+		Oferta maiorOferta = leilaoExistente
+				.getOfertas()
+				.stream()
 				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
 				.filter(o -> o.getValorOferta() != null)
 				.max(Comparator.comparing(Oferta::getValorOferta))
@@ -184,7 +186,6 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	
 	@Override 
 	public LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO leilao, Long tempoMinimoHoras, Usuario usuarioLogado) {
-
 		Leilao entity = MyMaper.parseObject(leilao, Leilao.class);
 
 		if (!entity.isAindaAtivo())

@@ -19,11 +19,12 @@ public interface UsuarioCompradorService {
 	 Map<String, Object> fazerUploadDeImamgemDePerfil(Long id, MultipartFile file) throws Exception;
 	 String escreverBiografia(Long usuarioId, String beografia);
 	 String atualizarUsername(Long usuarioId, String usernameNovo);
-	 String atualizarPassword(Long usuarioId, String passwordNova);
+	 String atualizarPassword(Long usuarioId, String passwordNova, String oldPassword) throws Exception;
 	 Set<LeilaoDTO>findLeiloesAdquiridosDeUsuario(Long usuarioCompradorId);
 	 Set<OfertaDTO> findOfertaMaisBaixa(String cpfComprador, Double maximumValue);
 	 UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception;
 	 Set<OfertaDTO> findOfertasMaisCarasComprador(Usuario usuarioLogado, String cpfComprador, Double minimumValue);
+
 	
 	
 }

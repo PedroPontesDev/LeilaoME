@@ -66,7 +66,7 @@ public class WebSecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://192.168.0.100:5173"));
 
         // Métodos HTTP permitidos
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH" , "OPTIONS"));
 
         // Cabeçalhos permitidos
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));

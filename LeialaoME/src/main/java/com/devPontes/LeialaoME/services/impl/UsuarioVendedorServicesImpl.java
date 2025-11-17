@@ -89,7 +89,7 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 
 		Permissao roleComprador = permissaoRepository.findByUsuarioRole(UsuarioRole.ROLE_VENDEDOR);
 		if (roleComprador == null)
-			throw new RuntimeException("Permissão ROLE_COMPRADOR não encontrada no banco!");
+			throw new RuntimeException("Permissão ROLE_VENDEDOR não encontrada no banco!");
 
 		user.getPermissoes().add(roleComprador);
 		user.setPassword(encoder.encode(user.getPassword()));
