@@ -38,24 +38,25 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(Customizer.withDefaults())   // ativa CORS
-            .csrf(csrf -> csrf.disable())      // desativa CSRF
-            .authorizeHttpRequests(auth -> auth
-                // Rotas públicas
-                .requestMatchers("/v1/auth/**").permitAll()
-                .requestMatchers("/v1/comprador/cadastrar-comprador").permitAll()
-                .requestMatchers("/v1/vendedor/cadastrar-vendedor").permitAll()
-                // Rotas privadas por role
-                .requestMatchers("/v1/comprador/*/upload-foto").hasRole("COMPRADOR")
-                .requestMatchers("/v1/leilao/criar-leilao").hasRole("VENDEDOR")
+    	 http
+         .cors(Customizer.withDefaults())
+         .csrf(csrf -> csrf.disable())
+         
+         // O filtro só será aplicado a qualquer rota exceto /v1/auth/**
+         .securityMatcher("/**")
+         
+         .authorizeHttpRequests(auth -> auth
+             .requestMatchers("/v1/auth/**").permitAll()
+             .requestMatchers("/v1/comprador/*/upload-foto").hasRole("COMPRADOR")
+             .requestMatchers("/v1/leilao/criar-leilao").hasRole("VENDEDOR")
+             .anyRequest().authenticated()
+         )
+         
+         // Aqui está o segredo:
+         // Só adicionamos o filtro nas rotas autenticadas
+         .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
-                // Qualquer outra rota precisa de autenticação
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+    	 return http.build();
     }
 
     @Bean

@@ -55,16 +55,14 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 	private BCryptPasswordEncoder encoder;
 
 	@Autowired
-	OfertaServicesImpl ofertaServices;
+	private OfertaServicesImpl ofertaServices;
 	
 	@Autowired
-	CnpjCpfValidadorClient cnpjValidator;
-	
+	private	CnpjCpfValidadorClient cnpjValidator;
 	
 	private static final Logger log = LoggerFactory.getLogger(UsuarioVendedorServicesImpl.class);
 	
-	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha
-	// permissão)
+	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha permissão)
 	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
 	
 	public UsuarioVendedorDTO findById(Long compradorId) {
@@ -80,23 +78,25 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 
 	@Transactional
 	public UsuarioDTO cadastrarUsuarioVendedor(UsuarioDTO novoUsuario) throws Exception {
-
 		UsuarioVendedor user = (UsuarioVendedor) MyMaper.parseObject(novoUsuario, UsuarioVendedor.class);
-
-		if (!cnpjValidator.validarCnpj(user.getCnpj())) {
-			throw new Exception("CNPJ Não Pode Ser Validado como CNPJ REAL");
-		}
-
+		
+		if (!cnpjValidator.validarCnpj(user.getCnpj()))  throw new Exception("CNPJ Não Pode Ser Validado como CNPJ REAL");
+		
 		Permissao roleComprador = permissaoRepository.findByUsuarioRole(UsuarioRole.ROLE_VENDEDOR);
-		if (roleComprador == null)
-			throw new RuntimeException("Permissão ROLE_VENDEDOR não encontrada no banco!");
-
+		
+		if (roleComprador == null) throw new RuntimeException("Permissão ROLE_VENDEDOR não encontrada no banco!");
+		
 		user.getPermissoes().add(roleComprador);
 		user.setPassword(encoder.encode(user.getPassword()));
 
 		UsuarioVendedor salvo = usuarioRepository.save(user);
 
 		UsuarioDTO dto = MyMaper.parseObject(salvo, UsuarioDTO.class);
+		dto.setPermissoes(
+			        salvo.getPermissoes()
+			             .stream()
+			             .map(p -> new PermissaoDTO(p.getUsuarioRole()))
+			             .collect(Collectors.toSet()));
 		return dto;
 	}
 	
@@ -245,15 +245,20 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 
 
 	@Override
-	public Set<LeilaoDTO> findLeiloesParticipados(Long usuarioCompradorId) {
+	public Set<LeilaoDTO> findLeiloesParticipados(Long usuarioVendedorId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
 	@Override
-	public Set<OfertaDTO> findOfertasMaisCarasRecebidas(String cnpjComprador, Double minimumValue) {
+	public Set<OfertaDTO> findOfertasMaisCarasRecebidas(String cnpjVendedor, Double minimumValue) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	private <R> R PermissaoDTO(PermissaoDTO permissaodto1) {
 		return null;
 	}
 

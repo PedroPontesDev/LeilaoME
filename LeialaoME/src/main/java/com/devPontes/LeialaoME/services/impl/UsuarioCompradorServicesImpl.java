@@ -54,13 +54,16 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	private BCryptPasswordEncoder encoder;
 
 	@Autowired
-	OfertaServicesImpl ofertaServices;
+	private OfertaServicesImpl ofertaServices;
 
 	@Autowired
-	CnpjCpfValidadorClient cpfValidator;
+	private CnpjCpfValidadorClient cpfValidator;
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradorServicesImpl.class);
 
+	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha permissão)
+	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
+	
 	@Override
 	public UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception {
 		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class);
@@ -93,11 +96,6 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	 * @return Map com informações do upload
 	 * @throws Exception caso algo dê errado
 	 */
-
-	// Define a pasta de upload (pode ser qualquer pasta que o usuário atual tenha
-	// permissão)
-	private final String uploadDir = System.getProperty("user.home") + File.separator + "uploads";
-
 	@Transactional
 	public Map<String, Object> fazerUploadDeImamgemDePerfil(Long userId, MultipartFile file) throws Exception {
 		var entidade = usuarioRepository.findById(userId)
