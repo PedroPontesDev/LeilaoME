@@ -80,12 +80,16 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 	public UsuarioDTO cadastrarUsuarioVendedor(UsuarioDTO novoUsuario) throws Exception {
 		UsuarioVendedor user = (UsuarioVendedor) MyMaper.parseObject(novoUsuario, UsuarioVendedor.class);
 		
-		if (!cnpjValidator.validarCnpj(user.getCnpj()))  throw new Exception("CNPJ Não Pode Ser Validado como CNPJ REAL");
+		if (!cnpjValidator.validarCnpj(user.getCnpj())) 
+			throw new Exception("CNPJ Não Pode Ser Validado como CNPJ REAL");
+		
+		if(vendedorRepository.existsByUsername(user.getUsername()))
+			throw new RuntimeException("Usuário já existe com esse username");
 		
 		Permissao roleComprador = permissaoRepository.findByUsuarioRole(UsuarioRole.ROLE_VENDEDOR);
 		
 		if (roleComprador == null) throw new RuntimeException("Permissão ROLE_VENDEDOR não encontrada no banco!");
-		
+	
 		user.getPermissoes().add(roleComprador);
 		user.setPassword(encoder.encode(user.getPassword()));
 
@@ -148,7 +152,6 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 						
 			}
 		}
-
 		// cria URL relativa para o frontend acessar a imagem
 		String urlRelativa = "/uploads/" + nomeArquivo;
 		entidade.setUrlFotoPerfil(urlRelativa);
