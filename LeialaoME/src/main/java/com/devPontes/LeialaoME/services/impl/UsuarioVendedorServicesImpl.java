@@ -234,9 +234,22 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 
 
 	@Override
-	public String atualizarPassword(Long usuarioId, String passwordNova) {
-		// TODO Auto-generated method stub
-		return null;
+	public String atualizarPassword(Long usuarioId, String passwordNova, String passwordAntiga) {
+	
+		// 1 buscar usuario
+		UsuarioVendedor user = (UsuarioVendedor) usuarioRepository.findById(usuarioId)
+				                                                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrdo!"));
+		if(!encoder.matches(passwordAntiga, user.getPassword())) {
+			throw new SecurityException("Senha antiga nãoo coincidem");
+		}
+
+		if(passwordNova.length() < 6) {
+			throw new IllegalArgumentException("Senha deve ser maior que 6 digitos!")
+		}
+		
+		user.setPassword(encoder.encode(passwordNova));
+		usuarioRepository.save(user);
+		
 	}
 
 

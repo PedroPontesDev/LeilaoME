@@ -142,7 +142,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 			throw new LeilaoException("O horario leilão não foi encerrado!");
 
 		// Garantir que existem ofertas
-		if (leilaoExistente.getOfertas() == null && leilaoExistente.getOfertas().isEmpty()) {
+		if (leilaoExistente.getOfertas() == null || leilaoExistente.getOfertas().isEmpty()) {
 			throw new LeilaoException("Nenhuma oferta encontrada neste leilão.");
 		}
 

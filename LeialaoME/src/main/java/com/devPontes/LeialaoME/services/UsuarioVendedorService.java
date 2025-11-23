@@ -20,10 +20,11 @@ public interface UsuarioVendedorService {
 	 Map<String, Object> fazerUploadDeImamgemDePerfil(Long id, MultipartFile file) throws Exception;
 	 String escreverBiografia(Long usuarioId, String beografia);
 	 String atualizarUsername(Long usuarioId, String usernameNovo);
-	 String atualizarPassword(Long usuarioId, String passwordNova);
+	 String atualizarPassword(Long usuarioId, String passwordNova, String passwordAntiga);
 	 Set<LeilaoDTO>findLeiloesParticipados(Long usuarioCompradorId);
-	 Set<OfertaDTO> findOfertasMaisCarasRecebidas(String cnpjComprador, Double minimumValue);
+	 Set<OfertaDTO> findOfertasMaisCarasRecebidas(Usuario usuarioLogado, String cnpjComprador, Double minimumValue);
 	 Set<OfertaDTO> findOfertaMaisBaixaRecebida(Usuario usuarioLogado, String cnpjComprador, Double maximumValue);
+	 
 	
 
 }

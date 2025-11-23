@@ -34,7 +34,7 @@ public class JwtService {
 
 			String token = JWT
 							  .create()
-							  .withIssuer("")
+							  .withIssuer("WEB-LEILAO")
 							  .withClaim("id", userId)
 							  .withClaim("roles", userDetails.getAuthorities()
 									  						 .stream()
