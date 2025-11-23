@@ -235,8 +235,6 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 
 	@Override
 	public String atualizarPassword(Long usuarioId, String passwordNova, String passwordAntiga) {
-	
-		// 1 buscar usuario
 		UsuarioVendedor user = (UsuarioVendedor) usuarioRepository.findById(usuarioId)
 				                                                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrdo!"));
 		if(!encoder.matches(passwordAntiga, user.getPassword())) {
@@ -259,26 +257,26 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 		return ofertaRecebidas;
 	}
 
+	
+
+	@Override
+	public Set<OfertaDTO> findOfertasMaisCarasRecebidas(Usuario usuarioLogado, String cnpjComprador,
+			Double minimumValue) {
+			var ofertaCaras = ofertaServices.findOfertasMaisCarasRecebidasDeVendedor(usuarioLogado, cnpjComprador, minimumValue);
+			return ofertaCaras;
+	}
+
+	
 
 	@Override
 	public Set<LeilaoDTO> findLeiloesParticipados(Long usuarioVendedorId) {
-		// TODO Auto-generated method stub
+		// TODO VEFICAR OS LEILOS QUEO USUARIO PATICIOU E ESTA INATIFOV PENSE
 		return null;
 	}
 
 
-	@Override
-	public Set<OfertaDTO> findOfertasMaisCarasRecebidas(String cnpjVendedor, Double minimumValue) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-
-	private <R> R PermissaoDTO(PermissaoDTO permissaodto1) {
-		return null;
-	}
-
-
+	
 	
 	
 	

@@ -141,7 +141,7 @@ public class OfertaServicesImpl implements OfertaService {
 		novaOferta.setStatusOferta(StatusOferta.ATIVA);
 		novaOferta.setLeilao(leilao);
 
-		if (ofertaMaisAlta != null)
+		if (ofertaMaisAlta != null && novaOferta.getValorOferta() > ofertaMaisAlta.getValorOferta())
 			
 		leilao.setComprador(usuarioComprador); //Commprador no contexto atual do novo lance
 		leilao.getOfertas().add(novaOferta);
