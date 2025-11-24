@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.devPontes.LeialaoME.model.DTO.v1.CordenadasRequestDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,7 +23,11 @@ public class OpenRouteServiceClient {
 	private String token = "5b3ce3597851110001cf62483438fbd348be4dc88b5e76a4c981108c";
 	
 	
-	public Map<String, Object> verDistanciaCidadeds(Double[][] cordenadas) {
+	public Map<String, Object> verDistanciaCidadeds(CordenadasRequestDTO cordenadas) {
+	
+		CordenadasRequestDTO cords = new CordenadasRequestDTO();
+		cords.setLatlong(new Double[-22968889][ -43711667][][]});
+		
 		RestTemplate restTemplate = new RestTemplate();
 		ObjectMapper objMapper = new ObjectMapper();
 		

@@ -159,29 +159,28 @@ public class OfertaServicesImpl implements OfertaService {
 
 		// Lance inicial do leilão
 		double lanceMinimo;
-
+		double incremento;
+		
 		if (leilao.getLanceInicial() != null) {
 			lanceMinimo = leilao.getLanceInicial(); 
 		} else {
 			lanceMinimo = 0.0;
 		}
-
-		// Valor de incremento definido pelo leilão
-		double incremento = 0.0;
-		
+	
 		if(leilao.getValorDeIncremento() != null) {
 			incremento = leilao.getValorDeIncremento();
+		} else {
+			incremento = 0.0;
 		}
-
+		
 		for (Oferta oferta : leilao.getOfertas()) {
 			if (!ofertaValida(oferta)) {
 				continue;
 			}
+			double minimoObrigatorio = lanceMinimo + incremento;
 
-			double proximoLance = lanceMinimo + incremento;
-
-			if (proximoLance > lanceMinimo) {
-				lanceMinimo = proximoLance;
+			if (oferta.getValorOferta() >= minimoObrigatorio) {
+				lanceMinimo = oferta.getValorOferta();
 			}
 		}
 

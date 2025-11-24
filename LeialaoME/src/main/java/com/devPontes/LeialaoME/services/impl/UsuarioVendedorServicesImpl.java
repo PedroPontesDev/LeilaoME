@@ -242,12 +242,12 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 		}
 
 		if(passwordNova.length() < 6) {
-			throw new IllegalArgumentException("Senha deve ser maior que 6 digitos!")
+			throw new IllegalArgumentException("Senha deve ser maior que 6 digitos!");
 		}
 		
 		user.setPassword(encoder.encode(passwordNova));
 		usuarioRepository.save(user);
-		
+		return "Senha atuliazada com sucesso!";
 	}
 
 
