@@ -164,7 +164,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		
 		if (horarioMaiorOferta.isAfter(horarioEncerramentoLeilao)) throw new LeilaoException("A oferta foi feita após o encerramento do leilão.");
 
-		//Percorre as ofertas do leilao, se oferta atual atende  que seja meior oferta  seta o satus  cmom ganhadora, caso não for maior oferta é perdedora
+		//Percorre as ofertas do leilao, se oferta atual atende  sue seja meior oferta  seta o satus  cmom ganhadora, caso não for maior oferta é perdedora
 		for(Oferta o : leilaoExistente.getOfertas()) {
 			if(o.equals(maiorOferta)) {
 				o.setStatusOferta(StatusOferta.GANHADORA);

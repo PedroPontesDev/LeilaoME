@@ -157,35 +157,21 @@ public class OfertaServicesImpl implements OfertaService {
 		Leilao leilao = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilao não encontrado com ID" + leilaoId));
 
-		// Lance inicial do leilão
-		double lanceMinimo;
-		double incremento;
-		
-		if (leilao.getLanceInicial() != null) {
-			lanceMinimo = leilao.getLanceInicial(); 
-		} else {
-			lanceMinimo = 0.0;
-		}
 	
-		if(leilao.getValorDeIncremento() != null) {
-			incremento = leilao.getValorDeIncremento();
-		} else {
-			incremento = 0.0;
-		}
-		
+		double lanceMinimo = leilao.getLanceInicial() != null ? leilao.getLanceInicial() : 0.0;
+		double incremento = leilao.getValorDeIncremento() != null ? leilao.getValorDeIncremento() : 0.0;
+	
 		for (Oferta oferta : leilao.getOfertas()) {
-			if (!ofertaValida(oferta)) {
-				continue;
-			}
+			if (!ofertaValida(oferta)) continue;
+			
 			double minimoObrigatorio = lanceMinimo + incremento;
 
 			if (oferta.getValorOferta() >= minimoObrigatorio) {
 				lanceMinimo = oferta.getValorOferta();
 			}
 		}
-
+		
 		return lanceMinimo;
-
 	}
 
 	private boolean ofertaValida(Oferta oferta) {
