@@ -154,7 +154,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 				.filter(o -> o.getValorOferta() != null)
 				.filter(o -> !o.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 				.collect(Collectors.toList());
-
+		
 
 	    if (maioresOfertaValidadas.isEmpty()) {
 	        throw new LeilaoException("Nenhuma oferta válida encontrada.");
@@ -162,8 +162,8 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		
 		Oferta maiorOfertaValida = maioresOfertaValidadas
 				.stream()
-				.max(Comparator.comparing(Oferta::getStatusOferta))
-				.orElseThrow(() -> new LeilaoException(null));
+				.max(Comparator.comparing(Oferta::getValorOferta))
+				.orElseThrow(() -> new LeilaoException("Erro inesperado ao definir vencedor"));
 		
 		UsuarioComprador vencedor = maiorOfertaValida.getComprador();
 				
@@ -233,18 +233,26 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	}
 	
 	@Override
-	public List<LeilaoDTO> findBY(String status) {
-		StatusOferta statusEnum;
-		
-		try {
-			
-		
-		}catch(IllegalArgumentException e) {	
-			throw new IllegalArgumentException("Status INVALDIO");
-		}
-		List<Leilao> statusDeLeiloes = leilaoRepository.findLeilaoPorStatus(statusString);
-		return MyMaper.parseObject(statusDeLeiloes.get(0), LeilaoDTO.class);
-		
+	public List<LeilaoDTO> findLeilaoPorStatus(String status) {
+
+	    // 1. Validar status
+	    StatusOferta statusEnum;
+	    try {
+	        statusEnum = StatusOferta.valueOf(status.toUpperCase());
+	    } catch (IllegalArgumentException e) {
+	        throw new IllegalArgumentException(
+	            "Status inválido! Use: ATIVO, ENCERRADO, FUTURO"
+	        );
+	    }
+
+	    // 2. Buscar no banco
+	    List<Leilao> leiloes = leilaoRepository.findLeilaoPorStatus(statusEnum);
+
+	    if (leiloes.isEmpty())
+	        throw new LeilaoException("Nenhum leilão encontrado com status: " + statusEnum);
+
+	    // 3. Converter para DTO
+	    return MyMaper.parseListObjects(leiloes, LeilaoDTO.class);
 	}
 
 	@Override
