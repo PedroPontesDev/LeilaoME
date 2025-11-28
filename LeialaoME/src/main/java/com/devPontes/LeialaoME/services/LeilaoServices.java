@@ -21,10 +21,10 @@ public interface LeilaoServices {
 			Usuario usuarioLogado);
 	
 	LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO novoLeilao, Long tempoNecessario, Usuario usuarioLogado);
+	
+	List<LeilaoDTO> findLeilaoPorStatus(String status);
 
-	LeilaoDTO verificarEstadoDeLeilao(Long leilaoId);
-
-	LeilaoDTO definirGanhador(Long leilaoId, Usuario usuarioLogado) throws Exception; //SOMENTE ADMINS EXECUTAM ESSE METODO
+	LeilaoDTO definirGanhador(Long leilaoId, Usuario usuarioLogado) throws Exception; 
 	
 	Set<OfertaDTO> visualizarOfertasDeLeilao(Usuario usuarioLogado, Long leilaoId);
 	
@@ -35,6 +35,8 @@ public interface LeilaoServices {
 	List<LeilaoDTO> findLeiloesDeUsuarioLogado(Usuario usuarioLogado, String cnpj, Long leilãoId);
 	
 	void fecharLeilao(Long leilaoId, String status);
+
+	
 
 
 

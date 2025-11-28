@@ -147,33 +147,42 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		}
 
 
-		Oferta maiorOferta = leilaoExistente
+		List<Oferta> maioresOfertaValidadas = leilaoExistente
 				.getOfertas()
 				.stream()
 				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
 				.filter(o -> o.getValorOferta() != null)
-				.max(Comparator.comparing(Oferta::getValorOferta))
-				.orElseThrow(() -> new IllegalAccessException("Nenhuma oferta encontrada para esse leilão" + leilaoId)); 
+				.filter(o -> !o.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
+				.collect(Collectors.toList());
 
-		UsuarioComprador vencedor = maiorOferta.getComprador();
+
+	    if (maioresOfertaValidadas.isEmpty()) {
+	        throw new LeilaoException("Nenhuma oferta válida encontrada.");
+	    }
 		
+		Oferta maiorOfertaValida = maioresOfertaValidadas
+				.stream()
+				.max(Comparator.comparing(Oferta::getStatusOferta))
+				.orElseThrow(() -> new LeilaoException(null));
 		
+		UsuarioComprador vencedor = maiorOfertaValida.getComprador();
+				
 		// Fazer novas validações como verificar se ganhou no tempo final e se metodo não executa antes do termino
-		LocalDateTime horarioMaiorOferta = maiorOferta.getMomentoOferta();
+		LocalDateTime horarioMaiorOferta = maiorOfertaValida.getMomentoOferta();
 		LocalDateTime horarioEncerramentoLeilao = leilaoExistente.getTermino();
 		
 		if (horarioMaiorOferta.isAfter(horarioEncerramentoLeilao)) throw new LeilaoException("A oferta foi feita após o encerramento do leilão.");
 
 		//Percorre as ofertas do leilao, se oferta atual atende  sue seja meior oferta  seta o satus  cmom ganhadora, caso não for maior oferta é perdedora
 		for(Oferta o : leilaoExistente.getOfertas()) {
-			if(o.equals(maiorOferta)) {
+			if(o.equals(maiorOfertaValida)) {
 				o.setStatusOferta(StatusOferta.GANHADORA);
 			} else {
 				o.setStatusOferta(StatusOferta.PERDEDORA);
 			}
 		}
 		
-		maiorOferta.setComprador(vencedor);
+		maiorOfertaValida.setComprador(vencedor);
 		leilaoExistente.setAindaAtivo(false);
 		leilaoExistente.setComprador(vencedor);	
 		
@@ -224,9 +233,18 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	}
 	
 	@Override
-	public LeilaoDTO verificarEstadoDeLeilao(Long leilaoId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<LeilaoDTO> findBY(String status) {
+		StatusOferta statusEnum;
+		
+		try {
+			
+		
+		}catch(IllegalArgumentException e) {	
+			throw new IllegalArgumentException("Status INVALDIO");
+		}
+		List<Leilao> statusDeLeiloes = leilaoRepository.findLeilaoPorStatus(statusString);
+		return MyMaper.parseObject(statusDeLeiloes.get(0), LeilaoDTO.class);
+		
 	}
 
 	@Override
