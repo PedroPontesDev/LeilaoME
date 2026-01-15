@@ -3,6 +3,7 @@ package com.devPontes.LeialaoME.services.impl;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -145,8 +146,21 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		if (leilaoExistente.getOfertas() == null || leilaoExistente.getOfertas().isEmpty()) {
 			throw new LeilaoException("Nenhuma oferta encontrada neste leilão.");
 		}
-
-
+		
+		
+		List<Oferta> maioresOfertsComForEach = new ArrayList<>();
+		
+		for(Oferta ofertas : leilaoExistente.getOfertas()) {
+			if(ofertas.getStatusOferta().equals(StatusOferta.ATIVA)); 
+			if(ofertas.getValorOferta() != null); 
+			if(ofertas.getMomentoOferta().isAfter(leilaoExistente.getTermino()));
+		
+		}
+		
+			
+		}
+		
+		
 		List<Oferta> maioresOfertaValidadas = leilaoExistente
 				.getOfertas()
 				.stream()
@@ -175,16 +189,10 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 		//Percorre as ofertas do leilao, se oferta atual atende  sue seja meior oferta  seta o satus  cmom ganhadora, caso não for maior oferta é perdedora
 		for(Oferta o : leilaoExistente.getOfertas()) {
-			if(o.equals(maiorOfertaValida)) {
-				o.setStatusOferta(StatusOferta.GANHADORA);
-			} else {
-				o.setStatusOferta(StatusOferta.PERDEDORA);
-			}
-		}
-		
+			
 		maiorOfertaValida.setComprador(vencedor);
 		leilaoExistente.setAindaAtivo(false);
-		leilaoExistente.setComprador(vencedor);	
+
 		
 		leilaoRepository.save(leilaoExistente);
 

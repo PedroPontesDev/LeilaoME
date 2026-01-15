@@ -1,3 +1,6 @@
+
+
+
 package com.devPontes.LeialaoME.services.impl;
 
 import java.time.LocalDateTime;
@@ -130,18 +133,12 @@ public class OfertaServicesImpl implements OfertaService {
 		if (ofertaMaisAlta != null && ofertaMaisAlta.getStatusOferta() != StatusOferta.ATIVA)
 			throw new IllegalArgumentException("Oferta de leilão não é mais válida");
 
-		if (ofertaMaisAlta != null && novoValor <= ofertaMaisAlta.getValorOferta())
-			throw new IllegalArgumentException("Seu novo lance deve ser maior que o seu lance anterior.");
-
-
 		Oferta novaOferta = new Oferta();
 
 		novaOferta.setValorOferta(novoValor);
 		novaOferta.setMomentoOferta(LocalDateTime.now());
 		novaOferta.setStatusOferta(StatusOferta.ATIVA);
 		novaOferta.setLeilao(leilao);
-
-		if (ofertaMaisAlta != null && novaOferta.getValorOferta() > ofertaMaisAlta.getValorOferta())
 			
 		leilao.setComprador(usuarioComprador); //Commprador no contexto atual do novo lance
 		leilao.getOfertas().add(novaOferta);
@@ -244,7 +241,7 @@ public class OfertaServicesImpl implements OfertaService {
 				o.setStatusOferta(StatusOferta.NEGADA);
 				ofertaNegada = ofertaRepository.save(o);
 				break;
-			}
+			} 
 		}
 
 		return MyMaper.parseObject(ofertaNegada, OfertaDTO.class);

@@ -9,12 +9,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,7 +45,7 @@ public class LeilaoController {
 	@PreAuthorize("hasRole('VENDEDOR')")
 	@PostMapping(path = "/criar-leilao")
 	public ResponseEntity<LeilaoDTO> criarLeilao(@RequestBody LeilaoDTO leilaoNovo, @AuthenticationPrincipal Usuario usuarioLogado) {
-		log.info("🧱 Iniciando criação de leilão pelo vendedor ID {}", usuarioLogado.getUsername());
+		log.info("🧱 Iniciando criação de leilão pelo vendedor ID {}" + usuarioLogado.getId());
 		LeilaoDTO novoLeilao = leilaoServices.criarLeilao(leilaoNovo, usuarioLogado);
 		if(novoLeilao != null) log.info("Leilão sendo criado com sucesso: {}" + leilaoNovo.getDescricao());
 		return new ResponseEntity<>(novoLeilao, HttpStatus.OK);		
@@ -65,7 +68,7 @@ public class LeilaoController {
 
 	
 	@GetMapping(path = "/visualizar-ofertas/{leilaoId}")
- 	public ResponseEntity<Set<OfertaDTO>> visualizarOfertasDeLeilao(@AuthenticationPrincipal Usuario usuarioLogado, Long leilaoId) {
+ 	public ResponseEntity<Set<OfertaDTO>> visualizarOfertasDeLeilao(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable Long leilaoId) {
  		var ofertas = leilaoServices.visualizarOfertasDeLeilao(usuarioLogado, leilaoId);
  		return new ResponseEntity<>(ofertas, HttpStatus.OK);
  	}
@@ -76,4 +79,18 @@ public class LeilaoController {
 		return new ResponseEntity<>(all, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping(path = "/definir-ganhador/{leilaoId}")
+	public ResponseEntity<LeilaoDTO> definirGanhador(@PathVariable Long leilaoId,
+			@AuthenticationPrincipal Usuario usuarioLogado) throws Exception {
+		LeilaoDTO ganhadorLeilao = leilaoServices.definirGanhador(leilaoId, usuarioLogado);
+		return new ResponseEntity<LeilaoDTO>(ganhadorLeilao, HttpStatus.OK);
+	}
+	
+	@PreAuthorize("hasRole('VENDEDOR')")
+	@PostMapping(path = "/leilao-ruduzido/{tempoMinimoHoras}")
+	public ResponseEntity<LeilaoDTO> abrirLeilaoComPoucaMargemDeTempo (@AuthenticationPrincipal Usuario usuarioLogado, @RequestBody LeilaoDTO leilao, @RequestParam Long tempoMinimoHoras) {
+		LeilaoDTO leilaoComTmepoReduzido = leilaoServices.abrirLeilaoComPoucaMargemDeTempo(leilao, tempoMinimoHoras, usuarioLogado);
+		return ResponseEntity.status(HttpStatus.CREATED).body(leilaoComTmepoReduzido);
+	}
 }

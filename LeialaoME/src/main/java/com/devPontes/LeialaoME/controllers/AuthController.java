@@ -33,6 +33,7 @@ public class AuthController {
 	}
 	
 
+	//SO ADMINS
 	@PostMapping(path = "/cadastrar-vendedor")
 	public ResponseEntity<UsuarioDTO> registrarUsuarioVendedor(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved = vendedorServices.cadastrarUsuarioVendedor(usuario);

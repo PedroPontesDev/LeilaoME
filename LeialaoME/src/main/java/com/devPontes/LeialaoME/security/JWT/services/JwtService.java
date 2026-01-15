@@ -34,11 +34,11 @@ public class JwtService {
 
 			String token = JWT
 							  .create()
-							  .withIssuer("WEB-LEILAO")
+							  .withIssuer("Leilao-WebService")
 							  .withClaim("id", userId)
 							  .withClaim("roles", userDetails.getAuthorities()
 									  						 .stream()
-									  						 .map(g -> g.getAuthority()).toList())
+									  						 .map(a -> a.getAuthority()).toList())
 									  						  
 							  .sign(alg);
 							
