@@ -59,6 +59,11 @@ public class OfertaServicesImpl implements OfertaService {
 		ofertaNova.setStatusOferta(StatusOferta.ATIVA);
 		ofertaNova.setVendor(leilaoExistente.getVendedor());
 
+		Double lanceAtual = leilaoExistente.getLanceInicial();
+		
+		if(ofertaNova.getValorOferta() <= lanceAtual ) 
+			throw new LeilaoException("Oferta deve ser maior que o lance atual");
+		
 		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
 
@@ -68,6 +73,9 @@ public class OfertaServicesImpl implements OfertaService {
 		
 		// Calcula valor mínimo permitido
 		Double valorMinimo = calcularNovoLanceMinimo(leilaoId);
+		
+		//Calcula incremento
+		Double incremento = ofertaNova.getValorOferta() - lanceAtual;
 
 		// Valida valor da oferta
 		if (ofertaNova.getValorOferta() < valorMinimo) {
@@ -77,6 +85,7 @@ public class OfertaServicesImpl implements OfertaService {
 		// Adiciona oferta ao leilão e vice versa
 		leilaoExistente.getOfertas().add(ofertaNova);
 		ofertaNova.setLeilao(leilaoExistente);
+		leilaoExistente.setValorDeIncremento(incremento);
 
 		// Salva oferta e leilão
 		ofertaRepository.save(ofertaNova);
@@ -204,11 +213,19 @@ public class OfertaServicesImpl implements OfertaService {
 		boolean ofertaAceita = false;
 		Oferta ofertaAceitaFinal = null;
 		
+		Double valorMinimoPermitidoo = calcularNovoLanceMinimo(leilaoId);
+		
+		if(ofertaExistente.getValorOferta() < valorMinimoPermitidoo) 
+				throw new LeilaoException("Valor da oferta deve ser equivalente aominimo oferecido!");
+		
+		double valorAnterior = valorMinimoPermitidoo;
+		double incrementeReal =ofertaExistente.getValorOferta() - valorAnterior;
+		
 		for (Oferta oferta : leilao.getOfertas()) {
 			if (oferta.getId().equals(ofertaExistente.getId()) && oferta.getStatusOferta() == StatusOferta.ATIVA) {
 				oferta.setStatusOferta(StatusOferta.ACEITA);
-				leilao.setValorDeIncremento(oferta.getValorOferta());
 				leilao.setComprador(oferta.getComprador());
+				leilao.setValorDeIncremento(incrementeReal);
 				
 				ofertaAceita = true;
 				ofertaAceitaFinal = oferta;
@@ -221,10 +238,6 @@ public class OfertaServicesImpl implements OfertaService {
 			throw new IllegalArgumentException("Nenhuma oferta ativa encontrada para aceitar!");
 		}
 		
-		// Debug temporário
-		System.out.println("Ofertas carregadas: \n");
-		leilao.getOfertas()
-				.forEach(o -> System.out.println(" - ID: " + o.getId() + ", Status: " + o.getStatusOferta()));
 		ofertaRepository.saveAll(leilao.getOfertas());
 		leilaoRepository.save(leilao);
 		return MyMaper.parseObject(ofertaAceitaFinal, OfertaDTO.class);

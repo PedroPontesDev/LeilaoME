@@ -28,7 +28,7 @@ public interface LeilaoServices {
 	
 	Set<OfertaDTO> visualizarOfertasDeLeilao(Usuario usuarioLogado, Long leilaoId);
 	
-	Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes);
+	Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes) throws Exception;
 	
 	List<LeilaoDTO> findAll();
 	
