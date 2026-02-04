@@ -16,11 +16,11 @@ public interface LeilaoServices {
 
 
 	LeilaoDTO criarLeilao(LeilaoDTO novoLeilao, Usuario usernameLogado);
+
+	LeilaoDTO criarLeilaoReduzido(LeilaoDTO leilao, Long tempoMinimoHoras, Usuario usuarioLogado);
 	
 	LeilaoDTO criarLeilaoFuturo(LeilaoDTO novoLeilao, LocalDateTime tempoInicio, LocalDateTime tempoFim,
 			Usuario usuarioLogado);
-	
-	LeilaoDTO abrirLeilaoComPoucaMargemDeTempo(LeilaoDTO novoLeilao, Long tempoNecessario, Usuario usuarioLogado);
 	
 	List<LeilaoDTO> findLeilaoPorStatus(String status);
 
@@ -32,12 +32,10 @@ public interface LeilaoServices {
 	
 	List<LeilaoDTO> findAll();
 	
-	List<LeilaoDTO> findLeiloesDeUsuarioLogado(Usuario usuarioLogado, String cnpj, Long leilãoId);
-	
 	void fecharLeilao(Long leilaoId, String status);
 
+	List<LeilaoDTO> findLeiloesDeUsuarioComprador(Usuario usuarioLogado, String cpf, Long leilãoId);
 	
-
-
+	List<LeilaoDTO> findLeiloesDeUsuarioVendedor(Usuario usuarioLogado, String cnpj, Long leilãoId);
 
 }

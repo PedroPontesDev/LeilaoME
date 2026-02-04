@@ -153,12 +153,4 @@ public class Pagamento implements Serializable {
 		Pagamento other = (Pagamento) obj;
 		return Objects.equals(id, other.id) && Objects.equals(txid, other.txid);
 	}
-
-	@Override
-	public String toString() {
-		return "Pagamento [id=" + id + ", txid=" + txid + ", valor=" + valor + ", qrCodeImage=" + qrCodeImage
-				+ ", qrCodeText=" + qrCodeText + ", providerChargeId=" + providerChargeId + ", status=" + status
-				+ ", oferta=" + oferta + ", criadoEm=" + criadoEm + "]";
-	}
-
 }

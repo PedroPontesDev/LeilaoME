@@ -13,11 +13,19 @@ public class LeilaoDTO {
     private Boolean aindaAtivo;
 
     private Long vendedorId;
+    private Long compradorId;
     private Long vencedorId;
 
     // Getters/Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    
+    
+    
+    public Long getId() { return id;}
+    public Long getCompradorId() {return compradorId;}
+	public void setCompradorId(Long compradorId) {
+		this.compradorId = compradorId;
+	}
+	public void setId(Long id) { this.id = id; }
 
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }

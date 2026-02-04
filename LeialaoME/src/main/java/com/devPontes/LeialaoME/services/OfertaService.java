@@ -15,8 +15,6 @@ public interface OfertaService {
 
 	OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId);
 
-	Double calcularNovoLanceMinimo(Long leilaoId);
-
 	OfertaDTO aceitarOfertaDeLeilao(Usuario usuarioLogado, Long leilaoId, Long ofertaId);
 
 	OfertaDTO negarOfertaDeLeilao(Usuario usuarioLogado, Long LeilaoId, Long ofertaId);
@@ -24,5 +22,7 @@ public interface OfertaService {
 	Set<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, String cpfComprador, Double valorMinimo);
 	
 	Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(Usuario usuarioLogado, String cnpjVendedor, Double valorMinimo);
+
+	Double calcularNovoLance(Long leilaoId);
 
 }

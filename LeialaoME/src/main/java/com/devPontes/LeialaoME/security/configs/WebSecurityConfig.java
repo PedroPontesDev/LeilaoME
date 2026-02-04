@@ -6,13 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -20,66 +21,98 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.devPontes.LeialaoME.security.JWT.services.JwtTokenFilter;
+import com.devPontes.LeialaoME.security.services.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @Primary
-@Order(1)
 public class WebSecurityConfig {
 
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    // 🔐 AuthenticationManager
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig
+    ) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    // 🔐 Security Filter Chain
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    	 http
-         .cors(Customizer.withDefaults())
-         .csrf(csrf -> csrf.disable())
-         
-         // O filtro só será aplicado a qualquer rota exceto /v1/auth/**
-         .securityMatcher("/**")
-         
-         .authorizeHttpRequests(auth -> auth
-             .requestMatchers("/v1/auth/**").permitAll()
-             .requestMatchers("/v1/comprador/*/upload-foto").hasRole("COMPRADOR")
-             .requestMatchers("/v1/leilao/criar-leilao").hasRole("VENDEDOR")
-             .anyRequest().authenticated()
-         )
-         
-         // Aqui está o segredo:
-         // Só adicionamos o filtro nas rotas autenticadas
-         .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    	 return http.build();
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+
+            // API stateless
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+
+            .authorizeHttpRequests(auth -> auth
+
+                // 🔓 rotas públicas   
+                .requestMatchers(
+                    "/v1/auth/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**"
+                ).permitAll()
+
+                .requestMatchers("/v1/leilao/**").hasAnyRole("COMPRADOR", "VENDEDOR")
+                .requestMatchers("/v1/oferta/**").hasRole("COMPRADOR")
+
+                .anyRequest().authenticated()
+            )
+
+            .authenticationProvider(daoAuthenticationProvider())
+
+            // 🔥 JWT filter
+            .addFilterBefore(
+                jwtTokenFilter,
+                UsernamePasswordAuthenticationFilter.class
+            );
+
+        return http.build();
     }
 
+    // 🔐 Authentication Provider
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(customUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
+    }
+
+    // 🌍 CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Origens permitidas
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://192.168.0.100:5173"));
-
-        // Métodos HTTP permitidos
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH" , "OPTIONS"));
-
-        // Cabeçalhos permitidos
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));
-
-        // Expõe o header Authorization para o frontend
+        configuration.setAllowedOrigins(
+            List.of("http://localhost:5173", "http://192.168.0.100:5173")
+        );
+        configuration.setAllowedMethods(
+            List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+        );
+        configuration.setAllowedHeaders(
+            List.of("Authorization", "Content-Type", "Accept", "Origin")
+        );
         configuration.setExposedHeaders(List.of("Authorization"));
-
-        // Permite envio de cookies e credenciais
         configuration.setAllowCredentials(true);
 
-        // Registra para todas as rotas
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
         return source;

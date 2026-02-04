@@ -82,7 +82,11 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		UsuarioComprador salvo = usuarioRepository.save(user);
 
 		UsuarioDTO dto = MyMaper.parseObject(salvo, UsuarioDTO.class);
-
+		
+		dto.setPermissoes(salvo.getPermissoes()
+											.stream()
+											.map(p -> new PermissaoDTO(p.getUsuarioRole()))
+											.collect(Collectors.toSet()));
 
 		log.info("Usuário cadastrado com sucesso: {}", user.getCpf());
 		return dto;

@@ -1,9 +1,6 @@
 package com.devPontes.LeialaoME.integrations;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.springframework.http.HttpEntity;
@@ -27,9 +24,7 @@ public class OpenRouteServiceClient {
 	public Map<String, Object> verDistanciaCidadeds(CordenadasRequestDTO cordenadas) {
 
 		// ORS quer exatamente isso → uma matriz Double[][]
-		Double[][] coords = { { -46.638823, -23.548943 }, // SP (lon, lat)
-				{ -43.172896, -22.906847 } // RJ (lon, lat)
-		};
+		Double[][] coords = cordenadas.getLatlong();
 
 		RestTemplate restTemplate = new RestTemplate();
 		ObjectMapper objMapper = new ObjectMapper();
@@ -56,15 +51,21 @@ public class OpenRouteServiceClient {
 
 			if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
 
-				var obj = objMapper.readTree(response.getBody().toString());
+				JsonNode repsonsed = response.getBody();
+				JsonNode durations = repsonsed.path("durations");
+				JsonNode distances = repsonsed.path("distances");
 
-				Double durations = obj.path("durations").get(0).asDouble();
-				var distances = obj.path("distances").get(0).asDouble();
+				Double duration[][] = objMapper.convertValue(durations, Double[][].class);
+				Double distance[][] = objMapper.convertValue(distances, Double[][].class);
+				
 
+				Double durationInhours = duration[0][1] / 3600;
+				Double distanceInKm = distance[0][1] /1000;
+				
 				Map<String, Object> result = new HashMap<>();
-				result.put("durations", durations);
-				result.put("distances", distances);
-
+				result.put("DistanceInKm: ", distanceInKm);
+				result.put("Duration: ", durationInhours);
+				
 				return result;
 			} else {
 				System.out.println("Erro na requisição: " + response.getStatusCode());

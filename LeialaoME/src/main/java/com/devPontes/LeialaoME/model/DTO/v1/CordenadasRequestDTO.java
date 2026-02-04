@@ -51,6 +51,11 @@ public class CordenadasRequestDTO  implements Serializable {
 	public String toString() {
 		return "CordenadasRequestDTO [latlong=" + Arrays.toString(latlong) + "]";
 	}
+
+	public Object getCoordinates() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 	

@@ -179,12 +179,4 @@ public class Leilao implements Serializable {
 		return Objects.equals(id, other.id);
 	}
 
-	@Override
-	public String toString() {
-		return "Leilao [id=" + id + ", descricao=" + descricao + ", urlfotoProduto=" + urlfotoProduto + ", inicio="
-				+ inicio + ", termino=" + termino + ", valorDeIncremento=" + valorDeIncremento + ", lanceInicial="
-				+ lanceInicial + ", vendedor=" + vendedor + ", comprador=" + comprador + ", ofertas=" + ofertas
-				+ ", aindaAtivo=" + aindaAtivo + "]";
-	}
-
 }

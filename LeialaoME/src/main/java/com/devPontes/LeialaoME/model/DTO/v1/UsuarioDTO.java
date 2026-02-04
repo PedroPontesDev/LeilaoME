@@ -2,9 +2,12 @@ package com.devPontes.LeialaoME.model.DTO.v1;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import com.devPontes.LeialaoME.model.entities.Permissao;
 
 public class UsuarioDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -76,8 +79,8 @@ public class UsuarioDTO implements Serializable {
 		return permissoes;
 	}
 
-	public void setPermissoes(Set<PermissaoDTO> permissoes) {
-		this.permissoes = permissoes;
+	public void setPermissoes(Set<PermissaoDTO> set) {
+		this.permissoes = set;
 	}
 
 	public String getCpf() {
@@ -118,6 +121,8 @@ public class UsuarioDTO implements Serializable {
 		return "UsuarioDTO [id=" + id + ", username=" + username + ", password=" + password + ", biografia=" + biografia
 				+ ", fotoPerfil=" + fotoPerfil + ", permissoes=" + permissoes + ", cpf=" + cpf + ", cnpj=" + cnpj + "]";
 	}
+
+	}
 	
-}
+
 			

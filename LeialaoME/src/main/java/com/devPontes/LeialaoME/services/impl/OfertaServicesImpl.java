@@ -1,3 +1,6 @@
+
+
+
 package com.devPontes.LeialaoME.services.impl;
 
 import java.time.LocalDateTime;
@@ -58,12 +61,11 @@ public class OfertaServicesImpl implements OfertaService {
 		ofertaNova.setComprador(comprador);
 		ofertaNova.setStatusOferta(StatusOferta.ATIVA);
 		ofertaNova.setVendor(leilaoExistente.getVendedor());
+		 
+		if(ofertaNova.getMomentoOferta() == null) {
+			ofertaNova.setMomentoOferta(LocalDateTime.now());
+		}
 
-		Double lanceAtual = leilaoExistente.getLanceInicial();
-		
-		if(ofertaNova.getValorOferta() <= lanceAtual ) 
-			throw new LeilaoException("Oferta deve ser maior que o lance atual");
-		
 		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
 
@@ -72,20 +74,16 @@ public class OfertaServicesImpl implements OfertaService {
 		}
 		
 		// Calcula valor mínimo permitido
-		Double valorMinimo = calcularNovoLanceMinimo(leilaoId);
-		
-		//Calcula incremento
-		Double incremento = ofertaNova.getValorOferta() - lanceAtual;
+		Double valorMinimo = calcularNovoLance(leilaoId);
 
 		// Valida valor da oferta
-		if (ofertaNova.getValorOferta() < valorMinimo) {
+		if (ofertaNova.getValorOferta() <= valorMinimo) {
 			throw new LeilaoException("O valor da oferta deve ser igual ou maior que: " + valorMinimo);
 		}
 
 		// Adiciona oferta ao leilão e vice versa
 		leilaoExistente.getOfertas().add(ofertaNova);
 		ofertaNova.setLeilao(leilaoExistente);
-		leilaoExistente.setValorDeIncremento(incremento);
 
 		// Salva oferta e leilão
 		ofertaRepository.save(ofertaNova);
@@ -127,10 +125,10 @@ public class OfertaServicesImpl implements OfertaService {
 				.stream()
 				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
 				.max(Comparator.comparingDouble(Oferta::getValorOferta))
-				.orElse(null);
+				.get();
 
 	
-		Double lanceMinimoPermitido = calcularNovoLanceMinimo(leilaoId);
+		Double lanceMinimoPermitido = calcularNovoLance(leilaoId);
 	
 		if (novoValor < lanceMinimoPermitido) {
 			throw new IllegalArgumentException("O lance mínimo permitido é de R$ " + lanceMinimoPermitido);
@@ -139,18 +137,12 @@ public class OfertaServicesImpl implements OfertaService {
 		if (ofertaMaisAlta != null && ofertaMaisAlta.getStatusOferta() != StatusOferta.ATIVA)
 			throw new IllegalArgumentException("Oferta de leilão não é mais válida");
 
-		if (ofertaMaisAlta != null && novoValor <= ofertaMaisAlta.getValorOferta())
-			throw new IllegalArgumentException("Seu novo lance deve ser maior que o seu lance anterior.");
-
-
 		Oferta novaOferta = new Oferta();
 
 		novaOferta.setValorOferta(novoValor);
 		novaOferta.setMomentoOferta(LocalDateTime.now());
 		novaOferta.setStatusOferta(StatusOferta.ATIVA);
 		novaOferta.setLeilao(leilao);
-
-		if (ofertaMaisAlta != null && novaOferta.getValorOferta() > ofertaMaisAlta.getValorOferta())
 			
 		leilao.setComprador(usuarioComprador); //Commprador no contexto atual do novo lance
 		leilao.getOfertas().add(novaOferta);
@@ -162,35 +154,17 @@ public class OfertaServicesImpl implements OfertaService {
 	}
 
 	@Override
-	public Double calcularNovoLanceMinimo(Long leilaoId) {
+	public Double calcularNovoLance(Long leilaoId) {
 		Leilao leilao = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilao não encontrado com ID" + leilaoId));
 
-	
-		double lanceMinimo = leilao.getLanceInicial() != null ? leilao.getLanceInicial() : 0.0;
-		double incremento = leilao.getValorDeIncremento() != null ? leilao.getValorDeIncremento() : 0.0;
-	
-		for (Oferta oferta : leilao.getOfertas()) {
-			if (!ofertaValida(oferta)) continue;
-			
-			double minimoObrigatorio = lanceMinimo + incremento;
-
-			if (oferta.getValorOferta() >= minimoObrigatorio) {
-				lanceMinimo = oferta.getValorOferta();
-			}
-		}
-		
-		return lanceMinimo;
-	}
-
-	private boolean ofertaValida(Oferta oferta) {
-		if (oferta.getComprador() == null)
-			return false;
-		if (oferta.getMomentoOferta() == null && oferta.getMomentoOferta().isBefore(LocalDateTime.now()))
-			return false;
-		if (oferta.getStatusOferta() != StatusOferta.ATIVA)
-			return false;
-			return true;
+		return leilao.getOfertas()
+					.stream()
+					.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA || o.getStatusOferta() == StatusOferta.ACEITA)
+					.map(Oferta::getValorOferta)
+					.max(Double::compareTo)
+					.orElse(leilao.getLanceInicial());
+					
 	}
 
 	@Override
@@ -213,16 +187,19 @@ public class OfertaServicesImpl implements OfertaService {
 		boolean ofertaAceita = false;
 		Oferta ofertaAceitaFinal = null;
 		
-		Double valorMinimoPermitidoo = calcularNovoLanceMinimo(leilaoId);
+		Double valorMinimoPermitidoo = calcularNovoLance(leilaoId);
 		
 		if(ofertaExistente.getValorOferta() < valorMinimoPermitidoo) 
 				throw new LeilaoException("Valor da oferta deve ser equivalente aominimo oferecido!");
 		
-		double valorAnterior = valorMinimoPermitidoo;
-		double incrementeReal =ofertaExistente.getValorOferta() - valorAnterior;
-		
 		for (Oferta oferta : leilao.getOfertas()) {
 			if (oferta.getId().equals(ofertaExistente.getId()) && oferta.getStatusOferta() == StatusOferta.ATIVA) {
+				
+
+				double valorAnterior = leilao.getLanceInicial();
+				double incrementeReal = oferta.getValorOferta() - valorAnterior;
+				
+				
 				oferta.setStatusOferta(StatusOferta.ACEITA);
 				leilao.setComprador(oferta.getComprador());
 				leilao.setValorDeIncremento(incrementeReal);
@@ -257,7 +234,7 @@ public class OfertaServicesImpl implements OfertaService {
 				o.setStatusOferta(StatusOferta.NEGADA);
 				ofertaNegada = ofertaRepository.save(o);
 				break;
-			}
+			} 
 		}
 
 		return MyMaper.parseObject(ofertaNegada, OfertaDTO.class);
@@ -272,8 +249,7 @@ public class OfertaServicesImpl implements OfertaService {
 		if (oferta != null) {
 			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);
 		} else {
-			throw new IllegalArgumentException(
-					"Não foi possivel achar nenhuma oferta sob esse valor pro comprador" + cpfComprador);
+			throw new IllegalArgumentException("Não foi possivel achar nenhuma oferta sob esse valor pro comprador" + cpfComprador);
 		}
 
 	}

@@ -120,10 +120,4 @@ public class Oferta implements Serializable {
 		this.vendedor = vendedor;
 	}
 
-	@Override
-	public String toString() {
-		return "Oferta [id=" + id + ", valorOferta=" + valorOferta + ", statusOferta=" + statusOferta + ", comprador="
-				+ comprador + ", leilao=" + leilao + ", momentoOferta=" + momentoOferta + "]";
-	}
-
 }

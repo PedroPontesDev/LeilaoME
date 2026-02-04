@@ -28,22 +28,21 @@ public class AuthServicesImpl {
     }
 
     public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request) {
-        try {
             // autentica usuário
-            auth.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            auth.authenticate(
+            				new UsernamePasswordAuthenticationToken(
+            				request.getUsername(), 
+            				request.getPassword()));
 
             // carrega dados do usuário
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-
+            
+      
             // gera token
             String token = jwtService.generateToken(userDetails);
             log.info("Login bem-sucedido para usuário {}. Token gerado.", request.getUsername());
 
             return new UsuarioLoginResponseDTO(request.getUsername(), token);
 
-        } catch (Exception e) {
-            log.warn("Falha no login para usuário {}: {}", request.getUsername(), e.getMessage());
-            throw new RuntimeException("Usuário inexistente ou senha inválida");
-        }
     }
 }

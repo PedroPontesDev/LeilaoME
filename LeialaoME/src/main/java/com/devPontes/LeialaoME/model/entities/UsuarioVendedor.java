@@ -52,9 +52,4 @@ public class UsuarioVendedor extends Usuario implements Serializable {
 		this.leilaoCadastrado = leilaoCadastrado;
 	}
 
-	@Override
-	public String toString() {
-		return "UsuarioVendedor [cnpj=" + cnpj + ", leilaoCadastrado=" + leilaoCadastrado + "]";
-	}
-
 }

@@ -86,33 +86,32 @@ public abstract class Usuario implements UserDetails, Serializable {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return permissoes
 				.stream()
-				.map(p -> new SimpleGrantedAuthority(p.getUsuarioRole()
-						.name()))
+				.map(p -> new SimpleGrantedAuthority(p.getUsuarioRole().name()))
 						.collect(Collectors.toList()); //Mapeano as role
 	}
 
 	@Override
 	public boolean isAccountNonExpired() {
 		// TODO Auto-generated method stub
-		return UserDetails.super.isAccountNonExpired();
+		return true;
 	}
 
 	@Override
 	public boolean isAccountNonLocked() {
 		// TODO Auto-generated method stub
-		return UserDetails.super.isAccountNonLocked();
+		return true;
 	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {
 		// TODO Auto-generated method stub
-		return UserDetails.super.isCredentialsNonExpired();
+		return true;	
 	}
 
 	@Override
 	public boolean isEnabled() {
 		// TODO Auto-generated method stub
-		return UserDetails.super.isEnabled();
+		return true;
 	}
 
 	public String getUsername() {
@@ -164,13 +163,5 @@ public abstract class Usuario implements UserDetails, Serializable {
 		Usuario other = (Usuario) obj;
 		return Objects.equals(id, other.id);
 	}
-
-	@Override
-	public String toString() {
-		return "Usuario [id=" + id + ", username=" + username + ", password=" + password + ", biografia=" + biografia
-				+ ", urlFotoPerfil=" + urlFotoPerfil + ", permissoes=" + permissoes + "]";
-	}
-
-	
 
 }

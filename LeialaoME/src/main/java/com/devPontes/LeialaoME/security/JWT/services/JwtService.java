@@ -2,6 +2,7 @@ package com.devPontes.LeialaoME.security.JWT.services;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -34,11 +35,13 @@ public class JwtService {
 
 			String token = JWT
 							  .create()
-							  .withIssuer("WEB-LEILAO")
+							  .withSubject(userDetails.getUsername())
+							  .withIssuer("Leilao-WebService")
 							  .withClaim("id", userId)
 							  .withClaim("roles", userDetails.getAuthorities()
 									  						 .stream()
-									  						 .map(g -> g.getAuthority()).toList())
+									  						 .map(a -> a.getAuthority()).toList())
+							  .withExpiresAt(calculateExpiration())
 									  						  
 							  .sign(alg);
 							
@@ -52,10 +55,6 @@ public class JwtService {
 
 	}
 	
-	
-	
-
-
 	public String validateToken(String token) {
 		Algorithm alg = Algorithm.HMAC256(secret);
 
@@ -68,6 +67,5 @@ public class JwtService {
 	private Date calculateExpiration() {
 		return Date.from(Instant.now().plusSeconds(expiration));
 	}
-
 }
 
