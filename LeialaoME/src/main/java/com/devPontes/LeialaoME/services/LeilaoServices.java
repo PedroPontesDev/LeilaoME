@@ -32,10 +32,12 @@ public interface LeilaoServices {
 	
 	List<LeilaoDTO> findAll();
 	
-	void fecharLeilao(Long leilaoId, String status);
+	void fecharLeilao(Long leilaoId);
 
 	List<LeilaoDTO> findLeiloesDeUsuarioComprador(Usuario usuarioLogado, String cpf, Long leilãoId);
 	
 	List<LeilaoDTO> findLeiloesDeUsuarioVendedor(Usuario usuarioLogado, String cnpj, Long leilãoId);
+
+
 
 }

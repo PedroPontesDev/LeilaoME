@@ -1,6 +1,4 @@
 
-
-
 package com.devPontes.LeialaoME.services.impl;
 
 import java.time.LocalDateTime;
@@ -61,26 +59,23 @@ public class OfertaServicesImpl implements OfertaService {
 		ofertaNova.setComprador(comprador);
 		ofertaNova.setStatusOferta(StatusOferta.ATIVA);
 		ofertaNova.setVendor(leilaoExistente.getVendedor());
-		 
-		if(ofertaNova.getMomentoOferta() == null) {
-			ofertaNova.setMomentoOferta(LocalDateTime.now());
-		}
 
+		if (ofertaNova.getMomentoOferta() == null) 
+			ofertaNova.setMomentoOferta(LocalDateTime.now());
+		
 		if (ofertaNova.getMomentoOferta().isAfter(leilaoExistente.getTermino()))
 			throw new LeilaoException("A oferta so deve ser feita quando leilão estiver aberto!");
-
-		if(ofertaNova.getMomentoOferta().isBefore(leilaoExistente.getInicio())) {
-			throw new LeilaoException("A oferta não deve ser feita antes do leilão ter iniciado");
-		}
 		
+		if (ofertaNova.getMomentoOferta().isBefore(leilaoExistente.getInicio())) 
+			throw new LeilaoException("A oferta não deve ser feita antes do leilão ter iniciado");
+
 		// Calcula valor mínimo permitido
 		Double valorMinimo = calcularNovoLance(leilaoId);
 
 		// Valida valor da oferta
-		if (ofertaNova.getValorOferta() <= valorMinimo) {
+		if (ofertaNova.getValorOferta() <= valorMinimo) 
 			throw new LeilaoException("O valor da oferta deve ser igual ou maior que: " + valorMinimo);
-		}
-
+		
 		// Adiciona oferta ao leilão e vice versa
 		leilaoExistente.getOfertas().add(ofertaNova);
 		ofertaNova.setLeilao(leilaoExistente);
@@ -99,13 +94,14 @@ public class OfertaServicesImpl implements OfertaService {
 	 * Faz novos lances apos ofertas chegarem ao maximo
 	 * 
 	 * @param compradorId comprador logado que é responsavel pelo PUT
-	 * @param leilaoId  id do leilao que recebera o PUT de novo lance
-	 * @param novoValor novoValor que vem da request
+	 * @param leilaoId    id do leilao que recebera o PUT de novo lance
+	 * @param novoValor   novoValor que vem da request
 	 * @return OfertaDTO com as info no JSON da atulização do novo lance com as
 	 *         ofertas atualizadas
 	 * @throws Exception caso algo dê errado mas sera tratado
-	 */	
-	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) { //Usar o AuthenticationPrincipal
+	 */
+	public OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId) { // Usar o
+																											// AuthenticationPrincipal
 
 		// 1. Buscar leilão e comprador pra ver se ecoincidem na mesma transação
 
@@ -120,22 +116,20 @@ public class OfertaServicesImpl implements OfertaService {
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
 
 		// 2. Pegar a oferta mais alta do leilão
-		Oferta ofertaMaisAlta = leilao
-				.getOfertas()
-				.stream()
-				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
-				.max(Comparator.comparingDouble(Oferta::getValorOferta))
-				.get();
+		Oferta ofertaMaisAlta = leilao.getOfertas().stream().filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+				.max(Comparator.comparingDouble(Oferta::getValorOferta)).get();
 
-	
 		Double lanceMinimoPermitido = calcularNovoLance(leilaoId);
-	
+
 		if (novoValor < lanceMinimoPermitido) {
 			throw new IllegalArgumentException("O lance mínimo permitido é de R$ " + lanceMinimoPermitido);
 		}
 
 		if (ofertaMaisAlta != null && ofertaMaisAlta.getStatusOferta() != StatusOferta.ATIVA)
 			throw new IllegalArgumentException("Oferta de leilão não é mais válida");
+		
+		if(novoValor <= ofertaMaisAlta.getValorOferta())
+			throw new IllegalArgumentException("Valor inserido ainda não compete com o valor mais alto!");
 
 		Oferta novaOferta = new Oferta();
 
@@ -143,8 +137,8 @@ public class OfertaServicesImpl implements OfertaService {
 		novaOferta.setMomentoOferta(LocalDateTime.now());
 		novaOferta.setStatusOferta(StatusOferta.ATIVA);
 		novaOferta.setLeilao(leilao);
-			
-		leilao.setComprador(usuarioComprador); //Commprador no contexto atual do novo lance
+
+		leilao.setComprador(usuarioComprador); // Commprador no contexto atual do novo lance
 		leilao.getOfertas().add(novaOferta);
 
 		// Persistir alterações
@@ -159,12 +153,12 @@ public class OfertaServicesImpl implements OfertaService {
 				.orElseThrow(() -> new LeilaoException("Leilao não encontrado com ID" + leilaoId));
 
 		return leilao.getOfertas()
-					.stream()
-					.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA || o.getStatusOferta() == StatusOferta.ACEITA)
-					.map(Oferta::getValorOferta)
-					.max(Double::compareTo)
-					.orElse(leilao.getLanceInicial());
-					
+				.stream()
+				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA || o.getStatusOferta() == StatusOferta.ACEITA)
+				.map(Oferta::getValorOferta)
+				.max(Double::compareTo)
+				.orElseThrow(() -> new LeilaoException("Nenhuma oferta encontrada!"));
+
 	}
 
 	@Override
@@ -186,35 +180,32 @@ public class OfertaServicesImpl implements OfertaService {
 
 		boolean ofertaAceita = false;
 		Oferta ofertaAceitaFinal = null;
-		
+
 		Double valorMinimoPermitidoo = calcularNovoLance(leilaoId);
-		
-		if(ofertaExistente.getValorOferta() < valorMinimoPermitidoo) 
-				throw new LeilaoException("Valor da oferta deve ser equivalente aominimo oferecido!");
-		
+
+		if (ofertaExistente.getValorOferta() < valorMinimoPermitidoo)
+			throw new LeilaoException("Valor da oferta deve ser equivalente aominimo oferecido!");
+
+		double valorAnterior = leilao.getLanceInicial();
+		double incrementeReal = ofertaExistente.getValorOferta() - valorAnterior;
+
 		for (Oferta oferta : leilao.getOfertas()) {
 			if (oferta.getId().equals(ofertaExistente.getId()) && oferta.getStatusOferta() == StatusOferta.ATIVA) {
-				
 
-				double valorAnterior = leilao.getLanceInicial();
-				double incrementeReal = oferta.getValorOferta() - valorAnterior;
-				
-				
 				oferta.setStatusOferta(StatusOferta.ACEITA);
 				leilao.setComprador(oferta.getComprador());
 				leilao.setValorDeIncremento(incrementeReal);
-				
+
 				ofertaAceita = true;
 				ofertaAceitaFinal = oferta;
-			} else {
-				oferta.setStatusOferta(StatusOferta.INATIVA);
-			}
+				break;
+			} 
 		}
-	
+
 		if (!ofertaAceita) {
 			throw new IllegalArgumentException("Nenhuma oferta ativa encontrada para aceitar!");
 		}
-		
+
 		ofertaRepository.saveAll(leilao.getOfertas());
 		leilaoRepository.save(leilao);
 		return MyMaper.parseObject(ofertaAceitaFinal, OfertaDTO.class);
@@ -234,7 +225,7 @@ public class OfertaServicesImpl implements OfertaService {
 				o.setStatusOferta(StatusOferta.NEGADA);
 				ofertaNegada = ofertaRepository.save(o);
 				break;
-			} 
+			}
 		}
 
 		return MyMaper.parseObject(ofertaNegada, OfertaDTO.class);
@@ -243,13 +234,14 @@ public class OfertaServicesImpl implements OfertaService {
 	@Override
 	public Set<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, String cpfComprador,
 			Double valorMinimo) {
-		
+
 		String cpfLogado = ((UsuarioComprador) usuarioLogado).getCpf();
 		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeComprador(cpfLogado, valorMinimo);
 		if (oferta != null) {
 			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);
 		} else {
-			throw new IllegalArgumentException("Não foi possivel achar nenhuma oferta sob esse valor pro comprador" + cpfComprador);
+			throw new IllegalArgumentException(
+					"Não foi possivel achar nenhuma oferta sob esse valor pro comprador" + cpfComprador);
 		}
 
 	}
@@ -258,7 +250,8 @@ public class OfertaServicesImpl implements OfertaService {
 	public Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(Usuario usuarioLogado, String cnpjVendedor,
 			Double valorMinimo) {
 
-		String cnpjLogado = ((UsuarioVendedor) usuarioLogado).getCnpj(); //Pega o cnpj logado no contexto de Security com Cast pra UsuarioVendedor
+		String cnpjLogado = ((UsuarioVendedor) usuarioLogado).getCnpj(); // Pega o cnpj logado no contexto de Security
+																			// com Cast pra UsuarioVendedor
 		Set<Oferta> oferta = ofertaRepository.findOfertasMaisCarasDeVendedor(cnpjLogado, valorMinimo);
 		if (!oferta.isEmpty()) {
 			return MyMaper.parseSetObjects(oferta, OfertaDTO.class);
