@@ -59,10 +59,8 @@ public class WebSecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            .authorizeHttpRequests(auth -> auth
-
-                // 🔓 rotas públicas   
-                .requestMatchers(
+            //  rotas públicas   
+            .authorizeHttpRequests(auth -> auth .requestMatchers(
                     "/v1/auth/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**"
@@ -76,7 +74,7 @@ public class WebSecurityConfig {
 
             .authenticationProvider(daoAuthenticationProvider())
 
-            // 🔥 JWT filter
+            //  JWT filter
             .addFilterBefore(
                 jwtTokenFilter,
                 UsernamePasswordAuthenticationFilter.class

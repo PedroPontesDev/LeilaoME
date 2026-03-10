@@ -64,6 +64,6 @@ public class OfertaController {
 	        return ResponseEntity.ok(ofertas);
 	    }
 	 	
-	 
+	 //COntinuar criando os endpoints de oferta entity
 	
 }

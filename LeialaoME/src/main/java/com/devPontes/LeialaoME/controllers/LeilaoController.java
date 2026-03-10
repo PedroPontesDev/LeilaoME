@@ -99,11 +99,13 @@ public class LeilaoController {
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
 	@GetMapping(path = "/visualizar-por-status")
-	public ResponseEntity<List<LeilaoDTO>> findLeilaoPorStatus(@RequestParam("status") String status) {
+	public ResponseEntity<List<LeilaoDTO>> findLeilaoPorStatus(@RequestParam String status) {
 		var finded = leilaoServices.findLeilaoPorStatus(status);
 		return new ResponseEntity<List<LeilaoDTO>>(finded,HttpStatus.OK);
 		
 	}
 
+	
+	//COntinuar criando endpoints para leilao
 
 }

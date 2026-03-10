@@ -16,13 +16,15 @@ public interface OfertaService {
 	OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId);
 
 	OfertaDTO aceitarOfertaDeLeilao(Usuario usuarioLogado, Long leilaoId, Long ofertaId);
-
-	OfertaDTO negarOfertaDeLeilao(Usuario usuarioLogado, Long LeilaoId, Long ofertaId);
+	
+	OfertaDTO negarOfertaDeLeilao(Usuario usuarioLogado, Long ofertaId);
 	
 	Set<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, String cpfComprador, Double valorMinimo);
 	
 	Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(Usuario usuarioLogado, String cnpjVendedor, Double valorMinimo);
 
 	Double calcularNovoLance(Long leilaoId);
+
+
 
 }
