@@ -4,6 +4,7 @@ import java.net.http.HttpHeaders;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -40,13 +41,13 @@ public class AuthController {
 		return new ResponseEntity<UsuarioLoginResponseDTO>(token, HttpStatus.OK);
 	}
 	
-	@PostMapping(path = "/cadastrar-vendedor")
+	@PostMapping(path = "/cadastrar-vendedor", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE})
 	public ResponseEntity<UsuarioDTO> registrarUsuarioVendedor(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved = vendedorServices.cadastrarUsuarioVendedor(usuario);
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
 	}
 
-	@PostMapping(path = "/cadastrar-comprador")
+	@PostMapping(path = "/cadastrar-comprador", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE} )
 	public ResponseEntity<UsuarioDTO> registrarUsuarioComprador(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved = compradorServicesImpl.cadastrarUsuarioComprador(usuario);
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
