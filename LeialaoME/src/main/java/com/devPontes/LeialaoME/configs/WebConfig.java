@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig implements WebMvcConfigurer {  // Interface WebMvcConfigurer configura content-negotion e cors
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
@@ -21,9 +21,11 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 		configurer.ignoreAcceptHeader(false)
-				  .favorParameter(false)
+				  .useRegisteredExtensionsOnly(true)
+				  .mediaType("pdf", MediaType.APPLICATION_PDF)
 				  .mediaType("json", MediaType.APPLICATION_JSON)
 				  .mediaType("xml", MediaType.APPLICATION_XML)
+				  .mediaType("html", MediaType.TEXT_HTML)
 				  .defaultContentType(MediaType.APPLICATION_JSON);
 				  
 	}
