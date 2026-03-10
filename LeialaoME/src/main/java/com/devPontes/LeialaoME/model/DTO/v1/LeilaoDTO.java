@@ -2,9 +2,12 @@ package com.devPontes.LeialaoME.model.DTO.v1;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonFilter("LeilaoFilters")
 public class LeilaoDTO {
 
 	@JsonIgnore
@@ -12,13 +15,17 @@ public class LeilaoDTO {
     
     @JsonProperty("titulo")
     private String descricao;
+    
+    @JsonFormat(pattern = "dd/MM/yyy HH:mm:ss")
     private LocalDateTime inicio;
+    
+    @JsonFormat(pattern = "dd/MM/yyy HH:mm:ss") //JSONFORMAT PARA DESCERIALIZAR DATAS 
     private LocalDateTime termino;
     
     @JsonProperty("primeiro_lance")
     private Double lanceInicial;
     
-    @JsonProperty("primeiro_lance")
+    @JsonProperty("incremento_lance")
     private Double valorIncrementadoAposLance;
     
     @JsonProperty("ativo")
@@ -28,10 +35,6 @@ public class LeilaoDTO {
     private Long compradorId;
     private Long vencedorId;
 
-    // Getters/Setters
-    
-    
-    
     public Long getId() { return id;}
     public Long getCompradorId() {return compradorId;}
 	public void setCompradorId(Long compradorId) {

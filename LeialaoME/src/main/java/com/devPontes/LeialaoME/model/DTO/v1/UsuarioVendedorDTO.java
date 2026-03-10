@@ -4,14 +4,21 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class UsuarioVendedorDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @JsonIgnore
     private Long id;
     private String username;
     private String biografia;
-    private String password;
     private String urlProfilePic;
+    
+    @JsonIgnore
+    private String password;
+
+    @JsonIgnore
     private String cnpj;
 
     private Set<LeilaoDTO> leiloesCadastrados = new HashSet<>();

@@ -1,13 +1,25 @@
 package com.devPontes.LeialaoME.model.DTO.v1;
 
 import java.time.LocalDateTime;
+
 import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class OfertaDTO {
+	
+	@JsonIgnore
     private Long id;
+	
+	@JsonProperty("valor")
     private Double valorOferta;
+	
+	@JsonProperty("momento")
     private LocalDateTime momentoOferta;
+	
+	@JsonProperty("status")
     private StatusOferta statusOferta;
+	
     private Long compradorId; 
     private Long leilaoId;    
 

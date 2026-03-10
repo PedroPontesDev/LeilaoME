@@ -2,24 +2,29 @@ package com.devPontes.LeialaoME.model.DTO.v1;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import com.devPontes.LeialaoME.model.entities.Permissao;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UsuarioDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	@JsonIgnore
 	private Long id;
+	
     private String username;
+
+    @JsonIgnore
     private String password;
     private String biografia;
     private String fotoPerfil;
     private Set<PermissaoDTO> permissoes = new HashSet<>();
+   
+	@JsonIgnore
     private String cpf;
-    private  String cnpj;
+	@JsonIgnore
+	private  String cnpj;
     
 	public UsuarioDTO(Long id, String username, String password, String biografia, String fotoPerfil,
 			Set<PermissaoDTO> permissoes, String cpf, String cnpj) {
