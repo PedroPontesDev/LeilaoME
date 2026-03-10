@@ -43,7 +43,7 @@ public class LeilaoController {
 	UsuarioVendedorServicesImpl vendedorServices;
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
-	@PostMapping(path = "/criar-leilao", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE})
+	@PostMapping(path = "/criar-leilao", produces = {MediaType.APPLICATION_XML_VALUE})
 	public ResponseEntity<LeilaoDTO> criarLeilao(@RequestBody LeilaoDTO leilaoNovo, @AuthenticationPrincipal Usuario usuarioLogado) {
 		log.info("🧱 Iniciando criação de leilão pelo vendedor ID {}" + usuarioLogado.getId());
 		LeilaoDTO novoLeilao = leilaoServices.criarLeilao(leilaoNovo, usuarioLogado);
@@ -52,7 +52,7 @@ public class LeilaoController {
 	}
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
-	@PostMapping(path = "/criar-leilao-futuro", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE})
+	@PostMapping(path = "/criar-leilao-futuro", produces = {MediaType.APPLICATION_XML_VALUE})
 	public ResponseEntity<LeilaoDTO> criarLeilaoFuturo(
 	        @RequestBody LeilaoDTO novoLeilao,
 	        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime tempoInicio,
@@ -68,21 +68,21 @@ public class LeilaoController {
 
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
-	@GetMapping(path = "/visualizar-ofertas/{leilaoId}", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE})
+	@GetMapping(path = "/visualizar-ofertas/{leilaoId}", produces = {MediaType.APPLICATION_XML_VALUE})
  	public ResponseEntity<Set<OfertaDTO>> visualizarOfertasDeLeilao(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable Long leilaoId) {
  		var ofertas = leilaoServices.visualizarOfertasDeLeilao(usuarioLogado, leilaoId);
  		return new ResponseEntity<>(ofertas, HttpStatus.OK);
  	}
 	
 	
-	@GetMapping(path = "/find-all", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE})
+	@GetMapping(path = "/find-all", produces = {MediaType.APPLICATION_XML_VALUE})
 	public ResponseEntity<List<LeilaoDTO>> findAll() {
 		var all = leilaoServices.findAll();
 		return new ResponseEntity<>(all, HttpStatus.OK);
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping(path = "/definir-ganhador/{leilaoId}", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE})
+	@PutMapping(path = "/definir-ganhador/{leilaoId}", produces = {MediaType.APPLICATION_XML_VALUE})
 	public ResponseEntity<LeilaoDTO> definirGanhador(@PathVariable Long leilaoId,
 			@AuthenticationPrincipal Usuario usuarioLogado) throws Exception {
 		LeilaoDTO ganhadorLeilao = leilaoServices.definirGanhador(leilaoId, usuarioLogado);
@@ -91,7 +91,7 @@ public class LeilaoController {
 	
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
-	@PostMapping(path = "/criar-leilao-reduzido", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE})
+	@PostMapping(path = "/criar-leilao-reduzido", produces = {MediaType.APPLICATION_XML_VALUE})
 	public ResponseEntity<LeilaoDTO> criarLeilaoReduzidoEmTempo(@RequestBody LeilaoDTO leilaoReduzido,
 			@RequestParam("reducao") Long reducaoHoras, @AuthenticationPrincipal Usuario usuarioLogado) {
 				LeilaoDTO leilaoFlash =  leilaoServices.criarLeilaoReduzido(leilaoReduzido, reducaoHoras, usuarioLogado);

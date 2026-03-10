@@ -1,12 +1,9 @@
 package com.devPontes.LeialaoME.controllers;
 
-import java.net.http.HttpHeaders;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +16,7 @@ import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginResponseDTO;
 import com.devPontes.LeialaoME.security.services.AuthServicesImpl;
 import com.devPontes.LeialaoME.services.impl.UsuarioCompradorServicesImpl;
 import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
+import com.fasterxml.jackson.annotation.JsonFilter;
 
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})

@@ -15,8 +15,13 @@ public class JacksonFilters {
 	public ObjectMapper objectMapper() {
 		ObjectMapper mapper = new ObjectMapper();
 		FilterProvider filters = new SimpleFilterProvider()
-													.addFilter("LeilaoFilters", SimpleBeanPropertyFilter
-													.serializeAllExcept("password")); //Filtro pra Deserializar Sensitive Datas
+														   .addFilter("UserFilters", SimpleBeanPropertyFilter.serializeAllExcept("passowrd"))
+														   .addFilter("UsuarioResponseFilters", SimpleBeanPropertyFilter.serializeAllExcept("token"));
+											
+														   
+													
+				
+																			//Filtro pra Deserializar Sensitive Datas
 		mapper.setFilterProvider(filters);
 		return mapper;
 	}

@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@JsonFilter("UserFilters") //Escpmder token na response
 public class UsuarioDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -15,7 +17,6 @@ public class UsuarioDTO implements Serializable {
 	
     private String username;
 
-    @JsonIgnore
     private String password;
     private String biografia;
     private String fotoPerfil;
