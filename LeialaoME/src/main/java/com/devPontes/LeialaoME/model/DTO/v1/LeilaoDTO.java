@@ -2,14 +2,26 @@ package com.devPontes.LeialaoME.model.DTO.v1;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class LeilaoDTO {
 
+	@JsonIgnore
     private Long id;
+    
+    @JsonProperty("titulo")
     private String descricao;
     private LocalDateTime inicio;
     private LocalDateTime termino;
+    
+    @JsonProperty("primeiro_lance")
     private Double lanceInicial;
+    
+    @JsonProperty("primeiro_lance")
     private Double valorIncrementadoAposLance;
+    
+    @JsonProperty("ativo")
     private Boolean aindaAtivo;
 
     private Long vendedorId;

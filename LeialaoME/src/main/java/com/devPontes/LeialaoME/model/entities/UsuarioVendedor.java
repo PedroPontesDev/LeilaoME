@@ -22,9 +22,10 @@ public class UsuarioVendedor extends Usuario implements Serializable {
 	private String cnpj;
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "vendedor", cascade = CascadeType.ALL)
-	@JsonManagedReference
+	@JsonManagedReference 
 	Set<Leilao> leilaoCadastrado = new HashSet<>();
-
+	// ManagedReference → serializa
+	
 	public UsuarioVendedor(String cnpj, Set<Leilao> leilaoCadastrado) {
 		this.cnpj = cnpj;
 		this.leilaoCadastrado = leilaoCadastrado;

@@ -52,8 +52,8 @@ public class OfertaServicesImpl implements OfertaService {
 			throw new LeilaoEncerradoException("Leilão encerrado ou desativado!");
 		}
 
-		UsuarioComprador comprador = (UsuarioComprador) compradorRepository.findById(usuarioLogado.getId()).orElseThrow(
-				() -> new UsuarioNaoEncontradoException("Usuário não encontrado com ID " + usuarioLogado.getId()));
+		UsuarioComprador comprador = (UsuarioComprador) compradorRepository.findById(usuarioLogado.getId())
+																		   .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado com ID " + usuarioLogado.getId()));
 
 		// Converte DTO para entidade
 		Oferta ofertaNova = MyMaper.parseObject(ofertaDTO, Oferta.class);
@@ -117,8 +117,10 @@ public class OfertaServicesImpl implements OfertaService {
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontraado com Id" + leilaoId));
 
 		// 2. Pegar a oferta mais alta do leilão
-		Oferta ofertaMaisAlta = leilao.getOfertas().stream().filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
-				.max(Comparator.comparingDouble(Oferta::getValorOferta)).get();
+		Oferta ofertaMaisAlta = leilao.getOfertas()
+									  .stream()
+									  .filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+									  .max(Comparator.comparingDouble(Oferta::getValorOferta)).get();
 
 		Double lanceMinimoPermitido = calcularNovoLance(leilaoId);
 
@@ -144,7 +146,6 @@ public class OfertaServicesImpl implements OfertaService {
 
 		// Persistir alterações
 		leilaoRepository.save(leilao);
-		ofertaRepository.save(novaOferta);
 		return MyMaper.parseObject(novaOferta, OfertaDTO.class);
 	}
 
