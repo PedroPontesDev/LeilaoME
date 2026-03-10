@@ -13,6 +13,8 @@ import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginRequestDTO;
 import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginResponseDTO;
 import com.devPontes.LeialaoME.security.JWT.services.JwtService;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Service
 public class AuthServicesImpl {
 
@@ -27,15 +29,14 @@ public class AuthServicesImpl {
 
     private static final Logger log = LoggerFactory.getLogger(AuthServicesImpl.class);
 
-    public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request) {
-         	HttpHeaders header = new HttpHeaders();
-         	
+    public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request, HttpServletResponse responseHeader) {
          	auth.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));  // autentica usuário
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());   // carrega dados do usuário direto do banco
    
             String token = jwtService.generateToken(userDetails);   // gera tokem
-            header.setBearerAuth(token);		//Guarda já mp header
+            
+            responseHeader.setHeader("Authorization", "Bearer " + token); //guarda o token no Header
             
             log.info("Login bem-sucedido para usuário {}. Token gerado.", request.getUsername());
             return new UsuarioLoginResponseDTO(request.getUsername(), token);
