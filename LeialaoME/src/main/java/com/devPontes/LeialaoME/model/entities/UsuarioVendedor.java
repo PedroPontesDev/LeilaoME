@@ -7,6 +7,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,6 +20,7 @@ import jakarta.persistence.Table;
 public class UsuarioVendedor extends Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "cnpj_vendedor")
 	private String cnpj;
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "vendedor", cascade = CascadeType.ALL)

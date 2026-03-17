@@ -1,4 +1,4 @@
-CREATE TABLE tb_usuario_permissao (
+CREATE TABLE tb_permissoes_usuarios (
     usuario_id BIGINT NOT NULL,
     permissao_id BIGINT NOT NULL,
 
