@@ -14,7 +14,7 @@ import com.devPontes.LeialaoME.integrations.OpenRouteServiceClient;
 import com.devPontes.LeialaoME.model.DTO.v1.CordenadasRequestDTO;
 
 @RestController
-@RequestMapping("/api/ors")
+@RequestMapping("/api/cors")
 public class OpenRouteController {
 
 	@Autowired

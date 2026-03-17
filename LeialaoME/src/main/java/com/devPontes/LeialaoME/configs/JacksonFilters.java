@@ -12,11 +12,11 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 public class JacksonFilters {
 
 	@Bean
-	public ObjectMapper objectMapper() {
+	public ObjectMapper objectMapper() { //ObjectMapper pra serializar e deserializa json 
 		ObjectMapper mapper = new ObjectMapper();
 		FilterProvider filters = new SimpleFilterProvider()
-														   .addFilter("UserFilters", SimpleBeanPropertyFilter.serializeAllExcept("passowrd"))
-														   .addFilter("UsuarioResponseFilters", SimpleBeanPropertyFilter.serializeAllExcept("token"));
+									 .addFilter("UserFilters", SimpleBeanPropertyFilter.serializeAllExcept("passowrd"))
+									 .addFilter("UsuarioResponseFilters", SimpleBeanPropertyFilter.serializeAllExcept("token"));
 											
 														   
 													

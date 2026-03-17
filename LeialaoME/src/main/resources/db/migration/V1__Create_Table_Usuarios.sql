@@ -1,9 +1,11 @@
 CREATE TABLE tb_usuario(
-	id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tipo_usuario VARCHAR(31),
-    username VARCHAR(30),
-    password VARCHAR(100),
-    biografia VARCHAR(500),
+
+    username VARCHAR(30) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+
+    biografia TEXT,
     url_perfil VARCHAR(100)
 );
 

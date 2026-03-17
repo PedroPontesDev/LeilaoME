@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.services.impl.UsuarioCompradorServicesImpl;
 
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
+@CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/v1/comprador")
 public class UsuarioCompradoController {

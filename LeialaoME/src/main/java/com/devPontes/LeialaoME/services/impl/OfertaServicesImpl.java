@@ -202,6 +202,7 @@ public class OfertaServicesImpl implements OfertaService {
 				oferta.setStatusOferta(StatusOferta.ACEITA);
 				leilao.setComprador(oferta.getComprador());
 				leilao.setValorDeIncremento(incrementeReal);
+				leilao.setLanceInicial(incrementeReal += oferta.getValorOferta());
 				break;
 			}
 		}

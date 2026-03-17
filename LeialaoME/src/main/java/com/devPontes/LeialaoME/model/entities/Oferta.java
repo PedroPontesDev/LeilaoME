@@ -37,7 +37,7 @@ public class Oferta implements Serializable {
 	private UsuarioComprador comprador;
 
 	@ManyToOne
-	@JoinColumn(name = "vendedor_id", nullable = false)
+	@JoinColumn(name = "vendedor_id", nullable = false)  //APAGAR ESSA COLUNA DPS E ESSE RELACIONAMENTO
 	private UsuarioVendedor vendedor;
 
 	@ManyToOne

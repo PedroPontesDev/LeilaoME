@@ -3,6 +3,7 @@ package com.devPontes.LeialaoME.security.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,14 +30,14 @@ public class AuthServicesImpl {
 
     private static final Logger log = LoggerFactory.getLogger(AuthServicesImpl.class);
 
-    public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request, HttpServletResponse responseHeader) {
+    public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request, HttpServletResponse response) {
          	auth.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));  // autentica usuário
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());   // carrega dados do usuário direto do banco
    
             String token = jwtService.generateToken(userDetails);   // gera tokem
             
-            responseHeader.setHeader("Authorization", "Bearer " + token); //guarda o token no Header
+            response.setHeader("Authorization", "Bearer " + token); //guarda o token no Header
             
             log.info("Login bem-sucedido para usuário {}. Token gerado.", request.getUsername());
             return new UsuarioLoginResponseDTO(request.getUsername(), token);

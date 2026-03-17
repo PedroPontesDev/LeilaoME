@@ -11,6 +11,7 @@ public class UsuarioVendedorDTO implements Serializable {
 
     @JsonIgnore
     private Long id;
+    
     private String username;
     private String biografia;
     private String urlProfilePic;

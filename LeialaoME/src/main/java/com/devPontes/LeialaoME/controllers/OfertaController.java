@@ -23,7 +23,7 @@ import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.services.impl.OfertaServicesImpl;
 
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:8080", "http://192.168.0.100:8080" })
+@CrossOrigin(origins = { "*" })
 @RestController
 @RequestMapping("/v1/oferta")
 public class OfertaController {

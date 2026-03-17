@@ -29,7 +29,7 @@ import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.services.impl.LeilaoServicesImpl;
 import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
 
-@CrossOrigin(origins = {"http://localhost:5173"})
+@CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/v1/leilao")
 public class LeilaoController {

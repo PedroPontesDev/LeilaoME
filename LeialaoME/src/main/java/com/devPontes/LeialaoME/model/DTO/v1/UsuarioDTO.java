@@ -7,6 +7,8 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @JsonFilter("UserFilters") //Escpmder token na response
 public class UsuarioDTO implements Serializable {
@@ -17,14 +19,17 @@ public class UsuarioDTO implements Serializable {
 	
     private String username;
 
+    @JsonProperty(access = Access.WRITE_ONLY)
     private String password;
+    
     private String biografia;
     private String fotoPerfil;
     private Set<PermissaoDTO> permissoes = new HashSet<>();
-   
-	@JsonIgnore
+
+    @JsonProperty(access = Access.WRITE_ONLY)
     private String cpf;
-	@JsonIgnore
+
+    @JsonProperty(access = Access.WRITE_ONLY)
 	private  String cnpj;
     
 	public UsuarioDTO(Long id, String username, String password, String biografia, String fotoPerfil,

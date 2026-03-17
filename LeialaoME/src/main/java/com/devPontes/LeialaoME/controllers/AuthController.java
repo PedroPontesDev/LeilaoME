@@ -1,5 +1,7 @@
 package com.devPontes.LeialaoME.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,9 +19,8 @@ import com.devPontes.LeialaoME.security.services.AuthServicesImpl;
 import com.devPontes.LeialaoME.services.impl.UsuarioCompradorServicesImpl;
 import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
 import com.fasterxml.jackson.annotation.JsonFilter;
+import jakarta.servlet.http.HttpServletResponse;
 
-
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthController {
@@ -33,19 +34,22 @@ public class AuthController {
 	@Autowired
 	UsuarioCompradorServicesImpl compradorServicesImpl;
 	
-	@PostMapping(path = "/login")
-	public ResponseEntity<?> login(@RequestBody UsuarioLoginRequestDTO request) {
-		UsuarioLoginResponseDTO token = authServices.login(request);
+	private final Logger logger = LoggerFactory.getLogger(AuthController.class);
+	
+	@PostMapping(path = "/login", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<?> login(@RequestBody UsuarioLoginRequestDTO request, HttpServletResponse response) {
+		UsuarioLoginResponseDTO token = authServices.login(request, response);
+		logger.info("TOKEN GERADO ->" + token.getToken());
 		return new ResponseEntity<UsuarioLoginResponseDTO>(token, HttpStatus.OK);
 	}
 	
-	@PostMapping(path = "/cadastrar-vendedor", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE})
+	@PostMapping(path = "/cadastrar-vendedor", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<UsuarioDTO> registrarUsuarioVendedor(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved = vendedorServices.cadastrarUsuarioVendedor(usuario);
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
 	}
 
-	@PostMapping(path = "/cadastrar-comprador", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_HTML_VALUE} )
+	@PostMapping(path = "/cadastrar-comprador", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<UsuarioDTO> registrarUsuarioComprador(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved = compradorServicesImpl.cadastrarUsuarioComprador(usuario);
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
