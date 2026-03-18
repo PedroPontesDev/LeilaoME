@@ -4,6 +4,8 @@ import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -55,39 +57,50 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 	@Override
 	public LeilaoDTO criarLeilao(LeilaoDTO novoLeilao, Usuario usuarioLogado) {
-		Leilao leilao = MyMaper.parseObject(novoLeilao, Leilao.class);
 
-		UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository.findByUsername(usuarioLogado.getUsername())
-				.orElseThrow(() -> new RuntimeException("Você não pode criar leilão para outro vendedor!"));
+	    Leilao leilao = MyMaper.parseObject(novoLeilao, Leilao.class);
 
-		// Validações\
-		LocalDateTime agora = LocalDateTime.now();
-		LocalDateTime limiteFuturo = agora.plusDays(2); // Exemplo: permite criar leilões para daqui a no máximo 7 dias
+	    UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository
+	            .findByUsername(usuarioLogado.getUsername())
+	            .orElseThrow(() -> new RuntimeException("Você não pode criar leilão para outro vendedor!"));
 
-		// Se o início do leilão for depois do meu limite permitido (ex: 2 dias)
+	    LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+	    
+	    // 🔒 Validação básica
+	    if (leilao.getInicio() == null || leilao.getTermino() == null) {
+	        throw new IllegalArgumentException("Datas inválidas ou formato incorreto");
+	    }
+	    // ❌ passado
+	    if (leilao.getInicio().isBefore(agora)) {
+	        throw new IllegalArgumentException("Leilão não pode começar no passado");
+	    }
 
-		if (leilao.getInicio().isBefore(agora)) {
-			throw new IllegalArgumentException("Leilão não pode começar no passado");
-		}
-		if (leilao.getInicio().isAfter(limiteFuturo))
-			throw new IllegalArgumentException("Leilão não pode ser agendado para mais de 2 dias no futuro");
+	    // ❌ limite futuro (mais de 4 dias)
+	    if (leilao.getInicio().isAfter(agora.plusDays(4))) {
+	        throw new IllegalArgumentException("Leilão só pode ser criado com até 4 dias de antecedência");
+	    }
 
-		if (leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0)
-			throw new IllegalArgumentException("Leilão deve começar com um valor de lance inicial válido.");
+	    // ❌ término inválido
+	    if (leilao.getTermino().isBefore(leilao.getInicio())) {
+	        throw new IllegalArgumentException("Data de término deve ser após o início");
+	    }
 
-		if (leilao.getTermino().isBefore(leilao.getInicio()))
-			throw new IllegalArgumentException("Data de término deve ser posterior à data de início");
-		// Configurações
-		leilao.setVendedor(vendedor);
-		leilao.setAindaAtivo(true);
-		vendedor.getLeilaoCadastrado().add(leilao);
+	    // ❌ lance inválido
+	    if (leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0) {
+	        throw new IllegalArgumentException("Lance inicial inválido");
+	    }
 
-		// Persistencia
-		leilaoRepository.save(leilao);
+	    // ✅ Configuração
+	    leilao.setVendedor(vendedor);
+	    leilao.setAindaAtivo(true);
 
-		return MyMaper.parseObject(leilao, LeilaoDTO.class);
+	    vendedor.getLeilaoCadastrado().add(leilao);
+
+	    leilaoRepository.save(leilao);
+
+	    return MyMaper.parseObject(leilao, LeilaoDTO.class);
 	}
-
+	
 	@Override
 	public LeilaoDTO criarLeilaoFuturo(LeilaoDTO novoLeilao, LocalDateTime tempoInicio, LocalDateTime tempoFim,
 			Usuario usuarioLogado) {

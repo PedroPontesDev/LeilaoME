@@ -2,12 +2,14 @@ package com.devPontes.LeialaoME.model.DTO.v1;
 
 import java.time.LocalDateTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonFilter("LeilaoFilters")
+
 public class LeilaoDTO {
 
 	@JsonIgnore
@@ -16,10 +18,12 @@ public class LeilaoDTO {
     @JsonProperty("titulo")
     private String descricao;
     
-    @JsonFormat(pattern = "dd/MM/yyy HH:mm:ss")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime inicio;
-    
-    @JsonFormat(pattern = "dd/MM/yyy HH:mm:ss") //JSONFORMAT PARA DESCERIALIZAR DATAS 
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime termino;
     
     @JsonProperty("primeiro_lance")
@@ -31,7 +35,12 @@ public class LeilaoDTO {
     @JsonProperty("ativo")
     private Boolean aindaAtivo;
 
+    @JsonIgnore
     private Long vendedorId;
+    
+    private String urlFotoProduto;
+    
+    
     private Long compradorId;
     private Long vencedorId;
 
@@ -65,5 +74,13 @@ public class LeilaoDTO {
 
     public Long getVencedorId() { return vencedorId; }
     public void setVencedorId(Long vencedorId) { this.vencedorId = vencedorId; }
+	
+    public String getUrlFotoProduto() {return urlFotoProduto;}
+	
+    public void setUrlFotoProduto(String urlFotoProduto) {
+		this.urlFotoProduto = urlFotoProduto;
+	}
+    
+    
 
 }
