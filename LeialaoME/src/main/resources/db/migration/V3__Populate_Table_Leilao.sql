@@ -4,7 +4,7 @@ INSERT INTO tb_leilao (
  lance_inicial,
  termino,
  urlfoto_produto,
- valor_de_incremento,
+ incremento_lance,
  ainda_ativo,
  vendedor_id,
  comprador_id

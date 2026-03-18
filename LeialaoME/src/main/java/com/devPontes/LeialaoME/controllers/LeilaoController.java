@@ -67,7 +67,7 @@ public class LeilaoController {
 
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
-	@GetMapping(path = "/visualizar-ofertas/{leilaoId}", produces = {MediaType.APPLICATION_XML_VALUE})
+	@GetMapping(path = "/visualizar-ofertas/{leilaoId}", produces = {MediaType.APPLICATION_JSON_VALUE})
  	public ResponseEntity<Set<OfertaDTO>> visualizarOfertasDeLeilao(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable Long leilaoId) {
  		var ofertas = leilaoServices.visualizarOfertasDeLeilao(usuarioLogado, leilaoId);
  		return new ResponseEntity<>(ofertas, HttpStatus.OK);

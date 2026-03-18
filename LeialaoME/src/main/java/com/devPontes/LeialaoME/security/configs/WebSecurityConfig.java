@@ -25,7 +25,7 @@ import com.devPontes.LeialaoME.security.services.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @Primary
 public class WebSecurityConfig {
 
@@ -67,7 +67,7 @@ public class WebSecurityConfig {
                 ).permitAll()
 
                 .requestMatchers("/v1/leilao/**").hasAnyRole("COMPRADOR", "VENDEDOR")
-                .requestMatchers("/v1/oferta/**").hasRole("COMPRADOR")
+                .requestMatchers("/v1/oferta/**").hasAnyRole("COMPRADOR", "VENDEDOR")
 
                 .anyRequest().authenticated()
             )

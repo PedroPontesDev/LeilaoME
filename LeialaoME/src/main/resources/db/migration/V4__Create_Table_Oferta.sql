@@ -11,12 +11,10 @@ CREATE TABLE tb_oferta (
     
     CONSTRAINT fk_oferta_comprador FOREIGN KEY (comprador_id) 
         REFERENCES tb_usuario_comprador(id),
-     
         
-    CONSTRAINT fk_oferta_vendedor FOREIGN KEY (vendedor_id) 
+   CONSTRAINT fk_oferta_vendedor FOREIGN KEY (vendedor_id) 
         REFERENCES tb_usuario_vendedor(id),
       
-        
     CONSTRAINT fk_oferta_leilao FOREIGN KEY (leilao_id) 
         REFERENCES tb_leilao(id)
       

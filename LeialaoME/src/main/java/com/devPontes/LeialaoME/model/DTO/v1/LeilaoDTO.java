@@ -30,12 +30,11 @@ public class LeilaoDTO {
     private Double lanceInicial;
     
     @JsonProperty("incremento_lance")
-    private Double valorIncrementadoAposLance;
+    private Double valorDeIncremento;
     
     @JsonProperty("ativo")
     private Boolean aindaAtivo;
 
-    @JsonIgnore
     private Long vendedorId;
     
     private String urlFotoProduto;
@@ -62,11 +61,15 @@ public class LeilaoDTO {
 
     public Double getLanceInicial() { return lanceInicial; }
     public void setLanceInicial(Double lanceInicial) { this.lanceInicial = lanceInicial; }
-
-    public Double getValorIncrementadoAposLance() { return valorIncrementadoAposLance; }
-    public void setValorIncrementadoAposLance(Double valorIncrementadoAposLance) { this.valorIncrementadoAposLance = valorIncrementadoAposLance; }
-
-    public Boolean getAindaAtivo() { return aindaAtivo; }
+    
+    
+    public Double getValorDeIncremento() {
+		return valorDeIncremento;
+	}
+	public void setValorDeIncremento(Double valorDeIncremento) {
+		this.valorDeIncremento = valorDeIncremento;
+	}
+	public Boolean getAindaAtivo() { return aindaAtivo; }
     public void setAindaAtivo(Boolean aindaAtivo) { this.aindaAtivo = aindaAtivo; }
 
     public Long getVendedorId() { return vendedorId; }

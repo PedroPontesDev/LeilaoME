@@ -58,49 +58,53 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	@Override
 	public LeilaoDTO criarLeilao(LeilaoDTO novoLeilao, Usuario usuarioLogado) {
 
-	    Leilao leilao = MyMaper.parseObject(novoLeilao, Leilao.class);
+		Leilao leilao = MyMaper.parseObject(novoLeilao, Leilao.class);
 
-	    UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository
-	            .findByUsername(usuarioLogado.getUsername())
-	            .orElseThrow(() -> new RuntimeException("Você não pode criar leilão para outro vendedor!"));
+		UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository.findByUsername(usuarioLogado.getUsername())
+				.orElseThrow(() -> new RuntimeException("Você não pode criar leilão para outro vendedor!"));
 
-	    LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
-	    
-	    // 🔒 Validação básica
-	    if (leilao.getInicio() == null || leilao.getTermino() == null) {
-	        throw new IllegalArgumentException("Datas inválidas ou formato incorreto");
-	    }
-	    // ❌ passado
-	    if (leilao.getInicio().isBefore(agora)) {
-	        throw new IllegalArgumentException("Leilão não pode começar no passado");
-	    }
+		LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+		
+		leilao.setValorDeIncremento(novoLeilao.getValorDeIncremento());
+		leilao.setLanceInicial(leilao.getLanceInicial() + novoLeilao.getValorDeIncremento());
+		
+		//  Validação de datas
+		if (leilao.getInicio() == null || leilao.getTermino() == null) {
+			throw new IllegalArgumentException("Datas inválidas ou formato incorreto");
+		}
 
-	    // ❌ limite futuro (mais de 4 dias)
-	    if (leilao.getInicio().isAfter(agora.plusDays(4))) {
-	        throw new IllegalArgumentException("Leilão só pode ser criado com até 4 dias de antecedência");
-	    }
+		if (leilao.getInicio().isBefore(agora)) {
+			throw new IllegalArgumentException("Leilão não pode começar no passado");
+		}
 
-	    // ❌ término inválido
-	    if (leilao.getTermino().isBefore(leilao.getInicio())) {
-	        throw new IllegalArgumentException("Data de término deve ser após o início");
-	    }
+		if (leilao.getInicio().isAfter(agora.plusDays(4))) {
+			throw new IllegalArgumentException("Leilão só pode ser criado com até 4 dias de antecedência");
+		}
 
-	    // ❌ lance inválido
-	    if (leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0) {
-	        throw new IllegalArgumentException("Lance inicial inválido");
-	    }
+		if (leilao.getTermino().isBefore(leilao.getInicio())) {
+			throw new IllegalArgumentException("Data de término deve ser após o início");
+		}
 
-	    // ✅ Configuração
-	    leilao.setVendedor(vendedor);
-	    leilao.setAindaAtivo(true);
+		//  Validação de valores
+		if (leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0) {
+			throw new IllegalArgumentException("Lance inicial inválido");
+		}
 
-	    vendedor.getLeilaoCadastrado().add(leilao);
+		if (leilao.getValorDeIncremento() == null || leilao.getValorDeIncremento() <= 0) {
+			throw new IllegalArgumentException("Valor de incremento deve ser maior que zero");
+		}
 
-	    leilaoRepository.save(leilao);
+		// Configuração correta
+		leilao.setVendedor(vendedor);
+		leilao.setAindaAtivo(true);
 
-	    return MyMaper.parseObject(leilao, LeilaoDTO.class);
+		vendedor.getLeilaoCadastrado().add(leilao);
+
+		leilaoRepository.save(leilao);
+
+		return MyMaper.parseObject(leilao, LeilaoDTO.class);
 	}
-	
+
 	@Override
 	public LeilaoDTO criarLeilaoFuturo(LeilaoDTO novoLeilao, LocalDateTime tempoInicio, LocalDateTime tempoFim,
 			Usuario usuarioLogado) {
@@ -144,10 +148,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
 				.orElseThrow(() -> new LeilaoException("Leilão não encontrado"));
 
-		boolean isAdmin = usuarioLogado
-				.getAuthorities()
-				.stream()
-				.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+		boolean isAdmin = usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
 		if (!isAdmin)
 			throw new SecurityException("Você não é um administrador");
@@ -277,27 +278,26 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 		if (leilaoExistente.getTermino().isAfter(LocalDateTime.now())) {
 			throw new LeilaoException("Leilao ainda não terminou! ");
-		} 
+		}
 		boolean existeOfertaAtiva = leilaoExistente.getOfertas().stream()
-																.anyMatch(o -> o.getStatusOferta() == StatusOferta.ATIVA);
-		
+				.anyMatch(o -> o.getStatusOferta() == StatusOferta.ATIVA);
+
 		if (!existeOfertaAtiva) {
 			throw new LeilaoException("Nenhuma oferta ativa para fechar o leilão");
 		}
-		
-		Oferta ofertaMaisAlta = leilaoExistente.getOfertas()
-											   .stream()
-											   .filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
-											   .max(Comparator.comparingDouble(o -> o.getValorOferta()))
-											   .orElseThrow(() -> new LeilaoException("Não foram encontradas ofertas ATIVAS ou com valores máximos"));
+
+		Oferta ofertaMaisAlta = leilaoExistente.getOfertas().stream()
+				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
+				.max(Comparator.comparingDouble(o -> o.getValorOferta()))
+				.orElseThrow(() -> new LeilaoException("Não foram encontradas ofertas ATIVAS ou com valores máximos"));
 		ofertaMaisAlta.setStatusOferta(StatusOferta.ACEITA);
-		
-		for(Oferta oferta : leilaoExistente.getOfertas()) {
-			if(oferta != ofertaMaisAlta) {
+
+		for (Oferta oferta : leilaoExistente.getOfertas()) {
+			if (oferta != ofertaMaisAlta) {
 				oferta.setStatusOferta(StatusOferta.INATIVA);
 			}
 		}
-		
+
 		leilaoExistente.setAindaAtivo(false);
 
 		leilaoRepository.save(leilaoExistente);

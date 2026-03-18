@@ -39,7 +39,7 @@ public class Leilao implements Serializable {
 
 	private LocalDateTime termino;
 
-	@Column
+	@Column(name = "incremento_lance")
 	private Double valorDeIncremento; 
 
 	@Column(name = "lance_inicial")

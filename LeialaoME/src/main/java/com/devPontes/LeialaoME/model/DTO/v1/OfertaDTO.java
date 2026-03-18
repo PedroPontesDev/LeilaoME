@@ -3,6 +3,7 @@ package com.devPontes.LeialaoME.model.DTO.v1;
 import java.time.LocalDateTime;
 
 import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +16,8 @@ public class OfertaDTO {
     private Double valorOferta;
 	
 	@JsonProperty("momento")
-    private LocalDateTime momentoOferta;
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime momentoOferta = LocalDateTime.now();
 	
 	@JsonProperty("status")
     private StatusOferta statusOferta;
