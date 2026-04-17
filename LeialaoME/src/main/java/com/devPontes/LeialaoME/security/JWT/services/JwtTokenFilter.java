@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,12 +20,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class JwtTokenFilter extends OncePerRequestFilter { //ONcePoerRequest Classe que faz cadeia requisições com filtros sincronos e assicronos
 
     private static final Logger log =  LoggerFactory.getLogger(JwtTokenFilter.class);
 
     @Autowired
-    private JwtService jwtService;
+    private JwtService jwtService; //Gerador de JWT 
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -59,15 +60,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        Usuario usuario =
-                (Usuario) userDetailsService.loadUserByUsername(username);
+        Usuario usuario = (Usuario) userDetailsService.loadUserByUsername(username);
 
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         usuario,
                         null,
-                        usuario.getAuthorities()
-                );
+                        usuario.getAuthorities());
 
         
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -76,6 +74,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().getAuthentication();
 
         log.info("AUTH CONTEXTO: {}", auth);
+        log.info("IP REQUEST: {}", request.getRemoteAddr());
 
         filterChain.doFilter(request, response);
     }

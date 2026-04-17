@@ -92,15 +92,9 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 	
 		user.getPermissoes().add(roleComprador);
 		user.setPassword(encoder.encode(user.getPassword()));
-
-		UsuarioVendedor salvo = usuarioRepository.save(user);
-
-		UsuarioDTO dto = MyMaper.parseObject(salvo, UsuarioDTO.class);
-		dto.setPermissoes(
-			        salvo.getPermissoes()
-			             .stream()
-			             .map(p -> new PermissaoDTO(p.getUsuarioRole()))
-			             .collect(Collectors.toSet()));
+		
+		UsuarioDTO dto = MyMaper.parseObject(usuarioRepository.save(user), UsuarioDTO.class);
+	
 		return dto;
 	}
 	
@@ -113,9 +107,9 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 	 * @throws Exception caso algo dê errado
 	 */
 	@Transactional
-	public Map<String, Object> fazerUploadDeImamgemDePerfil(Long userId, MultipartFile file) throws Exception {
-		var entidade = usuarioRepository.findById(userId)
-				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + userId));
+	public Map<String, Object> fazerUploadDeImamgemDePerfil(Usuario usuarioLogado, MultipartFile file) throws Exception {
+		var entidade = usuarioRepository.findById(usuarioLogado.getId())
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioLogado.getId()));
 
 		// 1️ Verifica se o arquivo está vazio
 		if (file.isEmpty()) {
@@ -163,7 +157,7 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 		response.put("fileName", file.getOriginalFilename());
 		response.put("size", file.getSize()); // tamanho em bytes
 
-		log.info("Upload feito para usuário {} -> {}", userId, urlRelativa + "Para Onjeto/Entidade: " + entidade);
+		log.info("Upload feito para usuário {} -> {}", usuarioLogado.getId(), urlRelativa + "Para Onjeto/Entidade: " + entidade);
 
 		usuarioRepository.save(entidade);
 
@@ -212,7 +206,7 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 			entidade.setBiografia(beografia);
 
 		// Salva as alterações
-		UsuarioVendedor salvo = (UsuarioVendedor) usuarioRepository.save(entidade);
+		usuarioRepository.save(entidade);
 
 		return entidade.getBiografia();
 	}
@@ -227,7 +221,7 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 			entidade.setUsername(usernameNovo);
 
 		// Salva as alterações
-		UsuarioVendedor salvo = (UsuarioVendedor) usuarioRepository.save(entidade);
+		usuarioRepository.save(entidade);
 
 		return entidade.getUsername();
 	}
@@ -251,22 +245,6 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 	}
 
 
-	@Override
-	public Set<OfertaDTO> findOfertaMaisBaixaRecebida(Usuario usuarioLogado, String cnpjComprador, Double maximumValue) {
-		var ofertaRecebidas = ofertaServices.findOfertasMaisCarasRecebidasDeVendedor(usuarioLogado, cnpjComprador, maximumValue);
-		return ofertaRecebidas;
-	}
-
-	
-
-	@Override
-	public Set<OfertaDTO> findOfertasMaisCarasRecebidas(Usuario usuarioLogado, String cnpjComprador,
-			Double minimumValue) {
-			var ofertaCaras = ofertaServices.findOfertasMaisCarasRecebidasDeVendedor(usuarioLogado, cnpjComprador, minimumValue);
-			return ofertaCaras;
-	}
-
-	
 
 	@Override
 	public Set<LeilaoDTO> findLeiloesParticipados(Long usuarioVendedorId) {

@@ -18,7 +18,6 @@ import com.devPontes.LeialaoME.model.entities.Usuario;
 @Service
 public class JwtService {
 
-
 	@Value("${jwt.secret}")
 	private String secret;
 
@@ -31,7 +30,7 @@ public class JwtService {
 		
 		try {
 
-			Algorithm alg = Algorithm.HMAC256(secret);
+			Algorithm alg = Algorithm.HMAC256(secret); //Objeto que cria algortimos de 
 
 			String token = JWT
 							  .create()
@@ -41,12 +40,8 @@ public class JwtService {
 							  .withClaim("roles", userDetails.getAuthorities()
 									  						 .stream()
 									  						 .map(a -> a.getAuthority()).toList())
-							  .withExpiresAt(calculateExpiration())
-									  						  
-							  .sign(alg);
-							
-						
-					     
+							  .withExpiresAt(calculateExpiration())  						  
+							  .sign(alg);   
 			return token;
 
 		} catch (JWTCreationException ex) {
@@ -55,7 +50,7 @@ public class JwtService {
 
 	}
 	
-	public String validateToken(String token) {
+	public String validateToken(String token) { //Pega o subject/username pra validar o token
 		Algorithm alg = Algorithm.HMAC256(secret);
 
 		return JWT.require(alg)

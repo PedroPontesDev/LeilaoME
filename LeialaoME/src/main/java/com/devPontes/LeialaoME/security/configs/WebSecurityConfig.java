@@ -37,64 +37,50 @@ public class WebSecurityConfig {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
-    // 🔐 AuthenticationManager
+    
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig
-    ) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-    // 🔐 Security Filter Chain
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        // HttpSecurity configura a segurança da aplicação.
+        // SecurityFilterChain define a cadeia de filtros e regras de acesso.
+        
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
-
-            // API stateless
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-
-            //  rotas públicas   
-            .authorizeHttpRequests(auth -> auth .requestMatchers(
-                    "/v1/auth/**",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**"
-                ).permitAll()
-
+            
+            // API stateless: não usa sessão; cada request deve trazer o JWT
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/v1/leilao/**").hasAnyRole("COMPRADOR", "VENDEDOR")
                 .requestMatchers("/v1/oferta/**").hasAnyRole("COMPRADOR", "VENDEDOR")
-
-                .anyRequest().authenticated()
-            )
-
+                .anyRequest().authenticated())
+            
+            // Usa autenticação baseada em UserDetailsService + senha criptografada com BCrypt
             .authenticationProvider(daoAuthenticationProvider())
 
-            //  JWT filter
-            .addFilterBefore(
-                jwtTokenFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
+            // Valida o JWT antes do filtro padrão de autenticação do Spring Security
+            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
-    // 🔐 Authentication Provider
+   
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
+    public DaoAuthenticationProvider daoAuthenticationProvider() {  // Provedor de autenticação que usa o UserDetailsService para carregar o usuário e o BCryptPasswordEncoder para comparar a senha informada com a senha criptografada.
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(customUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
 
-    // 🌍 CORS
+  
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {   // Configura o CORS, definindo quais origens, métodos e headers podem acessar a API a partir do frontend.
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(
             List.of("http://localhost:5173", "http://192.168.0.100:5173", "http://localhost:8080")

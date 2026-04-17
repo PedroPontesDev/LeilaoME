@@ -156,9 +156,21 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		if (!leilaoExistente.isAindaAtivo())
 			throw new LeilaoException("Leilão já foi encerrado");
 
-		Oferta ofertaGanhadora = leilaoExistente.getOfertas().stream()
-				.filter(o -> o.getStatusOferta() == StatusOferta.ACEITA || o.getStatusOferta() == StatusOferta.ATIVA)
-				.max(Comparator.comparing(Oferta::getValorOferta)).orElseThrow(null);
+		Oferta ofertaGanhadora = null;
+		Double maiorOferta = 0.0;
+		for(Oferta oferta : leilaoExistente.getOfertas()) {
+			if(oferta.getStatusOferta() == StatusOferta.ATIVA || 
+					oferta.getStatusOferta() == StatusOferta.ACEITA || 
+					oferta.getValorOferta() > maiorOferta) {
+					maiorOferta = oferta.getValorOferta();
+					ofertaGanhadora = oferta;
+			}
+			
+		}
+		
+		//Oferta ofertaGanhadora = leilaoExistente.getOfertas().stream()
+		//		.filter(o -> o.getStatusOferta() == StatusOferta.ACEITA || o.getStatusOferta() == StatusOferta.ATIVA)
+		//		.max(Comparator.comparing(Oferta::getValorOferta)).orElseThrow(null);
 
 		UsuarioComprador vencedor = ofertaGanhadora.getComprador();
 

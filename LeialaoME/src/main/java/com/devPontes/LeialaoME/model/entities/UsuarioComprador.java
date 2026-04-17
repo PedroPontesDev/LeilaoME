@@ -49,6 +49,10 @@ public class UsuarioComprador extends Usuario implements Serializable {
 	public List<Oferta> getOfertas() {
 		return ofertas;
 	}
+	
+	public Set<Leilao> getLeiloesPaticipados() {
+		return leiloesPaticipados;
+	}
 
 	@Override
 	public int hashCode() {

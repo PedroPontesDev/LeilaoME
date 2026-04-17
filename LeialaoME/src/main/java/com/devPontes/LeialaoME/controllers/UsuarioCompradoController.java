@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,10 +28,11 @@ public class UsuarioCompradoController {
 	@Autowired
 	UsuarioCompradorServicesImpl compradorServices;
 	
-	@PostMapping("/{id}/upload-foto") //Utilizar anotation @AuthenticationPrincipal pra passar o id logado correto
-	public ResponseEntity<Map<String, Object>> uploadFoto(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable Long id, @RequestParam("file") MultipartFile file) throws Exception {
-		Map<String, Object> caminho =  compradorServices.fazerUploadDeImamgemDePerfil(id, file);
-		return new ResponseEntity<>(caminho, HttpStatus.ACCEPTED);
+	@PostMapping("/upload-foto") //Utilizar anotation @AuthenticationPrincipal pra passar o id logado correto
+	public ResponseEntity<Map<String, Object>> uploadFoto(@AuthenticationPrincipal Usuario usuarioLogado, 
+														  @RequestParam("file") MultipartFile file) throws Exception {
+		Map<String, Object> caminho =  compradorServices.fazerUploadDeImamgemDePerfil(usuarioLogado, file);
+		return ResponseEntity.status(HttpStatus.CREATED).body(caminho);
 	}
 
 

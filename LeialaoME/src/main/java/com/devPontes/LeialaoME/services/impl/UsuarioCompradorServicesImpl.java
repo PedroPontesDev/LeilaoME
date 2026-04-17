@@ -6,7 +6,10 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -26,9 +29,12 @@ import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.PermissaoDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioUpdateDTO;
+import com.devPontes.LeialaoME.model.entities.Leilao;
+import com.devPontes.LeialaoME.model.entities.Oferta;
 import com.devPontes.LeialaoME.model.entities.Permissao;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
+import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
 import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.PermissaoRepositories;
@@ -68,7 +74,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	public UsuarioDTO cadastrarUsuarioComprador(UsuarioDTO novoUsuario) throws Exception {
 		UsuarioComprador user = MyMaper.parseObject(novoUsuario, UsuarioComprador.class);
 
-		if (!CnpjCpfValidadorClient.validarCPf(user.getCpf())) {
+		if (!cpfValidator.validarCPf(user.getCpf())) {
 			throw new Exception("CPF Não Pode Ser Validado como CPF");
 		}
 
@@ -94,51 +100,49 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	/**
 	 * Faz upload de imagem de perfil do usuário.
-	 * 
-	 * @param userId id do usuário (pode ser usado para associar a imagem)
 	 * @param file   MultipartFile enviado pelo frontend
 	 * @return Map com informações do upload
 	 * @throws Exception caso algo dê errado
 	 */
 	@Transactional
-	public Map<String, Object> fazerUploadDeImamgemDePerfil(Long userId, MultipartFile file) throws Exception {
-		var entidade = usuarioRepository.findById(userId)
-				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + userId));
-
-		// 1️ Verifica se o arquivo está vazio
+	public Map<String, Object> fazerUploadDeImamgemDePerfil(Usuario usuarioLogado, MultipartFile file) throws Exception {
+		var entidade = usuarioRepository.findById(usuarioLogado.getId())
+				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioLogado.getId()));
+		
 		if (file.isEmpty()) {
 			throw new RuntimeException("Arquivo vazio!");
 		}
 
-		// 2️ Valida o tipo MIME do arquivo
 		String contentType = file.getContentType();
 		if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png"))) {
 			throw new Exception("Servidor só pode consumir imagens JPG ou PNG!");
 		}
+		
+		String nomeOriginal = file.getOriginalFilename();
+	    if (nomeOriginal == null || 
+	        !(nomeOriginal.toLowerCase().endsWith(".jpg") || 
+	          nomeOriginal.toLowerCase().endsWith(".jpeg") || 
+	          nomeOriginal.toLowerCase().endsWith(".png"))) {
+	        throw new RuntimeException("Extensão inválida! Apenas .jpg, .jpeg ou .png"); //
+	    }
 
-		// 3️ Gera um nome único para o arquivo, evitando sobrescrita
-		String nomeArquivo = UUID.randomUUID() + "_FRONTEND_  " + "_"
+		String nomeArquivo = UUID.randomUUID() + "_"
 				+ file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_"); // remove
 
-		// 4️ Cria a pasta de upload se não existir COM OBJETO fiLE
-		File pasta = new File(uploadDir);
+		File pasta = new File(uploadDir); //Passar diretorio que sera criado o arquivo
+		
 		if (!pasta.exists()) {
-			pasta.mkdirs(); // cria a pasta e subpastas
+			pasta.mkdir();
 		}
 
-		// 5️ Cria o Path completo do arquivo com objeto Path e Paths!!
-		Path caminhoArquivo = Paths.get(pasta.getAbsolutePath(), nomeArquivo);
+		Path caminhoArquivo = Paths.get(uploadDir, nomeArquivo);
 
-		// 6️ Abre InputStream do MultipartFile e OutputStream do Path com file vindo do
-		// frontend e Files.outPut do objeto java
+		// Abre InputStream do MultipartFile e OutputStream do Path com file vindo do frontend e Files.outPut do objeto java
 		try (InputStream input = file.getInputStream(); OutputStream output = Files.newOutputStream(caminhoArquivo)) {
-
 			byte[] buffer = new byte[8192]; // lê 8KB por vez
 			int bytesLidos;
 			while ((bytesLidos = input.read(buffer)) != -1) {
-				output.write(buffer, 0, bytesLidos); // escreve no disco passando da posição zero até o final qu ter
-														// bufferlidos
-
+				output.write(buffer, 0, bytesLidos); // escreve no disco passando da posição zero até o final qu ter bufferlidos
 			}
 		}
 
@@ -153,11 +157,18 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		response.put("fileName", file.getOriginalFilename());
 		response.put("size", file.getSize()); // tamanho em bytes
 
-		log.info("Upload feito para usuário {} -> {}", userId, urlRelativa + "Para Objeto/Entidade: " + entidade);
+		log.info("Upload feito para usuário {} -> {}", usuarioLogado.getId(), urlRelativa + "Para Objeto/Entidade: " + entidade);
 
 		usuarioRepositories.save(entidade);
 
 		return response;
+		
+
+		// 1️ Verifica se o arquivo está vazio
+		// 2️ Valida o tipo MIME do arquivo
+		// 3️ Gera um nome único para o arquivo, evitando sobrescrita
+		// 4️ Cria a pasta de upload se não existir COM OBJETO FILE e COM DIRERTORIO DO ARQUIVO
+		// 5️ Cria o Path completo do arquivo com objeto Path e Paths!!
 	}
 
 	@Override
@@ -202,7 +213,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 			entidade.setBiografia(biografia);
 
 		// Salva as alterações
-		UsuarioComprador salvo = (UsuarioComprador) usuarioRepository.save(entidade);
+		usuarioRepository.save(entidade);
 
 		return entidade.getBiografia();
 	}
@@ -217,7 +228,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 			entidade.setUsername(usernameNovo);
 
 		// Salva as alterações
-		UsuarioComprador salvo = (UsuarioComprador) usuarioRepository.save(entidade);
+		 usuarioRepository.save(entidade);
 
 		return entidade.getUsername();
 	}
@@ -247,21 +258,18 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	@Override
 	public Set<LeilaoDTO> findLeiloesAdquiridosDeUsuario(Long usuarioCompradorId) {
 		// TODO: mostrar historico de leiloes adquiridos por id de usuario
-		throw new UnsupportedOperationException("Não implementado ainda");
-	}
-
-	@Override
-	public Set<OfertaDTO> findOfertaMaisBaixa(String cpfComprador, Double maximumValue) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<OfertaDTO> findOfertasMaisCarasComprador(Usuario usuarioLogado, String cpfComprador,
-			Double minimumValue) {
-		var ofertasCaras = ofertaServices.findOfertasMaisCarasDeComprador(usuarioLogado, cpfComprador, minimumValue);
-		return ofertasCaras;
-
+		
+		UsuarioComprador usuario = (UsuarioComprador) usuarioRepositories.findById(usuarioCompradorId)
+													   .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+		Set<Leilao> adquiridos = new HashSet<>();
+		
+		for(Oferta oferta : usuario.getOfertas()) {
+			if(oferta.getStatusOferta() == StatusOferta.GANHADORA) {
+				adquiridos.add(oferta.getLeilao());
+			}
+		}
+	
+		return MyMaper.parseSetObjects(adquiridos, LeilaoDTO.class);
 	}
 
 }

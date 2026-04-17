@@ -14,13 +14,12 @@ import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginRequestDTO;
 import com.devPontes.LeialaoME.security.DTO.v1.UsuarioLoginResponseDTO;
 import com.devPontes.LeialaoME.security.JWT.services.JwtService;
 
-import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class AuthServicesImpl {
 
 	@Autowired
-    private AuthenticationManager auth; //Manager de autenticação do SPring Sec
+    private AuthenticationManager auth; //Manager de autenticação do Spring Sec
 	
 	@Autowired
 	private JwtService jwtService;
@@ -30,18 +29,16 @@ public class AuthServicesImpl {
 
     private static final Logger log = LoggerFactory.getLogger(AuthServicesImpl.class);
 
-    public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request, HttpServletResponse response) {
+    public UsuarioLoginResponseDTO login(UsuarioLoginRequestDTO request) {
          	auth.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));  // autentica usuário
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());   // carrega dados do usuário direto do banco
    
-            String token = jwtService.generateToken(userDetails);   // gera tokem
-            
-            response.setHeader("Authorization", "Bearer " + token); //guarda o token no Header
-            
+            String token = jwtService.generateToken(userDetails);   // gera token trazendo usuario carregado do banco
+
             log.info("Login bem-sucedido para usuário {}. Token gerado.", request.getUsername());
             return new UsuarioLoginResponseDTO(request.getUsername(), token);
 
-    }
+    } //Sempre utilizar UserDetails pra carregar o usuario do banco  e authmanager para autenticar
 }
- //Sempre utilizar UserDetails pra carregar o usuario do banco 
+ 

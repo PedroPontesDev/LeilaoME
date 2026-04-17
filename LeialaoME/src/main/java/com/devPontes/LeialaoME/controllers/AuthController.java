@@ -36,20 +36,19 @@ public class AuthController {
 	
 	private final Logger logger = LoggerFactory.getLogger(AuthController.class);
 	
-	@PostMapping(path = "/login", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<?> login(@RequestBody UsuarioLoginRequestDTO request, HttpServletResponse response) {
-		UsuarioLoginResponseDTO token = authServices.login(request, response);
-		logger.info("TOKEN GERADO ->" + token.getToken());
+	@PostMapping(path = "/login")
+	public ResponseEntity<UsuarioLoginResponseDTO> login(@RequestBody UsuarioLoginRequestDTO request) {
+		UsuarioLoginResponseDTO token = authServices.login(request);
 		return new ResponseEntity<UsuarioLoginResponseDTO>(token, HttpStatus.OK);
 	}
 	
-	@PostMapping(path = "/cadastrar-vendedor", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	@PostMapping(path = "/cadastrar-vendedor")
 	public ResponseEntity<UsuarioDTO> registrarUsuarioVendedor(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved = vendedorServices.cadastrarUsuarioVendedor(usuario);
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);
 	}
 
-	@PostMapping(path = "/cadastrar-comprador", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	@PostMapping(path = "/cadastrar-comprador")
 	public ResponseEntity<UsuarioDTO> registrarUsuarioComprador(@RequestBody UsuarioDTO usuario) throws Exception {
 		UsuarioDTO saved = compradorServicesImpl.cadastrarUsuarioComprador(usuario);
 	    return new ResponseEntity<>(saved, HttpStatus.CREATED);

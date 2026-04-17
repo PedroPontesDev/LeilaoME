@@ -30,8 +30,8 @@ public class UsuarioVendedorController {
 	UsuarioVendedorServicesImpl vendedorServices;
 	
 	@PostMapping("/{id}/upload-foto")  //Utilizar anotaiton @AuthenticationPrincipal para passar o id logado certo
-	public ResponseEntity<Map<String, Object>> uploadFoto(@AuthenticationPrincipal Usuario logado,@PathVariable Long id, @RequestParam("file") MultipartFile file) throws Exception {
-		Map<String, Object> caminho =  vendedorServices.fazerUploadDeImamgemDePerfil(id, file);
+	public ResponseEntity<Map<String, Object>> uploadFoto(@AuthenticationPrincipal Usuario usuarioLogado, @RequestParam("file") MultipartFile file) throws Exception {
+		Map<String, Object> caminho =  vendedorServices.fazerUploadDeImamgemDePerfil(usuarioLogado, file);
 		return new ResponseEntity<>(caminho, HttpStatus.ACCEPTED);
 	}
 

@@ -16,8 +16,8 @@ public interface UsuarioVendedorRepositories extends JpaRepository<UsuarioVended
 	boolean existsByUsername(String username);
 	
 	
-	@Query("SELECT l FROM Leilao l WHERE l.vendedor.id = :usuarioVendedorId")
-	Set<LeilaoDTO> findLeiloesParticipados(Long usuarioVendedorId);
+	@Query("SELECT l FROM Leilao l WHERE l.vendedor.id = :vendedorId")
+	Set<LeilaoDTO> findLeiloesDeVendedor(Long vendedorId);
 	
 	
 }

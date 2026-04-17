@@ -37,10 +37,6 @@ public class Oferta implements Serializable {
 	private UsuarioComprador comprador;
 
 	@ManyToOne
-	@JoinColumn(name = "vendedor_id", nullable = false)  //APAGAR ESSA COLUNA DPS E ESSE RELACIONAMENTO
-	private UsuarioVendedor vendedor;
-
-	@ManyToOne
 	@JoinColumn(name = "leilao_id", nullable = false)
 	private Leilao leilao;
 
@@ -51,13 +47,12 @@ public class Oferta implements Serializable {
 	}
 
 	public Oferta(Long id, Double valorOferta, StatusOferta statusOferta, UsuarioComprador comprador,
-			UsuarioVendedor vendor, Leilao leilao, LocalDateTime momentoOferta) {
+			 Leilao leilao, LocalDateTime momentoOferta) {
 		super();
 		this.id = id;
 		this.valorOferta = valorOferta;
 		this.statusOferta = statusOferta;
 		this.comprador = comprador;
-		this.vendedor = vendor;
 		this.leilao = leilao;
 		this.momentoOferta = momentoOferta;
 	}
@@ -110,14 +105,5 @@ public class Oferta implements Serializable {
 		this.momentoOferta = momentoOferta;
 	}
 
-	
-	
-	public UsuarioVendedor getVendedor() {
-		return vendedor;
-	}
-
-	public void setVendor(UsuarioVendedor vendedor) {
-		this.vendedor = vendedor;
-	}
 
 }

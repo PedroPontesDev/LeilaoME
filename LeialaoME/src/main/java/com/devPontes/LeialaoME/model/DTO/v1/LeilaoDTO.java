@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+@JsonFilter("LeilaoFilter")
 public class LeilaoDTO {
 
 	@JsonIgnore
@@ -38,7 +38,6 @@ public class LeilaoDTO {
     private Long vendedorId;
     
     private String urlFotoProduto;
-    
     
     private Long compradorId;
     private Long vencedorId;

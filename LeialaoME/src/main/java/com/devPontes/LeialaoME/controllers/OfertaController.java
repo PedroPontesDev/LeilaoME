@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
@@ -53,16 +52,8 @@ public class OfertaController {
         return ResponseEntity.ok(ofertaAceita);
     }
 	
-	
-	 	@PreAuthorize("hasRole('VENDEDOR')")
-	    @GetMapping("/mais-caras")
-	    public ResponseEntity<Set<OfertaDTO>> findOfertasMaisCaras(
-	            @AuthenticationPrincipal Usuario usuarioLogado,
-	            @RequestParam String cnpjVendedor,
-	            @RequestParam Double valorMinimo) {
-	        Set<OfertaDTO> ofertas = ofertaServices.findOfertasMaisCarasRecebidasDeVendedor(usuarioLogado, cnpjVendedor, valorMinimo);
-	        return ResponseEntity.ok(ofertas);
-	    }
+	 	
+	 	
 	 	
 	 //COntinuar criando os endpoints de oferta entity
 	

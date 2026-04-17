@@ -1,5 +1,6 @@
 package com.devPontes.LeialaoME.services;
 
+
 import java.util.List;
 import java.util.Set;
 
@@ -17,13 +18,16 @@ public interface OfertaService {
 
 	OfertaDTO aceitarOfertaDeLeilao(Usuario usuarioLogado, Long leilaoId, Long ofertaId);
 	
-	OfertaDTO negarOfertaDeLeilao(Usuario usuarioLogado, Long ofertaId);
+	OfertaDTO negarOfertaDeLeilao(Usuario usuarioLogado, Long ofertaId, Long leilaoId);
 	
-	Set<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, String cpfComprador, Double valorMinimo);
+	List<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, Double valorMinimo);
 	
-	Set<OfertaDTO> findOfertasMaisCarasRecebidasDeVendedor(Usuario usuarioLogado, String cnpjVendedor, Double valorMinimo);
+	List<OfertaDTO> findOfertasMaisBaixasDeComprador(Usuario usuarioLogado, Double valorMaximo);
 
 	Double calcularNovoLance(Long leilaoId);
+
+
+	
 
 
 

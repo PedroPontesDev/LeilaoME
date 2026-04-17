@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-@JsonFilter("UserFilters") //Escpmder token na response
+@JsonFilter("UserFilters") 
 public class UsuarioDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

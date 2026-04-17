@@ -17,14 +17,16 @@ public class JacksonFilters {
 	@Bean
 	public ObjectMapper objectMapper() { //ObjectMapper pra serializar e deserializa json 
 		ObjectMapper mapper = new ObjectMapper();
-		FilterProvider filters = new SimpleFilterProvider()
+		
+		//Filtro pra Deserializar Sensitive Datas
+		FilterProvider filters = new SimpleFilterProvider() 
 									 .addFilter("UserFilters", SimpleBeanPropertyFilter.serializeAllExcept("passowrd"))
 									 .addFilter("UsuarioResponseFilters", SimpleBeanPropertyFilter.serializeAllExcept("token"));
 											
 														   
 													
 				
-																			//Filtro pra Deserializar Sensitive Datas
+																		
 		mapper.setFilterProvider(filters);
 		mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 		return mapper;

@@ -3,6 +3,7 @@ package com.devPontes.LeialaoME.model.entities;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,13 +43,14 @@ public abstract class Usuario implements UserDetails, Serializable {
 	private String password;
 
 	@Lob
-	@Column(length = 225)
+	@Column(columnDefinition = "TEXT")
 	private String biografia;
 
 	private String urlFotoPerfil;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinTable(name = "tb_permissoes_usuarios", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "permissao_id"))
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "tb_permissoes_usuarios", joinColumns = @JoinColumn(name = "usuario_id"), 
+	inverseJoinColumns = @JoinColumn(name = "permissao_id"))
 	private Set<Permissao> permissoes = new HashSet<>();
 
 	public Usuario() {
@@ -87,7 +89,7 @@ public abstract class Usuario implements UserDetails, Serializable {
 		return permissoes
 				.stream()
 				.map(p -> new SimpleGrantedAuthority(p.getUsuarioRole().name()))
-						.collect(Collectors.toList()); //Mapeano as role
+				.toList(); //Mapeando as roles por meio de stream/Enumerated
 	}
 
 	@Override

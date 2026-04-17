@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import jakarta.annotation.PostConstruct;
 
 @Configuration
-public class TimeZoneConfig {
+public class TimeZoneConfig { //Classe de configuração de configuração de tempo do servidor igual de SP
 	
 	@PostConstruct
 	public void init() {
