@@ -5,10 +5,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
 import com.devPontes.LeialaoME.exceptions.LeilaoException;
-import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
 import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.entities.Leilao;
@@ -29,10 +25,7 @@ import com.devPontes.LeialaoME.model.entities.UsuarioVendedor;
 import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.LeilaoRepositories;
-import com.devPontes.LeialaoME.repositories.OfertaRepositories;
-import com.devPontes.LeialaoME.repositories.UsuarioCompradorRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioRepositories;
-import com.devPontes.LeialaoME.repositories.UsuarioVendedorRepositories;
 import com.devPontes.LeialaoME.services.LeilaoServices;
 
 import jakarta.transaction.Transactional;
@@ -42,18 +35,10 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 	@Autowired
 	private LeilaoRepositories leilaoRepository;
-
-	@Autowired
-	private UsuarioCompradorRepositories compradorRepository;
-
+	
 	@Autowired
 	private UsuarioRepositories usuarioRepository;
 
-	@Autowired
-	private UsuarioVendedorRepositories vendedorRepositories;
-
-	@Autowired
-	private OfertaRepositories ofertaRepository;
 
 	@Override
 	public LeilaoDTO criarLeilao(LeilaoDTO novoLeilao, Usuario usuarioLogado) {
@@ -116,11 +101,11 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository.findById(usuarioLogado.getId())
 				.orElseThrow(() -> new RuntimeException("Você não pode criar leilão para outro vendedor!"));
 
-		if (tempoInicio == null || tempoFim == null)
-			throw new IllegalArgumentException("As datas de início e término devem ser informadas.");
-
 		if (leilao.getLanceInicial() == null)
 			throw new IllegalArgumentException("Leilão deve começar com algum valor numérico!");
+		
+		if (tempoInicio == null || tempoFim == null)
+			throw new IllegalArgumentException("As datas de início e término devem ser informadas.");
 
 		if (tempoInicio.isBefore(LocalDateTime.now()))
 			throw new IllegalArgumentException("Leilão deve começar num momento futuro!");
@@ -128,6 +113,9 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		if (tempoFim.isBefore(tempoInicio))
 			throw new IllegalArgumentException("A data de término deve ser posterior ao início do leilão!");
 
+		if (tempoInicio.isBefore(tempoFim))
+			throw new IllegalArgumentException("A data de inicio deve ser posterior ao termino do leilão!");
+		
 		if (leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0)
 			throw new IllegalArgumentException("Leilão deve começar com um valor de lance inicial válido.");
 
@@ -145,50 +133,48 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	@Transactional
 	public LeilaoDTO definirGanhador(Long leilaoId, Usuario usuarioLogado) throws Exception {
 
-		Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
-				.orElseThrow(() -> new LeilaoException("Leilão não encontrado"));
+	    Leilao leilaoExistente = leilaoRepository.findById(leilaoId)
+	            .orElseThrow(() -> new LeilaoException("Leilão não encontrado"));
 
-		boolean isAdmin = usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+	    boolean isAdmin = usuarioLogado.getAuthorities()
+	            .stream()
+	            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
-		if (!isAdmin)
-			throw new SecurityException("Você não é um administrador");
+	    if (!isAdmin) {
+	        throw new SecurityException("Você não é um administrador");
+	    }
 
-		if (!leilaoExistente.isAindaAtivo())
-			throw new LeilaoException("Leilão já foi encerrado");
+	    if (!leilaoExistente.isAindaAtivo()) {
+	        throw new LeilaoException("Leilão já foi encerrado");
+	    }
 
-		Oferta ofertaGanhadora = null;
-		Double maiorOferta = 0.0;
-		for(Oferta oferta : leilaoExistente.getOfertas()) {
-			if(oferta.getStatusOferta() == StatusOferta.ATIVA || 
-					oferta.getStatusOferta() == StatusOferta.ACEITA || 
-					oferta.getValorOferta() > maiorOferta) {
-					maiorOferta = oferta.getValorOferta();
-					ofertaGanhadora = oferta;
-			}
-			
-		}
-		
-		//Oferta ofertaGanhadora = leilaoExistente.getOfertas().stream()
-		//		.filter(o -> o.getStatusOferta() == StatusOferta.ACEITA || o.getStatusOferta() == StatusOferta.ATIVA)
-		//		.max(Comparator.comparing(Oferta::getValorOferta)).orElseThrow(null);
+	   Oferta ofertaGanhadora = leilaoExistente
+			   								   .getOfertas()
+			   								   .stream()
+			   								   .filter(o -> o.getStatusOferta() == StatusOferta.ATIVA || o.getStatusOferta() == StatusOferta.ACEITA)
+			   								   .max(Comparator.comparingDouble(Oferta::getValorOferta))
+			   								   .orElseThrow(() -> new LeilaoException("Nenuma oferta encontrada válida"));
+	    
+	    UsuarioComprador ganhador =	ofertaGanhadora.getComprador();
+	    
+	    //Desativar outras ofertas
+	    for(Oferta oferta : leilaoExistente.getOfertas()) {
+	    	if(oferta.equals(ofertaGanhadora)) {
+	    		oferta.setStatusOferta(StatusOferta.GANHADORA);
+	    	} else if(oferta.getStatusOferta() == StatusOferta.ATIVA
+	                || oferta.getStatusOferta() == StatusOferta.ACEITA) {
+	    		oferta.setStatusOferta(StatusOferta.PERDEDORA);
+	    	}
+	    }
+	    					
+	    leilaoExistente.setAindaAtivo(false);
+	    leilaoExistente.setComprador(ganhador);
+	    leilaoRepository.save(leilaoExistente);
 
-		UsuarioComprador vencedor = ofertaGanhadora.getComprador();
+	    LeilaoDTO dto = MyMaper.parseObject(leilaoExistente, LeilaoDTO.class);
+	    dto.setVencedorId(ganhador.getId());
 
-		for (Oferta ofertaAceita : leilaoExistente.getOfertas()) {
-			if (ofertaAceita.equals(ofertaGanhadora)) {
-				ofertaAceita.setStatusOferta(StatusOferta.GANHADORA);
-			} else {
-				ofertaAceita.setStatusOferta(StatusOferta.PERDEDORA);
-			}
-		}
-
-		leilaoExistente.setAindaAtivo(false);
-		leilaoExistente.setComprador(vencedor);
-		leilaoRepository.save(leilaoExistente);
-
-		var dto = MyMaper.parseObject(leilaoExistente, LeilaoDTO.class);
-		dto.setVencedorId(vencedor.getId());
-		return dto;
+	    return dto;
 	}
 
 	@Transactional
@@ -213,6 +199,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		if (reducaoHoras >= duracaoAtual.toHours()) {
 			throw new LeilaoException("Redução maior ou igual à duração do leilão");
 		}
+		
 		entity.setInicio(inicio);
 		entity.setAindaAtivo(true);
 		entity.setTermino(tempoCalculado);
@@ -229,6 +216,10 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository.findById(usuarioLogado.getId())
 				.orElseThrow(() -> new SecurityException("Usuário inválido"));
 
+		if(vendedor.getId() != leilao.getVendedor().getId()) {
+			throw new LeilaoException("Esse leilão não pertence a este vendedor");
+		}
+		
 		var ofertas = leilao.getOfertas().stream().collect(Collectors.toSet());
 
 		return MyMaper.parseSetObjects(ofertas, OfertaDTO.class);
@@ -237,16 +228,14 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 	@Override
 	public List<LeilaoDTO> findLeilaoPorStatus(String status) {
-
-		// 1. Validar status
 		StatusOferta statusEnum;
 		try {
 			statusEnum = StatusOferta.valueOf(status.toUpperCase());
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException(
 					"Status inválido! Use: ATIVO,  INATIVA, PENDENTE, GANHADORA, PERDEDORA, ACEITA, NEGADA");
-		}
-
+		} // 1. Validar status
+ 
 		// 2. Buscar no banco
 		List<Leilao> leiloes = leilaoRepository.findLeilaoPorStatus(statusEnum);
 
@@ -263,18 +252,12 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		LocalDateTime agora = LocalDateTime.now();
 		LocalDateTime tempoLimite = proximoMes.atTime(23, 59, 29);
 
-		Set<Leilao> leiloes = (Set<Leilao>) leilaoRepository.findAll();
-
-		Set<Leilao> leilosFuturos = new HashSet<>();
-
-		for (Leilao proximos : leiloes) {
-			if (proximos.getInicio().isAfter(agora) && proximos.getInicio().isBefore(tempoLimite))
-				leilosFuturos.add(proximos);
-		}
-
-		if (leilosFuturos.isEmpty())
+		Set<Leilao> leiloes = leilaoRepository.buscarLeiloesFuturosAteData(agora, tempoLimite);
+		
+		if (leiloes.isEmpty())
 			throw new LeilaoException("Nenhum leilão futuro encontrado.");
-		return MyMaper.parseSetObjects(leilosFuturos, LeilaoDTO.class);
+		
+		return MyMaper.parseSetObjects(leiloes, LeilaoDTO.class);
 
 	}
 
@@ -326,9 +309,10 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	// Carregar todos os leilos de compradoresres e vendroresres
 
 	@Override
-	public List<LeilaoDTO> findLeiloesDeUsuarioComprador(Usuario usuarioLogado, String cpf, Long leilãoId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<LeilaoDTO> findLeiloesDeUsuarioComprador(Usuario usuarioLogado, String cpf, Long leilãoId) {
+		UsuarioComprador usuario = ((UsuarioComprador) usuarioLogado);
+		Set<Leilao> leiloesDoUsuario = usuario.getLeiloesPaticipados();
+		return MyMaper.parseSetObjects(leiloesDoUsuario, LeilaoDTO.class);
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public interface LeilaoServices {
 	
 	void fecharLeilao(Long leilaoId);
 
-	List<LeilaoDTO> findLeiloesDeUsuarioComprador(Usuario usuarioLogado, String cpf, Long leilãoId);
+	Set<LeilaoDTO> findLeiloesDeUsuarioComprador(Usuario usuarioLogado, String cpf, Long leilãoId);
 	
 	List<LeilaoDTO> findLeiloesDeUsuarioVendedor(Usuario usuarioLogado, String cnpj, Long leilãoId);
 

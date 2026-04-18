@@ -2,7 +2,6 @@ package com.devPontes.LeialaoME.services;
 
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -13,8 +12,6 @@ import com.devPontes.LeialaoME.model.entities.Usuario;
 public interface OfertaService {
 
 	OfertaDTO fazerPropostaParaLeilao(OfertaDTO oferta, Long leilaoId, Usuario usuarioLogado);
-
-	OfertaDTO fazerNovoLanceCasoOfertasSubam(Double novoValor, Long leilaoId, Long compradorId);
 
 	OfertaDTO aceitarOfertaDeLeilao(Usuario usuarioLogado, Long leilaoId, Long ofertaId);
 	
