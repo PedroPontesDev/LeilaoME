@@ -80,7 +80,7 @@ public class LeilaoController {
 		return new ResponseEntity<>(all, HttpStatus.OK);
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
 	@PutMapping(path = "/definir-ganhador/{leilaoId}", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<LeilaoDTO> definirGanhador(@PathVariable Long leilaoId,
 			@AuthenticationPrincipal Usuario usuarioLogado) throws Exception {

@@ -68,6 +68,7 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		}
 
 		Permissao roleComprador = permissaoRepository.findByUsuarioRole(UsuarioRole.ROLE_COMPRADOR);
+	
 		if (roleComprador == null)
 			throw new RuntimeException("Permissão ROLE_COMPRADOR não encontrada no banco!");
 
@@ -78,11 +79,6 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 		UsuarioDTO dto = MyMaper.parseObject(salvo, UsuarioDTO.class);
 		
-		dto.setPermissoes(salvo.getPermissoes()
-											.stream()
-											.map(p -> new PermissaoDTO(p.getUsuarioRole()))
-											.collect(Collectors.toSet()));
-
 		log.info("Usuário cadastrado com sucesso: {}", user.getCpf());
 		return dto;
 	}

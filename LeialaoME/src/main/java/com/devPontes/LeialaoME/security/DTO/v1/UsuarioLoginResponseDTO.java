@@ -2,10 +2,7 @@ package com.devPontes.LeialaoME.security.DTO.v1;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 
-
-@JsonFilter("UsuarioResponseFilters") //Esconder token na response
 public class UsuarioLoginResponseDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

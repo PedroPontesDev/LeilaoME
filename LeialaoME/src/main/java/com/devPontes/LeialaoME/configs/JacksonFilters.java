@@ -20,8 +20,7 @@ public class JacksonFilters {
 		
 		//Filtro pra Deserializar Sensitive Datas
 		FilterProvider filters = new SimpleFilterProvider() 
-									 .addFilter("UserFilters", SimpleBeanPropertyFilter.serializeAllExcept("passowrd"))
-									 .addFilter("UsuarioResponseFilters", SimpleBeanPropertyFilter.serializeAllExcept("token"));
+									 .addFilter("UserFilters", SimpleBeanPropertyFilter.serializeAllExcept("passowrd"));
 											
 														   
 													

@@ -24,22 +24,19 @@ public class UsuarioDTO implements Serializable {
     
     private String biografia;
     private String fotoPerfil;
-    private Set<PermissaoDTO> permissoes = new HashSet<>();
-
+    
     @JsonProperty(access = Access.WRITE_ONLY)
     private String cpf;
 
     @JsonProperty(access = Access.WRITE_ONLY)
 	private  String cnpj;
     
-	public UsuarioDTO(Long id, String username, String password, String biografia, String fotoPerfil,
-			Set<PermissaoDTO> permissoes, String cpf, String cnpj) {
+	public UsuarioDTO(Long id, String username, String password, String biografia, String fotoPerfil, String cpf, String cnpj) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.biografia = biografia;
 		this.fotoPerfil = fotoPerfil;
-		this.permissoes = permissoes;
 		this.cpf = cpf;
 		this.cnpj = cnpj;
 	}
@@ -86,13 +83,6 @@ public class UsuarioDTO implements Serializable {
 		this.fotoPerfil = fotoPerfil;
 	}
 
-	public Set<PermissaoDTO> getPermissoes() {
-		return permissoes;
-	}
-
-	public void setPermissoes(Set<PermissaoDTO> set) {
-		this.permissoes = set;
-	}
 
 	public String getCpf() {
 		return cpf;
@@ -130,7 +120,7 @@ public class UsuarioDTO implements Serializable {
 	@Override
 	public String toString() {
 		return "UsuarioDTO [id=" + id + ", username=" + username + ", password=" + password + ", biografia=" + biografia
-				+ ", fotoPerfil=" + fotoPerfil + ", permissoes=" + permissoes + ", cpf=" + cpf + ", cnpj=" + cnpj + "]";
+				+ ", fotoPerfil=" + fotoPerfil +  ", cpf=" + cpf + ", cnpj=" + cnpj + "]";
 	}
 
 	}

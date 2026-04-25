@@ -1,16 +1,13 @@
 package com.devPontes.LeialaoME.controllers;
 
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,10 +48,18 @@ public class OfertaController {
         OfertaDTO ofertaAceita = ofertaServices.aceitarOfertaDeLeilao(usuarioLogado, leilaoId, ofertaId);
         return ResponseEntity.ok(ofertaAceita);
     }
+
+
 	
-	 	
-	 	
-	 	
-	 //COntinuar criando os endpoints de oferta entity
+	@PreAuthorize("hasRole('COMPRADOR')")
+	@PutMapping("/negar/{leilaoId}/{ofertaId}")
+	public ResponseEntity<OfertaDTO> negarOferta(@AuthenticationPrincipal Usuario usuarioLogado,  
+												@PathVariable Long ofertaId,  
+												@PathVariable Long leilaoId) {
+		OfertaDTO ofertaNegada = ofertaServices.negarOfertaDeLeilao(usuarioLogado, ofertaId, leilaoId);
+		return new ResponseEntity<>(ofertaNegada, HttpStatus.NO_CONTENT);
+	}
+	 
+	
 	
 }

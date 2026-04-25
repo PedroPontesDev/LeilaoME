@@ -153,6 +153,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	    	}
 	    }
 	    
+	    if(ofertaGanhadora == null)
 	    for(Oferta oferta : leilaoExistente.getOfertas()) {
 	    	if(oferta.getStatusOferta() == StatusOferta.ATIVA || oferta.getStatusOferta() == StatusOferta.ACEITA) {
 	    		if(oferta.getValorOferta() > max) {

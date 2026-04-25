@@ -19,7 +19,7 @@ public interface LeilaoRepositories extends JpaRepository<Leilao, Long> {
 	@Query("SELECT DISTINCT l FROM Leilao l JOIN FETCH l.ofertas o WHERE o.statusOferta = :status")
 	List<Leilao> findLeilaoPorStatus(@Param("status") StatusOferta status); 
 	
-	@Query("SELECT l FROM Leilao WHERE l.inicio > :agora AND l.inicio <= :tempoLimite")
+	@Query("SELECT l FROM Leilao l WHERE l.inicio > :agora AND l.inicio <= :tempoLimite")
 	Set<Leilao> buscarLeiloesFuturosAteData(@Param("agora") LocalDateTime agora, 
 											@Param("tempoLimite")LocalDateTime tempoLimite);
 	

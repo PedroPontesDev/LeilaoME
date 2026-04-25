@@ -74,7 +74,7 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 
 
 	@Transactional
-	public UsuarioDTO cadastrarUsuarioVendedor(UsuarioDTO novoUsuario) throws Exception {
+	public UsuarioDTO cadastrarUsuarioVendedor(UsuarioDTO novoUsuario) throws Exception { 
 		UsuarioVendedor user = (UsuarioVendedor) MyMaper.parseObject(novoUsuario, UsuarioVendedor.class);
 		
 		if (!cnpjValidator.validarCnpj(user.getCnpj())) 
@@ -259,6 +259,5 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 		}
 		
 	}
-	}
-
 }
+
