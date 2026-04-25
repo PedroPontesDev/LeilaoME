@@ -15,6 +15,8 @@ import com.devPontes.LeialaoME.model.entities.Usuario;
 @Service
 public interface UsuarioVendedorService {
 
+	UsuarioDTO cadastrarUsuarioVendedor(UsuarioDTO novoUsuario) throws Exception;
+	
 	UsuarioDTO atualizarUsuarioVendedor(UsuarioUpdateDTO update, Long usuarioId) throws Exception;
 
 	Map<String, Object> fazerUploadDeImamgemDePerfil(Usuario usuarioLogado, MultipartFile file) throws Exception;
@@ -25,6 +27,5 @@ public interface UsuarioVendedorService {
 
 	String atualizarPassword(Long usuarioId, String passwordNova, String passwordAntiga);
 
-	Set<LeilaoDTO> findLeiloesParticipados(Long usuarioCompradorId);
 
 }

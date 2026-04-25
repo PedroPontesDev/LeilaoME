@@ -51,7 +51,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 		
 		leilao.setValorDeIncremento(novoLeilao.getValorDeIncremento());
-		leilao.setLanceInicial(leilao.getLanceInicial() + novoLeilao.getValorDeIncremento());
+		leilao.setLanceInicial(novoLeilao.getLanceInicial()) ;
 		
 		//  Validação de datas
 		if (leilao.getInicio() == null || leilao.getTermino() == null) {
@@ -67,7 +67,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		}
 
 		if (leilao.getTermino().isBefore(leilao.getInicio())) {
-			throw new IllegalArgumentException("Data de término deve ser após o início");
+			throw new IllegalArgumentException("Data de término deve ser antes do início");
 		}
 
 		//  Validação de valores
@@ -140,22 +140,28 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	            .stream()
 	            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
-	    if (!isAdmin) {
-	        throw new SecurityException("Você não é um administrador");
-	    }
+	    if (!isAdmin && !leilaoExistente.getVendedor().getId().equals(usuarioLogado.getId()))  throw new SecurityException("Você não é um administrador ou dono do leilão");
+	    if (leilaoExistente.isAindaAtivo())  throw new LeilaoException("Leilão ainda em andamento horario de termino:" + leilaoExistente.getTermino());
+	
+	    Double max = 0D;
+	    Oferta ofertaGanhadora = null;
 
-	    if (!leilaoExistente.isAindaAtivo()) {
-	        throw new LeilaoException("Leilão já foi encerrado");
+	    for(Oferta oferta : leilaoExistente.getOfertas()) {  	    //Priozar a aceita para ser justo??
+	    	if(oferta.getStatusOferta() == StatusOferta.ACEITA) {
+	    		ofertaGanhadora = oferta;
+	    		break;
+	    	}
 	    }
-
-	   Oferta ofertaGanhadora = leilaoExistente
-			   								   .getOfertas()
-			   								   .stream()
-			   								   .filter(o -> o.getStatusOferta() == StatusOferta.ATIVA || o.getStatusOferta() == StatusOferta.ACEITA)
-			   								   .max(Comparator.comparingDouble(Oferta::getValorOferta))
-			   								   .orElseThrow(() -> new LeilaoException("Nenuma oferta encontrada válida"));
 	    
-	    UsuarioComprador ganhador =	ofertaGanhadora.getComprador();
+	    for(Oferta oferta : leilaoExistente.getOfertas()) {
+	    	if(oferta.getStatusOferta() == StatusOferta.ATIVA || oferta.getStatusOferta() == StatusOferta.ACEITA) {
+	    		if(oferta.getValorOferta() > max) {
+	    			max = oferta.getValorOferta();
+	    			ofertaGanhadora = oferta;
+	    		}
+	    	}
+	    }
+	    
 	    
 	    //Desativar outras ofertas
 	    for(Oferta oferta : leilaoExistente.getOfertas()) {
@@ -167,6 +173,8 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	    	}
 	    }
 	    					
+	    UsuarioComprador ganhador = ofertaGanhadora.getComprador();
+	    
 	    leilaoExistente.setAindaAtivo(false);
 	    leilaoExistente.setComprador(ganhador);
 	    leilaoRepository.save(leilaoExistente);
@@ -176,6 +184,8 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 	    return dto;
 	}
+	
+
 
 	@Transactional
 	public LeilaoDTO criarLeilaoReduzido(LeilaoDTO leilao, Long reducaoHoras, Usuario usuarioLogado) {
@@ -274,34 +284,17 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		if (leilaoExistente.getTermino().isAfter(LocalDateTime.now())) {
 			throw new LeilaoException("Leilao ainda não terminou! ");
 		}
-		boolean existeOfertaAtiva = leilaoExistente.getOfertas().stream()
-				.anyMatch(o -> o.getStatusOferta() == StatusOferta.ATIVA);
-
-		if (!existeOfertaAtiva) {
-			throw new LeilaoException("Nenhuma oferta ativa para fechar o leilão");
-		}
-
-		Oferta ofertaMaisAlta = leilaoExistente.getOfertas().stream()
-				.filter(o -> o.getStatusOferta() == StatusOferta.ATIVA)
-				.max(Comparator.comparingDouble(o -> o.getValorOferta()))
-				.orElseThrow(() -> new LeilaoException("Não foram encontradas ofertas ATIVAS ou com valores máximos"));
-		ofertaMaisAlta.setStatusOferta(StatusOferta.ACEITA);
-
-		for (Oferta oferta : leilaoExistente.getOfertas()) {
-			if (oferta != ofertaMaisAlta) {
-				oferta.setStatusOferta(StatusOferta.INATIVA);
-			}
-		}
-
 		leilaoExistente.setAindaAtivo(false);
-
 		leilaoRepository.save(leilaoExistente);
 
 	}
 
 	@Override
 	public List<LeilaoDTO> findAll() {
-		var all = leilaoRepository.findAll().stream().limit(50).collect(Collectors.toList());
+		var all = leilaoRepository
+				.findAll()
+				.stream()
+				.limit(50).collect(Collectors.toList());
 
 		return MyMaper.parseListObjects(all, LeilaoDTO.class);
 	}

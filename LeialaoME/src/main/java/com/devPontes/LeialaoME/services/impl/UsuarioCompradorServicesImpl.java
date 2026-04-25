@@ -6,12 +6,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,17 +20,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devPontes.LeialaoME.exceptions.UsuarioNaoEncontradoException;
 import com.devPontes.LeialaoME.integrations.CnpjCpfValidadorClient;
-import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
-import com.devPontes.LeialaoME.model.DTO.v1.OfertaDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.PermissaoDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioDTO;
 import com.devPontes.LeialaoME.model.DTO.v1.UsuarioUpdateDTO;
-import com.devPontes.LeialaoME.model.entities.Leilao;
-import com.devPontes.LeialaoME.model.entities.Oferta;
 import com.devPontes.LeialaoME.model.entities.Permissao;
 import com.devPontes.LeialaoME.model.entities.Usuario;
 import com.devPontes.LeialaoME.model.entities.UsuarioComprador;
-import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
+
 import com.devPontes.LeialaoME.model.entities.enums.UsuarioRole;
 import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.PermissaoRepositories;
@@ -58,9 +50,6 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 
 	@Autowired
 	private BCryptPasswordEncoder encoder;
-
-	@Autowired
-	private OfertaServicesImpl ofertaServices;
 
 	@Autowired
 	private CnpjCpfValidadorClient cpfValidator;
@@ -223,12 +212,12 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 	public String atualizarUsername(Long usuarioId, String usernameNovo) {
 		var entidade = usuarioRepository.findById(usuarioId)
 				.orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não enontrado com ID" + usuarioId));
+		
+		validarUsername(usernameNovo);
+		
+		entidade.setUsername(usernameNovo);
 
-		if (entidade.getUsername() != null && entidade.getUsername().length() > 10)
-			entidade.setUsername(usernameNovo);
-
-		// Salva as alterações
-		 usuarioRepository.save(entidade);
+		usuarioRepository.save(entidade);
 
 		return entidade.getUsername();
 	}
@@ -254,22 +243,22 @@ public class UsuarioCompradorServicesImpl implements UsuarioCompradorService {
 		return passwordNova;
 
 	}
-
-	@Override
-	public Set<LeilaoDTO> findLeiloesAdquiridosDeUsuario(Long usuarioCompradorId) {
-		// TODO: mostrar historico de leiloes adquiridos por id de usuario
-		
-		UsuarioComprador usuario = (UsuarioComprador) usuarioRepositories.findById(usuarioCompradorId)
-													   .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
-		Set<Leilao> adquiridos = new HashSet<>();
-		
-		for(Oferta oferta : usuario.getOfertas()) {
-			if(oferta.getStatusOferta() == StatusOferta.GANHADORA) {
-				adquiridos.add(oferta.getLeilao());
-			}
-		}
 	
-		return MyMaper.parseSetObjects(adquiridos, LeilaoDTO.class);
+	public void validarUsername(String username) {
+		if(username == null || username.isBlank()) {
+			throw new IllegalArgumentException("Username não pode ser vazio");
+		}
+		
+		if(username.length() < 5 || username.length() > 20) {
+			throw new IllegalArgumentException("Username deve ter entre 5 e 20 caracteres");
+		}
+		
+		String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$";
+		
+		if(!username.matches(regex)) {
+		   throw new IllegalArgumentException("Username deve conter letra maiúscula, minúscula e caractere especial");
+		}
+		
 	}
 
 }

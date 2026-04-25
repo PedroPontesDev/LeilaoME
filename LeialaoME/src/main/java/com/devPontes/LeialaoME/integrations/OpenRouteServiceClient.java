@@ -111,8 +111,8 @@ public class OpenRouteServiceClient {
 				var obj = objMapper.readTree(response.getBody().toString());
 				System.out.println("JSON ORS → " + obj.toPrettyString()); // <<< IMPRIMA O JSON
 
-				Double durations = obj.path("durations").get(0).get(0).asDouble() / 3600;
-				var distances = obj.path("distances").get(0).get(0).asDouble();
+				Double durations = obj.path("durations").get(0).get(1).asDouble() / 3600;
+				var distances = obj.path("distances").get(0).get(1).asDouble() / 1000;
 
 				Map<String, Object> result = new HashMap<>();
 				result.put("durations", durations);

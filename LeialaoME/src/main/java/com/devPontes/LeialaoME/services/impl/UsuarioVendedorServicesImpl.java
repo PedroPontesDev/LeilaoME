@@ -55,9 +55,6 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 	private BCryptPasswordEncoder encoder;
 
 	@Autowired
-	private OfertaServicesImpl ofertaServices;
-	
-	@Autowired
 	private	CnpjCpfValidadorClient cnpjValidator;
 	
 	private static final Logger log = LoggerFactory.getLogger(UsuarioVendedorServicesImpl.class);
@@ -231,8 +228,9 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 	public String atualizarPassword(Long usuarioId, String passwordNova, String passwordAntiga) {
 		UsuarioVendedor user = (UsuarioVendedor) usuarioRepository.findById(usuarioId)
 				                                                 .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrdo!"));
+	
 		if(!encoder.matches(passwordAntiga, user.getPassword())) {
-			throw new SecurityException("Senha antiga nãoo coincidem");
+			throw new SecurityException("Senha antiga não coincidem");
 		}
 
 		if(passwordNova.length() < 6) {
@@ -244,18 +242,23 @@ public class UsuarioVendedorServicesImpl implements UsuarioVendedorService{
 		return "Senha atuliazada com sucesso!";
 	}
 
-
-
-	@Override
-	public Set<LeilaoDTO> findLeiloesParticipados(Long usuarioVendedorId) {
-		// TODO VEFICAR OS LEILOS QUEO USUARIO PATICIOU E ESTA INATIFOV PENSE
-		return null;
+	
+	public void vaidarUsername(String username) {
+		if(username == null || username.isBlank()) {
+			throw new IllegalArgumentException("Username não pode ser vazio");
+		}
+		
+		if(username.length() < 5 || username.length() > 20) {
+			throw new IllegalArgumentException("Username deve ter entre 5 e 20 caracteres");
+		}
+		
+		String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$";
+		
+		if(!username.matches(regex)) {
+		   throw new IllegalArgumentException("Username deve conter letra maiúscula, minúscula e caractere especial");
+		}
+		
+	}
 	}
 
-
-
-	
-	
-	
-	
 }
