@@ -14,7 +14,7 @@ import com.devPontes.LeialaoME.integrations.OpenRouteServiceClient;
 import com.devPontes.LeialaoME.model.DTO.v1.CordenadasRequestDTO;
 
 @RestController
-@RequestMapping("/api/cors")
+@RequestMapping("/v1/distance")
 public class OpenRouteController {
 
 	@Autowired
@@ -31,22 +31,16 @@ public class OpenRouteController {
 
 	@PostMapping("/matrix")
 	public ResponseEntity<?> calcularDistancia(@RequestBody CordenadasRequestDTO cordenadas) throws Exception {
-		if (cordenadas.getLatlong().length <= 0 || cordenadas.getLatlong() == null)
+		if (cordenadas == null || cordenadas.getCordenadas().size() < 2)
 			throw new Exception("Cordneadas presicam ser incluidas com LAT E LONG");
 
-		Double duration = 0D;
-		
-		
 		Map<String, Object> resultado = orsClient.verDistanciaCidadeds(cordenadas);
 
-		if (resultado == null && !resultado.containsKey("distanceInKM")) {
+		if (resultado == null ) {
 			return ResponseEntity.internalServerError().body(Map.of("error", "Não foi possível obter dados do ORS"));
-		} else {
-			duration = (double) resultado.get("durationInKm");
-			
 		}
 
-		return ResponseEntity.ok(duration);
+		return ResponseEntity.ok(resultado);
 	}
 
 }

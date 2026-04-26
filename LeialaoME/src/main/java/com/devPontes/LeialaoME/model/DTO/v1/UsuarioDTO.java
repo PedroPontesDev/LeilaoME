@@ -5,16 +5,18 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @JsonFilter("UserFilters") 
-public class UsuarioDTO implements Serializable {
+public class UsuarioDTO extends RepresentationModel<OfertaDTO> implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	@JsonIgnore
+	
 	private Long id;
 	
     private String username;

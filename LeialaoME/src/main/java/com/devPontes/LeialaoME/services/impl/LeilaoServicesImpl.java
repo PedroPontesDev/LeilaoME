@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.devPontes.LeialaoME.controllers.LeilaoController;
 import com.devPontes.LeialaoME.exceptions.LeilaoEncerradoException;
 import com.devPontes.LeialaoME.exceptions.LeilaoException;
 import com.devPontes.LeialaoME.model.DTO.v1.LeilaoDTO;
@@ -27,6 +28,9 @@ import com.devPontes.LeialaoME.model.entities.mapper.MyMaper;
 import com.devPontes.LeialaoME.repositories.LeilaoRepositories;
 import com.devPontes.LeialaoME.repositories.UsuarioRepositories;
 import com.devPontes.LeialaoME.services.LeilaoServices;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 
 import jakarta.transaction.Transactional;
 
@@ -59,24 +63,24 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		}
 
 		if (leilao.getInicio().isBefore(agora)) {
-			throw new IllegalArgumentException("Leilão não pode começar no passado");
+			throw new LeilaoException("Leilão não pode começar no passado");
 		}
 
 		if (leilao.getInicio().isAfter(agora.plusDays(4))) {
-			throw new IllegalArgumentException("Leilão só pode ser criado com até 4 dias de antecedência");
+			throw new LeilaoException("Leilão só pode ser criado com até 4 dias de antecedência");
 		}
 
 		if (leilao.getTermino().isBefore(leilao.getInicio())) {
-			throw new IllegalArgumentException("Data de término deve ser antes do início");
+			throw new LeilaoException("Data de término deve ser antes do início");
 		}
 
 		//  Validação de valores
 		if (leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0) {
-			throw new IllegalArgumentException("Lance inicial inválido");
+			throw new LeilaoException("Lance inicial inválido");
 		}
 
 		if (leilao.getValorDeIncremento() == null || leilao.getValorDeIncremento() <= 0) {
-			throw new IllegalArgumentException("Valor de incremento deve ser maior que zero");
+			throw new LeilaoException("Valor de incremento deve ser maior que zero");
 		}
 
 		// Configuração correta
@@ -87,7 +91,9 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 		leilaoRepository.save(leilao);
 
-		return MyMaper.parseObject(leilao, LeilaoDTO.class);
+		var dto = MyMaper.parseObject(leilao, LeilaoDTO.class);
+		
+		return dto;
 	}
 
 	@Override
@@ -100,6 +106,8 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 		UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository.findById(usuarioLogado.getId())
 				.orElseThrow(() -> new RuntimeException("Você não pode criar leilão para outro vendedor!"));
+		
+		LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
 		if (leilao.getLanceInicial() == null)
 			throw new IllegalArgumentException("Leilão deve começar com algum valor numérico!");
@@ -107,21 +115,19 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		if (tempoInicio == null || tempoFim == null)
 			throw new IllegalArgumentException("As datas de início e término devem ser informadas.");
 
-		if (tempoInicio.isBefore(LocalDateTime.now()))
+		if (!tempoInicio.isAfter(agora))
 			throw new IllegalArgumentException("Leilão deve começar num momento futuro!");
 
-		if (tempoFim.isBefore(tempoInicio))
-			throw new IllegalArgumentException("A data de término deve ser posterior ao início do leilão!");
-
-		if (tempoInicio.isBefore(tempoFim))
-			throw new IllegalArgumentException("A data de inicio deve ser posterior ao termino do leilão!");
+	    if (!tempoFim.isAfter(tempoInicio)) 
+		   throw new IllegalArgumentException("A data de término deve ser posterior ao início do leilão!");
+			    
 		
 		if (leilao.getLanceInicial() == null || leilao.getLanceInicial() <= 0)
 			throw new IllegalArgumentException("Leilão deve começar com um valor de lance inicial válido.");
 
 		leilao.setInicio(tempoInicio);
 		leilao.setTermino(tempoFim);
-
+		leilao.setAindaAtivo(true);
 		leilao.setVendedor(vendedor);
 		vendedor.getLeilaoCadastrado().add(leilao);
 
@@ -190,33 +196,41 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 	@Transactional
 	public LeilaoDTO criarLeilaoReduzido(LeilaoDTO leilao, Long reducaoHoras, Usuario usuarioLogado) {
-		Leilao entity = MyMaper.parseObject(leilao, Leilao.class);
 
-		UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository.findById(usuarioLogado.getId())
-				.orElseThrow(() -> new SecurityException("Usuário inválido"));
+	    Leilao entity = MyMaper.parseObject(leilao, Leilao.class);
 
-		if (reducaoHoras == null || reducaoHoras <= 0) {
-			throw new LeilaoException("Horas de redução inválidas");
-		}
+	    UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository.findById(usuarioLogado.getId())
+	            .orElseThrow(() -> new SecurityException("Usuário inválido"));
 
-		if (entity.getTermino() == null)
-			throw new DateTimeException("Leilão precisa ter data final base");
+	    if (reducaoHoras == null || reducaoHoras <= 0) {
+	        throw new LeilaoException("Horas de redução inválidas");
+	    }
 
-		// Calcula duração atual com objeto Duration
-		LocalDateTime inicio = LocalDateTime.now();
-		Duration duracaoAtual = Duration.between(inicio, entity.getTermino());
-		LocalDateTime tempoCalculado = entity.getTermino().minusHours(reducaoHoras);
+	    if (entity.getTermino() == null) {
+	        throw new DateTimeException("Leilão precisa ter data final base");
+	    }
 
-		if (reducaoHoras >= duracaoAtual.toHours()) {
-			throw new LeilaoException("Redução maior ou igual à duração do leilão");
-		}
-		
-		entity.setInicio(inicio);
-		entity.setAindaAtivo(true);
-		entity.setTermino(tempoCalculado);
-		entity.setVendedor(vendedor);
-		leilaoRepository.save(entity);
-		return MyMaper.parseObject(entity, LeilaoDTO.class);
+	    LocalDateTime inicio = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+
+	    Duration duracaoAtual = Duration.between(inicio, entity.getTermino());
+
+	    long duracaoMinutos = duracaoAtual.toMinutes();
+	    long reducaoMinutos = reducaoHoras * 60;
+
+	    if (reducaoMinutos >= duracaoMinutos) {
+	        throw new LeilaoException("Redução maior ou igual à duração do leilão");
+	    }
+
+	    LocalDateTime novoTermino = entity.getTermino().minusHours(reducaoHoras);
+
+	    entity.setInicio(inicio);
+	    entity.setAindaAtivo(true);
+	    entity.setTermino(novoTermino);
+	    entity.setVendedor(vendedor);
+
+	    leilaoRepository.save(entity);
+
+	    return MyMaper.parseObject(entity, LeilaoDTO.class);
 	}
 
 	@Override
@@ -258,10 +272,10 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	}
 
 	@Override
-	public Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes) throws Exception {
+	public Set<LeilaoDTO> findLeiloesFuturos(LocalDateTime proximoMes) throws Exception {
 
 		LocalDateTime agora = LocalDateTime.now();
-		LocalDateTime tempoLimite = proximoMes.atTime(23, 59, 29);
+		LocalDateTime tempoLimite = proximoMes;
 
 		Set<Leilao> leiloes = leilaoRepository.buscarLeiloesFuturosAteData(agora, tempoLimite);
 		
@@ -285,6 +299,7 @@ public class LeilaoServicesImpl implements LeilaoServices {
 		if (leilaoExistente.getTermino().isAfter(LocalDateTime.now())) {
 			throw new LeilaoException("Leilao ainda não terminou! ");
 		}
+		
 		leilaoExistente.setAindaAtivo(false);
 		leilaoRepository.save(leilaoExistente);
 

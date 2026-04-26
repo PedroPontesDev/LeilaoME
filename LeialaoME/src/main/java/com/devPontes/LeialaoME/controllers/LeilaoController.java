@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,9 +40,35 @@ public class LeilaoController {
 	@Autowired
 	UsuarioVendedorServicesImpl vendedorServices;
 	
+
+	@GetMapping(path = "/find-all", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<List<LeilaoDTO>> findAll() {
+		var all = leilaoServices.findAll();
+		return new ResponseEntity<>(all, HttpStatus.OK);
+		
+	}
+	
+	
+	@PreAuthorize("hasRole('VENDEDOR')")
+	@GetMapping(path = "/visualizar-ofertas/{leilaoId}", produces = {MediaType.APPLICATION_JSON_VALUE})
+ 	public ResponseEntity<Set<OfertaDTO>> visualizarOfertasDeLeilao(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable Long leilaoId) {
+ 		var ofertas = leilaoServices.visualizarOfertasDeLeilao(usuarioLogado, leilaoId);
+ 		return new ResponseEntity<>(ofertas, HttpStatus.OK);
+ 	}
+	
+	@PreAuthorize("hasRole('VENDEDOR')")
+	@GetMapping(path = "/visualizar-por-status", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_HTML_VALUE})
+	public ResponseEntity<List<LeilaoDTO>> findLeilaoPorStatus(@RequestParam String status) {
+		var finded = leilaoServices.findLeilaoPorStatus(status);
+		return new ResponseEntity<List<LeilaoDTO>>(finded,HttpStatus.OK);
+		
+	}
+
+	
 	@PreAuthorize("hasRole('VENDEDOR')")
 	@PostMapping(path = "/criar-leilao", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<LeilaoDTO> criarLeilao(@RequestBody LeilaoDTO leilaoNovo, @AuthenticationPrincipal Usuario usuarioLogado) {
+	public ResponseEntity<LeilaoDTO> criarLeilao(@RequestBody LeilaoDTO leilaoNovo, 
+												@AuthenticationPrincipal Usuario usuarioLogado) {
 		log.info("🧱 Iniciando criação de leilão pelo vendedor ID {}" + usuarioLogado.getId());
 		LeilaoDTO novoLeilao = leilaoServices.criarLeilao(leilaoNovo, usuarioLogado);
 		if(novoLeilao != null) log.info("Leilão sendo criado com sucesso: {}" + leilaoNovo.getDescricao());
@@ -64,47 +89,29 @@ public class LeilaoController {
 	    LeilaoDTO leilaoCriado = leilaoServices.criarLeilaoFuturo(novoLeilao, tempoInicio, tempoFim, usuarioLogado);
 	    return new ResponseEntity<>(leilaoCriado, HttpStatus.CREATED);
 	}
-
-	
-	@PreAuthorize("hasRole('VENDEDOR')")
-	@GetMapping(path = "/visualizar-ofertas/{leilaoId}", produces = {MediaType.APPLICATION_JSON_VALUE})
- 	public ResponseEntity<Set<OfertaDTO>> visualizarOfertasDeLeilao(@AuthenticationPrincipal Usuario usuarioLogado, @PathVariable Long leilaoId) {
- 		var ofertas = leilaoServices.visualizarOfertasDeLeilao(usuarioLogado, leilaoId);
- 		return new ResponseEntity<>(ofertas, HttpStatus.OK);
- 	}
-	
-	
-	@GetMapping(path = "/find-all", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<List<LeilaoDTO>> findAll() {
-		var all = leilaoServices.findAll();
-		return new ResponseEntity<>(all, HttpStatus.OK);
-	}
-	
-	@PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
-	@PutMapping(path = "/definir-ganhador/{leilaoId}", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<LeilaoDTO> definirGanhador(@PathVariable Long leilaoId,
-			@AuthenticationPrincipal Usuario usuarioLogado) throws Exception {
-		LeilaoDTO ganhadorLeilao = leilaoServices.definirGanhador(leilaoId, usuarioLogado);
-		return new ResponseEntity<LeilaoDTO>(ganhadorLeilao, HttpStatus.OK);
-	}
 	
 	
 	@PreAuthorize("hasRole('VENDEDOR')")
 	@PostMapping(path = "/criar-leilao-reduzido", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<LeilaoDTO> criarLeilaoReduzidoEmTempo(@RequestBody LeilaoDTO leilaoReduzido,
-			@RequestParam("reducao") Long reducaoHoras, @AuthenticationPrincipal Usuario usuarioLogado) {
+														@RequestParam("reducao") Long reducaoHoras, 
+														@AuthenticationPrincipal Usuario usuarioLogado) {
 				LeilaoDTO leilaoFlash =  leilaoServices.criarLeilaoReduzido(leilaoReduzido, reducaoHoras, usuarioLogado);
 				return new ResponseEntity<LeilaoDTO>(leilaoFlash, HttpStatus.OK);
 	}
 	
-	@PreAuthorize("hasRole('VENDEDOR')")
-	@GetMapping(path = "/visualizar-por-status", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_HTML_VALUE})
-	public ResponseEntity<List<LeilaoDTO>> findLeilaoPorStatus(@RequestParam String status) {
-		var finded = leilaoServices.findLeilaoPorStatus(status);
-		return new ResponseEntity<List<LeilaoDTO>>(finded,HttpStatus.OK);
-		
-	}
-
+	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PutMapping(path = "/definir-ganhador/{leilaoId}", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<LeilaoDTO> definirGanhador(@PathVariable Long leilaoId,
+			@AuthenticationPrincipal Usuario usuarioLogado) throws Exception {
+		LeilaoDTO ganhadorLeilao = leilaoServices.definirGanhador(leilaoId, usuarioLogado);
+		return new ResponseEntity<LeilaoDTO>(ganhadorLeilao, HttpStatus.OK);
+	}	
+	
+	
+	
+	
+	
 	
 	//COntinuar criando endpoints para leilao
 

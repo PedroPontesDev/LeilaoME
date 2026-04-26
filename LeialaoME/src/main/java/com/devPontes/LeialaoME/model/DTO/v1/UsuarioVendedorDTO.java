@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class UsuarioVendedorDTO implements Serializable {
+public class UsuarioVendedorDTO extends RepresentationModel<UsuarioVendedorDTO> implements Serializable   {
     private static final long serialVersionUID = 1L;
 
     @JsonIgnore

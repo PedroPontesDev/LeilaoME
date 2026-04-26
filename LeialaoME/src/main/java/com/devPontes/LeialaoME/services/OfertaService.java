@@ -10,17 +10,18 @@ import com.devPontes.LeialaoME.model.entities.Usuario;
 
 @Service
 public interface OfertaService {
-
+	
+	
+	List<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, Double valorMinimo);
+	
+	List<OfertaDTO> findOfertasMaisBaixasDeComprador(Usuario usuarioLogado, Double valorMaximo);
+	
 	OfertaDTO fazerPropostaParaLeilao(OfertaDTO oferta, Long leilaoId, Usuario usuarioLogado);
 
 	OfertaDTO aceitarOfertaDeLeilao(Usuario usuarioLogado, Long leilaoId, Long ofertaId);
 	
 	OfertaDTO negarOfertaDeLeilao(Usuario usuarioLogado, Long ofertaId, Long leilaoId);
 	
-	List<OfertaDTO> findOfertasMaisCarasDeComprador(Usuario usuarioLogado, Double valorMinimo);
-	
-	List<OfertaDTO> findOfertasMaisBaixasDeComprador(Usuario usuarioLogado, Double valorMaximo);
-
 	Double calcularNovoLance(Long leilaoId);
 
 

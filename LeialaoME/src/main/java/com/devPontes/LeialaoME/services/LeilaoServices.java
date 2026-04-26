@@ -27,17 +27,16 @@ public interface LeilaoServices {
 	LeilaoDTO definirGanhador(Long leilaoId, Usuario usuarioLogado) throws Exception; 
 	
 	Set<OfertaDTO> visualizarOfertasDeLeilao(Usuario usuarioLogado, Long leilaoId);
-	
-	Set<LeilaoDTO> findLeiloesFuturos(LocalDate proximoMes) throws Exception;
+
+	Set<LeilaoDTO> findLeiloesFuturos(LocalDateTime proximoMes) throws Exception;
 	
 	List<LeilaoDTO> findAll();
 	
-	void fecharLeilao(Long leilaoId);
-
 	Set<LeilaoDTO> findLeiloesDeUsuarioComprador(Usuario usuarioLogado, String cpf, Long leilãoId);
 	
 	List<LeilaoDTO> findLeiloesDeUsuarioVendedor(Usuario usuarioLogado, String cnpj, Long leilãoId);
-
+	
+	void fecharLeilao(Long leilaoId);
 
 
 }

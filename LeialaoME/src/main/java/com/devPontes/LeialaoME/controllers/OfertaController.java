@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,7 +52,7 @@ public class OfertaController {
 
 
 	
-	@PreAuthorize("hasRole('COMPRADOR')")
+	@PreAuthorize("hasRole('VENDEDOR')")
 	@PutMapping("/negar/{leilaoId}/{ofertaId}")
 	public ResponseEntity<OfertaDTO> negarOferta(@AuthenticationPrincipal Usuario usuarioLogado,  
 												@PathVariable Long ofertaId,  
@@ -60,6 +61,11 @@ public class OfertaController {
 		return new ResponseEntity<>(ofertaNegada, HttpStatus.NO_CONTENT);
 	}
 	 
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping
+	public Double verRecalculoDeLeilao() {
+		return null;
+	}
 	
 	
 }

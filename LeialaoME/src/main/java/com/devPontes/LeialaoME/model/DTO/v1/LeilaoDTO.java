@@ -3,16 +3,13 @@ package com.devPontes.LeialaoME.model.DTO.v1;
 import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.RepresentationModel;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonFilter("LeilaoFilter")
-public class LeilaoDTO {
+public class LeilaoDTO extends RepresentationModel<LeilaoDTO> {
 
-	@JsonIgnore
     private Long id;
     
     @JsonProperty("titulo")

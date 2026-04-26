@@ -4,12 +4,12 @@ import java.time.LocalDateTime;
 
 import com.devPontes.LeialaoME.model.entities.enums.StatusOferta;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.hateoas.RepresentationModel;
 
-public class OfertaDTO {
+public class OfertaDTO extends RepresentationModel<OfertaDTO> {
 	
-	@JsonIgnore
+	
     private Long id;
 	
 	@JsonProperty("valor")

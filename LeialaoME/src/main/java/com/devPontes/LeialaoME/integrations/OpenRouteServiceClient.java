@@ -1,7 +1,10 @@
 package com.devPontes.LeialaoME.integrations;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.management.RuntimeErrorException;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,18 +26,15 @@ public class OpenRouteServiceClient {
 
 	public Map<String, Object> verDistanciaCidadeds(CordenadasRequestDTO cordenadas) {
 
-		// ORS quer exatamente isso → uma matriz Double[][]
-		Double[][] coords = cordenadas.getLatlong();
-
+		// ORS quer exatamente isso → uma matriz
+		List<List<Double>> coords = cordenadas.getCordenadas();
 		RestTemplate restTemplate = new RestTemplate();
-		ObjectMapper objMapper = new ObjectMapper();
-
+		
 		// Monta o body da requisição
 		Map<String, Object> body = new HashMap<>();
 		body.put("locations", coords); // coordenadas em [lon, lat]
 		body.put("metrics", new String[] { "distance", "duration" });
 		body.put("units", "km");
-
 		body.put("sources", new int[] { 0 });
 		body.put("destinations", new int[] { 1 });
 
@@ -51,20 +51,21 @@ public class OpenRouteServiceClient {
 
 			if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
 
-				JsonNode repsonsed = response.getBody();
-				JsonNode durations = repsonsed.path("durations");
-				JsonNode distances = repsonsed.path("distances");
-
-				Double duration[][] = objMapper.convertValue(durations, Double[][].class);
-				Double distance[][] = objMapper.convertValue(distances, Double[][].class);
+				JsonNode root = response.getBody();
 				
+				JsonNode durations = root.path("durations");
+				JsonNode distances = root.path("distances");
 
-				Double durationInhours = duration[0][1] / 3600;
-				Double distanceInKm = distance[0][1] /1000;
+				Integer durationSeconds =  durations.get(0).get(0).asInt() / 3600;
+				Double distanceKm = distances.get(0).get(0).asDouble();
+				
+				if(durations.isMissingNode() || distances.isMissingNode()) {
+	                return null;
+				}
 				
 				Map<String, Object> result = new HashMap<>();
-				result.put("DistanceInKm: ", distanceInKm);
-				result.put("Duration: ", durationInhours);
+				result.put("destino_Km", distanceKm);
+                result.put("duracao_destino", durationSeconds);
 				
 				return result;
 			} else {
