@@ -56,7 +56,14 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+            .requestMatchers(
+            		        "/v1/auth/**", 
+            		        "/v3/api-docs/**", 
+            		        "/v3/api-docs.yaml",
+            		        "/swagger-ui/**", 
+            		        "/swagger-ui.html", 
+            		        "/webjars/**",
+            		        "/swagger-resources/**").permitAll()
                 .requestMatchers("/v1/leilao/**").hasAnyRole("COMPRADOR", "VENDEDOR")
                 .requestMatchers("/v1/oferta/**").hasAnyRole("COMPRADOR", "VENDEDOR")
                 .anyRequest().authenticated())

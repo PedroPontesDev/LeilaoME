@@ -11,14 +11,11 @@ import io.swagger.v3.oas.models.info.License;
 public class OpenApiConfig {
 	
 	@Bean
-	public OpenAPI openApiConfig() {
+	public OpenAPI customOpenApiConfig() {
 		return new OpenAPI()
 						.info(new Info()
 						.title("LeilaoME - Plataforma de Leilao Online!")
-						.version("V1")
-						.license(new License()
-						.name("Minha Licensa PUBLICA")
-						.url("http://localhost:8080")));
+						.version("v1"));
 	}
 	
 }
