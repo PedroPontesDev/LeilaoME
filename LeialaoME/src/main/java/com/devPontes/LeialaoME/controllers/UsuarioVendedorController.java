@@ -21,7 +21,7 @@ import com.devPontes.LeialaoME.services.impl.UsuarioVendedorServicesImpl;
 
 @CrossOrigin(origins = {"*"})
 @RestController
-@RequestMapping("/v1/vendedor")
+@RequestMapping("/api/vendedor/v1")
 public class UsuarioVendedorController {
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioVendedorController.class);

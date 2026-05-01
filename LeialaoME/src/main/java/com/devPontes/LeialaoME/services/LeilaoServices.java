@@ -26,8 +26,6 @@ public interface LeilaoServices {
 
 	LeilaoDTO definirGanhador(Long leilaoId, Usuario usuarioLogado) throws Exception; 
 	
-	Set<OfertaDTO> visualizarOfertasDeLeilao(Usuario usuarioLogado, Long leilaoId);
-
 	Set<LeilaoDTO> findLeiloesFuturos(LocalDateTime proximoMes) throws Exception;
 	
 	List<LeilaoDTO> findAll();

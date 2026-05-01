@@ -14,7 +14,7 @@ import com.devPontes.LeialaoME.integrations.OpenRouteServiceClient;
 import com.devPontes.LeialaoME.model.DTO.v1.CordenadasRequestDTO;
 
 @RestController
-@RequestMapping("/v1/distance")
+@RequestMapping("/api/distance/v1/")
 public class OpenRouteController {
 
 	@Autowired

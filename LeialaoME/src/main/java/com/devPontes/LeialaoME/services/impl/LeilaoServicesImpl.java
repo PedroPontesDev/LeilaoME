@@ -169,10 +169,13 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	    	}
 	    }
 	    
+	    if (ofertaGanhadora == null) {
+	        throw new LeilaoException("Nenhuma oferta válida encontrada para definir ganhador.");
+	    }
 	    
 	    //Desativar outras ofertas
 	    for(Oferta oferta : leilaoExistente.getOfertas()) {
-	    	if(oferta.equals(ofertaGanhadora)) {
+	    	if(oferta.getId().equals(ofertaGanhadora.getId())) {
 	    		oferta.setStatusOferta(StatusOferta.GANHADORA);
 	    	} else if(oferta.getStatusOferta() == StatusOferta.ATIVA
 	                || oferta.getStatusOferta() == StatusOferta.ACEITA) {
@@ -188,7 +191,9 @@ public class LeilaoServicesImpl implements LeilaoServices {
 
 	    LeilaoDTO dto = MyMaper.parseObject(leilaoExistente, LeilaoDTO.class);
 	    dto.setVencedorId(ganhador.getId());
-
+	    
+	    dto.add(linkTo(methodOn(LeilaoController.class).definirGanhador(leilaoId, usuarioLogado)).withSelfRel());
+	    
 	    return dto;
 	}
 	
@@ -233,23 +238,6 @@ public class LeilaoServicesImpl implements LeilaoServices {
 	    return MyMaper.parseObject(entity, LeilaoDTO.class);
 	}
 
-	@Override
-	public Set<OfertaDTO> visualizarOfertasDeLeilao(Usuario usuarioLogado, Long leilaoId) {
-		Leilao leilao = leilaoRepository.findById(leilaoId)
-				.orElseThrow(() -> new LeilaoException("Leilão não encontrado com ID" + leilaoId));
-
-		UsuarioVendedor vendedor = (UsuarioVendedor) usuarioRepository.findById(usuarioLogado.getId())
-				.orElseThrow(() -> new SecurityException("Usuário inválido"));
-
-		if(vendedor.getId() != leilao.getVendedor().getId()) {
-			throw new LeilaoException("Esse leilão não pertence a este vendedor");
-		}
-		
-		var ofertas = leilao.getOfertas().stream().collect(Collectors.toSet());
-
-		return MyMaper.parseSetObjects(ofertas, OfertaDTO.class);
-
-	}
 
 	@Override
 	public List<LeilaoDTO> findLeilaoPorStatus(String status) {

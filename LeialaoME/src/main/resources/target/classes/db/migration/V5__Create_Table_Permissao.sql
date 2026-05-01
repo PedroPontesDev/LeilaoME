@@ -1,0 +1,4 @@
+CREATE TABLE tb_permissao (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    usuario_role VARCHAR(50) NOT NULL UNIQUE
+);

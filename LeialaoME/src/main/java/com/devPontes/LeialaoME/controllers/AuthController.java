@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("/api/auth/v1")
 public class AuthController {
 
 	@Autowired

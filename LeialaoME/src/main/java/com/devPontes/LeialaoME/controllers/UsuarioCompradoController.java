@@ -20,7 +20,7 @@ import com.devPontes.LeialaoME.services.impl.UsuarioCompradorServicesImpl;
 
 @CrossOrigin(origins = {"*"})
 @RestController
-@RequestMapping("/v1/comprador")
+@RequestMapping("/api/comrador/v1")
 public class UsuarioCompradoController {
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioCompradoController.class);

@@ -22,7 +22,7 @@ import com.devPontes.LeialaoME.services.impl.OfertaServicesImpl;
 
 
 @RestController
-@RequestMapping("/v1/oferta")
+@RequestMapping("/api/oferta/v1")
 public class OfertaController {
 	private static final Logger log = LoggerFactory.getLogger(OfertaController.class);
 
